@@ -190,6 +190,40 @@ function stopNextSlot() {
   slot.classList.remove('rolling');
   slot.classList.add('locked');
   SoundEngine.playLock();
+  
+  // ── White brake smoke (behind digit, like hard braking) ──
+  for (let i = 0; i < 10; i++) {
+    const smoke = document.createElement('div');
+    smoke.className = 'smoke-particle';
+    // Spread smoke outward and upward
+    smoke.style.setProperty('--smoke-x', (Math.random() * 140 - 70) + 'px');
+    smoke.style.setProperty('--smoke-y', (Math.random() * -120 - 30) + 'px');
+    smoke.style.setProperty('--smoke-s', (2 + Math.random() * 3).toFixed(1));
+    smoke.style.animationDelay = (Math.random() * 0.25) + 's';
+    slot.appendChild(smoke);
+    setTimeout(() => smoke.remove(), 2500);
+  }
+
+  // ── Pixel debris chunks (behind digit, pixelated brake dust) ──
+  for (let i = 0; i < 20; i++) {
+    const spark = document.createElement('div');
+    spark.className = 'spark-pixel';
+    // Start from center-bottom of the tire
+    spark.style.left = (30 + Math.random() * 40) + '%';
+    spark.style.top  = (50 + Math.random() * 40) + '%';
+    // Fly outward in all directions
+    const angle = Math.random() * Math.PI * 2;
+    const dist  = 30 + Math.random() * 100;
+    spark.style.setProperty('--spark-x', Math.cos(angle) * dist + 'px');
+    spark.style.setProperty('--spark-y', Math.sin(angle) * dist + 'px');
+    spark.style.animationDelay = (Math.random() * 0.2) + 's';
+    // Vary pixel size (chunky)
+    const size = 3 + Math.random() * 5;
+    spark.style.width  = size + 'px';
+    spark.style.height = size + 'px';
+    slot.appendChild(spark);
+    setTimeout(() => spark.remove(), 1200);
+  }
 
   AppState.stoppedCount++;
 

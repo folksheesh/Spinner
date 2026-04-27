@@ -48,14 +48,10 @@ const SyncEngine = (() => {
       if (asHost) {
         notifyStatus('ready', code);
         window.dispatchEvent(new CustomEvent('doorprize:pairing_code', { detail: code }));
-      } else {
-        notifyStatus('connected', 'Connected to main display');
-        window.dispatchEvent(new CustomEvent('doorprize:connected'));
       }
     };
 
     eventSource.onerror = () => {
-      // It auto-reconnects, but we can notify
       console.warn("Connection issue, retrying...");
     };
 
@@ -64,12 +60,29 @@ const SyncEngine = (() => {
         const data = JSON.parse(e.data);
         if (data.event === 'message') {
           const payload = JSON.parse(data.message);
-          // Ignore our own messages
+          
+          // Ignore messages sent by ourselves
           if ((asHost && payload.sender === 'host') || (!asHost && payload.sender === 'remote')) return;
+          
+          // Handshake logic
+          if (asHost && payload.type === 'ping') {
+            // Remote says hello, host replies with pong
+            window.dispatchEvent(new CustomEvent('doorprize:remote_connected'));
+            emit('pong');
+            return;
+          }
+          
+          if (!asHost && payload.type === 'pong') {
+            // Host confirmed our ping, we are connected!
+            notifyStatus('connected', 'Connected to main display');
+            window.dispatchEvent(new CustomEvent('doorprize:connected'));
+            return;
+          }
           
           if (asHost && payload.type === 'action') {
             window.dispatchEvent(new CustomEvent('doorprize:remote_connected'));
           }
+
           handleIncoming(payload);
         }
       } catch (err) {}
@@ -86,13 +99,18 @@ const SyncEngine = (() => {
   function connectRemote(code) {
     isHost = false;
     pairingCode = code;
-    notifyStatus('connecting', 'Connecting to main display...');
+    notifyStatus('connecting', 'Connecting...');
     connectToRoom(code, false);
     
-    // Ping host to let them know we are here
-    setTimeout(() => {
-      emit('ping');
-    }, 1000);
+    // Send ping every 2 seconds until we receive a pong
+    const pingInterval = setInterval(() => {
+      if (statusCallback) emit('ping');
+    }, 2000);
+    
+    // Stop pinging once connected
+    window.addEventListener('doorprize:connected', () => {
+      clearInterval(pingInterval);
+    }, { once: true });
   }
 
   // Fallback signature for old calls

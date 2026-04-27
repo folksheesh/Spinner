@@ -31,7 +31,7 @@ const SoundEngine = (() => {
       gain.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 0.04);
       osc.start(ac.currentTime);
       osc.stop(ac.currentTime + 0.05);
-    } catch(e) {}
+    } catch (e) { }
   }
 
   // Lock sound — when a digit is confirmed
@@ -50,7 +50,7 @@ const SoundEngine = (() => {
       gain.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 0.25);
       osc.start(ac.currentTime);
       osc.stop(ac.currentTime + 0.3);
-    } catch(e) {}
+    } catch (e) { }
   }
 
   // Winner fanfare — dramatic reveal
@@ -85,7 +85,7 @@ const SoundEngine = (() => {
       bassGain.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 0.8);
       bass.start(ac.currentTime);
       bass.stop(ac.currentTime + 0.9);
-    } catch(e) {}
+    } catch (e) { }
   }
 
   // Countdown beep
@@ -103,7 +103,7 @@ const SoundEngine = (() => {
       gain.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 0.15);
       osc.start(ac.currentTime);
       osc.stop(ac.currentTime + 0.2);
-    } catch(e) {}
+    } catch (e) { }
   }
 
   // Drum roll effect
