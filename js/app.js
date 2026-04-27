@@ -210,9 +210,10 @@ function stopNextSlot() {
         smoke.style.position = 'absolute';
         smoke.style.left = (slotCenterX + (Math.random() * 80 - 40)) + 'px';
         smoke.style.top  = (slotBottom - 30 - Math.random() * 40) + 'px';
-        smoke.style.setProperty('--smoke-x', (Math.random() * 240 - 120) + 'px');
-        smoke.style.setProperty('--smoke-y', (-20 - Math.random() * 60) + 'px');
-        smoke.style.setProperty('--smoke-s', (2.5 + Math.random() * 2).toFixed(1));
+        const size = Math.floor(15 + Math.random() * 20);
+        smoke.style.setProperty('--size', size + 'px');
+        smoke.style.setProperty('--smoke-x', (Math.random() * 180 - 90) + 'px');
+        smoke.style.setProperty('--smoke-y', (-20 - Math.random() * 80) + 'px');
         smoke.style.animationDelay = (Math.random() * 0.1) + 's';
         stage.appendChild(smoke);
         setTimeout(() => smoke.remove(), 2200);
@@ -266,9 +267,9 @@ function stopNextSlot() {
     
     // Emit braking smoke gradually while slowing down
     if (slowsLeft % 2 === 0) {
-      emitSmoke(2);
-      emitDots(4);
-      emitSparks(2);
+      emitSmoke(5);
+      emitDots(8);
+      emitSparks(3);
     }
     
     if (slowsLeft > 0) {
@@ -283,9 +284,9 @@ function stopNextSlot() {
       SoundEngine.playLock();
       
       // Emit the final big burst of smoke
-      emitSmoke(8);
-      emitSparks(15);
-      emitDots(20);
+      emitSmoke(18);
+      emitSparks(20);
+      emitDots(30);
 
     if (!isLastSlot) {
       setStatus(`Digit ${idx + 1} locked`, 'spinning');

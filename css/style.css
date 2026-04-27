@@ -791,58 +791,79 @@ body.flash {
 
 /* ═══════════════════════════════════════════
    BRAKE SMOKE — Ground-level tire lock-up
-   Smoke rises from BOTTOM like braking on asphalt
+   Pixel Art Style based on reference image
 ═══════════════════════════════════════════ */
 .smoke-particle {
   position: absolute;
-  width: 80px;
-  height: 50px;
-  margin-left: -40px;
+  width: var(--size, 25px);
+  height: var(--size, 25px);
+  margin-left: calc(var(--size, 25px) / -2);
   pointer-events: none;
   z-index: 1;
-  /* Below digit-slot (z-index: 2) */
   opacity: 0;
-  border-radius: 0; /* Square/pixel blocky feel */
+  border-radius: 50%; /* Round puffs like real smoke */
+  
+  /* Core pixel color (Light Grey) */
+  background-color: #b0b4b8;
+  
+  /* Hard pixelated outline / volume shadow (Dark Blue/Grey) */
+  box-shadow: 
+    4px 4px 0 #1b262c,
+    -3px 3px 0 #1b262c,
+    3px -3px 0 #1b262c,
+    -4px -2px 0 #222d34;
+
   image-rendering: pixelated;
-  background:
-    radial-gradient(ellipse 80% 60% at 40% 50%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.95) 48%, transparent 50%),
-    radial-gradient(ellipse 60% 70% at 65% 45%, rgba(240, 240, 240, 0.8) 0%, rgba(240, 240, 240, 0.8) 48%, transparent 50%),
-    radial-gradient(ellipse 90% 50% at 50% 55%, rgba(220, 220, 220, 0.6) 0%, rgba(220, 220, 220, 0.6) 48%, transparent 50%);
-  animation: brakeSmoke 1.8s cubic-bezier(0.05, 0.5, 0.15, 1) forwards;
+  /* Blocky framerate movement for retro feel */
+  animation: brakeSmoke 1.5s steps(12, end) forwards;
 }
 
-/* Alternate particles — wider spread */
+/* Alternate particles — darker or lighter for texture */
 .smoke-particle:nth-child(2n) {
-  width: 100px;
-  height: 40px;
-  margin-left: -50px;
-  background:
-    radial-gradient(ellipse 70% 50% at 35% 50%, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.7) 48%, transparent 50%),
-    radial-gradient(ellipse 50% 60% at 70% 40%, rgba(230, 230, 230, 0.5) 0%, rgba(230, 230, 230, 0.5) 48%, transparent 50%);
+  background-color: #a0a6aa;
+  box-shadow: 
+    5px 5px 0 #151e24,
+    -3px 3px 0 #151e24,
+    3px -2px 0 #151e24;
+}
+
+.smoke-particle:nth-child(3n) {
+  background-color: #c5c8ca;
+  box-shadow: 
+    3px 3px 0 #1b262c,
+    -3px 2px 0 #1b262c,
+    2px -3px 0 #1b262c;
+}
+
+.smoke-particle:nth-child(5n) {
+  background-color: #8a9098;
+  box-shadow: 
+    4px 4px 0 #0e171d,
+    -3px 3px 0 #0e171d;
 }
 
 @keyframes brakeSmoke {
   0% {
-    transform: translate(0, 0) scaleX(0.5) scaleY(0.3);
+    transform: translate(0, 0);
     opacity: 0;
   }
 
   6% {
-    opacity: 0.9;
+    opacity: 1;
   }
 
   20% {
-    /* Smoke expands wide and flat along ground */
-    transform: translate(var(--smoke-x), -10px) scaleX(2) scaleY(0.8);
-    opacity: 0.7;
+    /* Translate outward, no scaling to keep pixels perfectly square */
+    transform: translate(calc(var(--smoke-x) * 0.3), -10px);
+    opacity: 1;
   }
 
   50% {
-    opacity: 0.3;
+    opacity: 1;
   }
 
   100% {
-    transform: translate(var(--smoke-x), var(--smoke-y)) scaleX(var(--smoke-s, 3)) scaleY(1.5);
+    transform: translate(var(--smoke-x), var(--smoke-y));
     opacity: 0;
   }
 }
