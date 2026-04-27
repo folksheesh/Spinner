@@ -357,6 +357,32 @@ function bindEvents() {
       SyncEngine.emit('action');
     }
   });
+
+  window.addEventListener('doorprize:pairing_code', e => {
+    const pill = document.getElementById('remote-pill');
+    const codeEl = document.getElementById('remote-code');
+    if (pill && codeEl) {
+      pill.style.display = 'flex';
+      codeEl.textContent = e.detail;
+      codeEl.style.color = 'var(--accent)';
+    }
+  });
+
+  window.addEventListener('doorprize:remote_connected', () => {
+    const codeEl = document.getElementById('remote-code');
+    if (codeEl) {
+      codeEl.textContent = 'Connected';
+      codeEl.style.color = 'var(--green)';
+    }
+  });
+
+  window.addEventListener('doorprize:remote_disconnected', () => {
+    const codeEl = document.getElementById('remote-code');
+    if (codeEl) {
+      codeEl.textContent = 'Lost';
+      codeEl.style.color = 'var(--red)';
+    }
+  });
 }
 
 // ── Init ───────────────────────────────────────────────────

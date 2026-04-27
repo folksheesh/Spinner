@@ -1,101 +1,115 @@
 /**
- * SYNC ENGINE — Real-time Remote Trigger via BroadcastChannel API
- * Works across tabs/windows on the same browser & same origin.
- * No server needed for same-device scenarios.
- * 
- * For cross-device use, the system falls back to localStorage events
- * (works on same network via shared storage — requires same browser profile)
- * or uses QR code approach with URL hash state.
+ * SYNC ENGINE — Real-time Remote Trigger via PeerJS (WebRTC)
+ * Allows cross-device communication via internet without a custom backend.
  */
 
 const SyncEngine = (() => {
-  const CHANNEL_NAME = 'doorprize_channel';
-  const STORAGE_KEY  = 'doorprize_event';
-  let channel = null;
+  let peer = null;
+  let connection = null;
   let listeners = {};
-  let pollingInterval = null;
-  let lastEventId = null;
   let isHost = false;
-
-  // Try BroadcastChannel first (same browser, cross-tab)
-  function initChannel() {
-    if ('BroadcastChannel' in window) {
-      channel = new BroadcastChannel(CHANNEL_NAME);
-      channel.onmessage = (e) => {
-        handleIncoming(e.data);
-      };
-    }
-  }
-
-  // localStorage polling fallback (cross-device same session not possible,
-  // but works if both tabs open on same device)
-  function startPolling() {
-    pollingInterval = setInterval(() => {
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) return;
-        const event = JSON.parse(raw);
-        if (event.id !== lastEventId) {
-          lastEventId = event.id;
-          handleIncoming(event);
-        }
-      } catch(e) {}
-    }, 200);
-  }
+  let pairingCode = null;
+  let statusCallback = null;
 
   function handleIncoming(data) {
     if (!data || !data.type) return;
     const handler = listeners[data.type];
     if (handler) handler(data.payload);
-    // Also dispatch as DOM event for easy binding
     window.dispatchEvent(new CustomEvent('doorprize:' + data.type, { detail: data.payload }));
   }
 
   function emit(type, payload = {}) {
-    const event = {
-      id: Date.now() + '_' + Math.random().toString(36).slice(2),
-      type,
-      payload,
-      ts: Date.now()
-    };
-    // BroadcastChannel
-    if (channel) channel.postMessage(event);
-    // localStorage fallback
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(event));
-    } catch(e) {}
-    // Also handle locally so the sender sees it
-    handleIncoming(event);
+    const event = { type, payload, ts: Date.now() };
+    if (connection && connection.open) {
+      connection.send(event);
+    }
+    // Also handle locally for host UI updates
+    if (isHost) handleIncoming(event);
   }
 
-  function on(type, handler) {
-    listeners[type] = handler;
+  function on(type, handler) { listeners[type] = handler; }
+  function off(type) { delete listeners[type]; }
+  function setStatusCallback(cb) { statusCallback = cb; }
+  function notifyStatus(status, text) { if (statusCallback) statusCallback(status, text); }
+
+  function initHost() {
+    isHost = true;
+    if (typeof Peer === 'undefined') {
+      console.warn('PeerJS not loaded. Remote will not work across internet.');
+      return;
+    }
+    
+    // Generate 4-digit code
+    pairingCode = Math.floor(1000 + Math.random() * 9000).toString();
+    const peerId = 'doorprize-v1-' + pairingCode;
+    
+    notifyStatus('connecting', 'Generating pairing code...');
+    
+    peer = new Peer(peerId);
+    
+    peer.on('open', (id) => {
+      notifyStatus('ready', pairingCode);
+      window.dispatchEvent(new CustomEvent('doorprize:pairing_code', { detail: pairingCode }));
+    });
+
+    peer.on('connection', (conn) => {
+      connection = conn; // Keep single remote connection
+      notifyStatus('connected', 'Remote connected!');
+      window.dispatchEvent(new CustomEvent('doorprize:remote_connected'));
+      
+      conn.on('data', handleIncoming);
+      conn.on('close', () => {
+        connection = null;
+        notifyStatus('ready', pairingCode);
+        window.dispatchEvent(new CustomEvent('doorprize:remote_disconnected'));
+      });
+    });
+
+    peer.on('error', (err) => {
+      console.error(err);
+      notifyStatus('error', 'Connection error');
+    });
   }
 
-  function off(type) {
-    delete listeners[type];
+  function connectRemote(code) {
+    isHost = false;
+    if (typeof Peer === 'undefined') return;
+    notifyStatus('connecting', 'Connecting to main display...');
+    
+    peer = new Peer();
+    
+    peer.on('open', () => {
+      const targetId = 'doorprize-v1-' + code;
+      connection = peer.connect(targetId, { reliable: true });
+      
+      connection.on('open', () => {
+        notifyStatus('connected', 'Connected to main display');
+        window.dispatchEvent(new CustomEvent('doorprize:connected'));
+      });
+
+      connection.on('data', handleIncoming);
+      
+      connection.on('close', () => {
+        notifyStatus('error', 'Disconnected from main display');
+        window.dispatchEvent(new CustomEvent('doorprize:disconnected'));
+      });
+    });
+
+    peer.on('error', (err) => {
+      console.error(err);
+      notifyStatus('error', 'Connection failed');
+      window.dispatchEvent(new CustomEvent('doorprize:error'));
+    });
   }
 
-  function setHost(val) {
-    isHost = val;
-    localStorage.setItem('doorprize_role', val ? 'host' : 'remote');
-  }
-
-  function getRole() {
-    return localStorage.getItem('doorprize_role') || 'host';
-  }
-
-  // Generate a shareable remote URL
-  function getRemoteURL() {
-    const base = window.location.href.replace('index.html', '').replace(/\/$/, '');
-    return base + '/remote.html';
-  }
-
+  // Fallback signature for old calls
   function init(role) {
-    initChannel();
-    startPolling();
-    setHost(role === 'host');
+    if (role === 'host') initHost();
+  }
+  
+  function getRole() {
+    return isHost ? 'host' : 'remote';
   }
 
-  return { init, emit, on, off, getRole, getRemoteURL, setHost };
+  return { init, initHost, connectRemote, emit, on, off, setStatusCallback, getRole };
 })();

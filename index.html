@@ -25,6 +25,9 @@
       <div class="stat-pill">Peserta <span class="num" id="stat-total">0</span></div>
       <div class="stat-pill">Sisa <span class="num" id="stat-remaining">0</span></div>
       <div class="stat-pill">Pemenang <span class="num gold" id="stat-winners">0</span></div>
+      <div class="stat-pill" style="margin-left:1rem; border: 1px solid var(--accent-glow); padding: 2px 8px; border-radius: 12px; display: none;" id="remote-pill">
+        Remote Code: <span class="num gold" id="remote-code">----</span>
+      </div>
     </div>
     <div class="top-right">
       <div id="theme-switcher"></div>
@@ -104,6 +107,7 @@
     </div>
   </div>
 
+  <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
   <script src="js/database.js"></script>
   <script src="js/sound.js"></script>
   <script src="js/sync.js"></script>

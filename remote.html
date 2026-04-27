@@ -335,6 +335,34 @@
       text-transform: uppercase;
     }
 
+    /* Pairing Screen */
+    .pairing-screen {
+      position: absolute; inset: 0;
+      background: var(--bg);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      z-index: 1000; padding: 2rem;
+      transition: opacity 0.5s;
+    }
+    .pairing-screen.hidden { opacity: 0; pointer-events: none; }
+    .ps-title { font-size: 1.5rem; font-family: 'Outfit', sans-serif; font-weight: 800; margin-bottom: 0.5rem; }
+    .ps-sub { font-size: 0.8rem; color: var(--text-2); margin-bottom: 2rem; text-align: center; }
+    .ps-input {
+      background: rgba(255,255,255,0.05); border: 2px solid var(--border);
+      color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 2rem;
+      text-align: center; width: 100%; max-width: 250px; border-radius: 12px;
+      padding: 1rem; margin-bottom: 1.5rem; letter-spacing: 0.2em; outline: none;
+      transition: all 0.3s;
+    }
+    .ps-input:focus { border-color: var(--accent); box-shadow: 0 0 15px var(--accent-glow); }
+    .ps-btn {
+      background: var(--accent); color: var(--bg); font-weight: 700; font-family: 'Outfit', sans-serif;
+      font-size: 1.1rem; border: none; border-radius: 12px; padding: 1rem 2rem;
+      width: 100%; max-width: 250px; cursor: pointer; transition: all 0.2s;
+    }
+    .ps-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px var(--accent-glow); }
+    .ps-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .ps-status { margin-top: 1rem; font-size: 0.75rem; color: var(--accent-hot); height: 1rem; }
+
     /* Toast */
     .toast {
       position: fixed;
@@ -365,6 +393,16 @@
 </head>
 
 <body>
+
+  <!-- Pairing Screen -->
+  <div class="pairing-screen" id="pairing-screen">
+    <div class="r-eyebrow">Door Prize 2026</div>
+    <h2 class="ps-title">Remote Pairing</h2>
+    <p class="ps-sub">Enter the 4-digit code shown on the main display</p>
+    <input type="text" id="pairing-input" class="ps-input" maxlength="4" placeholder="----" autocomplete="off" />
+    <button class="ps-btn" id="pairing-btn">Connect</button>
+    <div class="ps-status" id="pairing-status"></div>
+  </div>
 
   <div class="r-header">
     <p class="r-eyebrow">Door Prize 2026</p>
@@ -400,10 +438,15 @@
 
   <div class="toast" id="toast">✓ Sent</div>
 
+  <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
   <script src="js/database.js"></script>
   <script src="js/sync.js"></script>
   <script>
-    SyncEngine.init('remote');
+    const pairingScreen = document.getElementById('pairing-screen');
+    const pairingInput = document.getElementById('pairing-input');
+    const pairingBtn = document.getElementById('pairing-btn');
+    const pairingStatus = document.getElementById('pairing-status');
+    const connStatus = document.querySelector('.conn');
 
     const btn = document.getElementById('big-btn');
     const icon = document.getElementById('btn-icon');
@@ -414,6 +457,26 @@
     const toast = document.getElementById('toast');
     const winCard = document.getElementById('win-card');
     let cooldown = false;
+
+    SyncEngine.setStatusCallback((status, text) => {
+      pairingStatus.textContent = text;
+      if (status === 'connected') {
+        pairingScreen.classList.add('hidden');
+        connStatus.innerHTML = '<span class="conn-dot"></span> Connected';
+      } else if (status === 'error') {
+        pairingBtn.disabled = false;
+        pairingBtn.textContent = 'Connect';
+      }
+    });
+
+    pairingBtn.addEventListener('click', () => {
+      const code = pairingInput.value.trim();
+      if (code.length === 4) {
+        pairingBtn.disabled = true;
+        pairingBtn.textContent = 'Connecting...';
+        SyncEngine.connectRemote(code);
+      }
+    });
 
     function showToast(msg) {
       toast.textContent = '✓ ' + msg;
