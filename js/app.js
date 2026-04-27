@@ -1,7 +1,6 @@
 /**
- * MAIN APP v2 — Semua slot berputar, STOP mengunci satu per satu
+ * MAIN APP v3 — Cinematic Stage Build
  */
-
 const PHASE = { IDLE: 'idle', SPINNING: 'spinning', DONE: 'done' };
 
 const AppState = {
@@ -15,10 +14,12 @@ const AppState = {
 
 const DOM = {
   get digitSlots()        { return document.querySelectorAll('.digit-slot'); },
+  get digitsStage()       { return document.getElementById('digits-stage'); },
   get winnerPanel()       { return document.getElementById('winner-panel'); },
   get winnerName()        { return document.getElementById('winner-name'); },
   get winnerId()          { return document.getElementById('winner-id-display'); },
   get winnerDept()        { return document.getElementById('winner-dept'); },
+  get winnerDismiss()     { return document.getElementById('winner-dismiss'); },
   get actionBtn()         { return document.getElementById('action-btn'); },
   get resetBtn()          { return document.getElementById('reset-btn'); },
   get soundBtn()          { return document.getElementById('sound-btn'); },
@@ -32,29 +33,45 @@ const DOM = {
   get particles()         { return document.getElementById('particles'); },
 };
 
-// ── Particles ──────────────────────────────────────────────
+// ── Particles (subtle, small) ──────────────────────────────
 function initParticles() {
   const c = DOM.particles; if (!c) return;
-  for (let i = 0; i < 60; i++) {
+  for (let i = 0; i < 35; i++) {
     const p = document.createElement('div');
     p.className = 'particle';
-    p.style.cssText = `left:${Math.random()*100}%;top:${Math.random()*100}%;animation-delay:${Math.random()*8}s;animation-duration:${6+Math.random()*6}s;width:${2+Math.random()*4}px;height:${2+Math.random()*4}px;opacity:${0.1+Math.random()*0.4}`;
+    const size = 1.5 + Math.random() * 2.5;
+    p.style.cssText = `
+      left: ${Math.random() * 100}%;
+      top: ${20 + Math.random() * 70}%;
+      width: ${size}px; height: ${size}px;
+      animation-delay: ${Math.random() * 10}s;
+      animation-duration: ${8 + Math.random() * 8}s;
+      opacity: ${0.15 + Math.random() * 0.3};
+    `;
     c.appendChild(p);
   }
 }
 
-// ── Confetti ───────────────────────────────────────────────
+// ── Confetti (winner celebration) ──────────────────────────
 function launchConfetti() {
-  const colors = ['#FFD700','#FF6B6B','#4ECDC4','#45B7D1','#FFEAA7','#DDA0DD'];
+  const colors = ['#D4A843','#F0C45A','#3BE8A0','#60A5FA','#F472B6','#FBBF24','#A78BFA'];
   const c = DOM.confettiContainer; if (!c) return;
-  for (let i = 0; i < 120; i++) {
+  for (let i = 0; i < 100; i++) {
     setTimeout(() => {
       const el = document.createElement('div');
       el.className = 'confetti-piece';
-      el.style.cssText = `left:${Math.random()*100}%;background:${colors[Math.floor(Math.random()*colors.length)]};width:${6+Math.random()*10}px;height:${6+Math.random()*10}px;animation-duration:${2+Math.random()*2}s;animation-delay:${Math.random()*0.5}s;border-radius:${Math.random()>.5?'50%':'2px'};transform:rotate(${Math.random()*360}deg)`;
+      const w = 5 + Math.random() * 10;
+      const h = 5 + Math.random() * 10;
+      el.style.cssText = `
+        left: ${Math.random() * 100}%;
+        background: ${colors[Math.floor(Math.random() * colors.length)]};
+        width: ${w}px; height: ${h}px;
+        animation-duration: ${2 + Math.random() * 2.5}s;
+        border-radius: ${Math.random() > 0.4 ? '50%' : '2px'};
+      `;
       c.appendChild(el);
-      setTimeout(() => el.remove(), 4000);
-    }, i * 15);
+      setTimeout(() => el.remove(), 5000);
+    }, i * 18);
   }
 }
 
@@ -62,24 +79,28 @@ function launchConfetti() {
 function setStatus(text, type = 'idle') {
   const el = DOM.statusText; if (!el) return;
   el.textContent = text;
-  el.className = 'status-text status-' + type;
+  el.className = 'status-line' + (type !== 'idle' ? ' status-' + type : '');
 }
 
 function updateStats() {
   if (DOM.statsTotal)     DOM.statsTotal.textContent     = DB.getTotalParticipants();
   if (DOM.statsRemaining) DOM.statsRemaining.textContent = DB.getRemainingCount();
   if (DOM.statsWinners)   DOM.statsWinners.textContent   = DB.getWinnersCount();
-  if (DOM.prizeRound)     DOM.prizeRound.textContent     = `Undian ke-${AppState.prizeRound}`;
+  if (DOM.prizeRound)     DOM.prizeRound.textContent     = `Draw #${AppState.prizeRound}`;
 }
 
 function updateWinnersList() {
   const list = DOM.winnersList; if (!list) return;
   list.innerHTML = '';
-  [...DB.winners].reverse().forEach((w, i) => {
-    const item = document.createElement('div');
-    item.className = 'winners-list-item';
-    item.innerHTML = `<span class="wl-round">#${DB.winners.length - i}</span><span class="wl-id">${w.id}</span><span class="wl-name">${w.name}</span>`;
-    list.appendChild(item);
+  if (DB.winners.length === 0) {
+    list.innerHTML = '<span class="empty-tray">No winners yet</span>';
+    return;
+  }
+  [...DB.winners].reverse().forEach(w => {
+    const chip = document.createElement('div');
+    chip.className = 'wh-chip';
+    chip.innerHTML = `<span class="wh-id">${w.id}</span><span class="wh-name">${w.name}</span>`;
+    list.appendChild(chip);
   });
 }
 
@@ -89,112 +110,115 @@ function resetDigitDisplay() {
     const d = slot.querySelector('.digit-display');
     if (d) d.textContent = '?';
   });
+  DOM.digitsStage?.classList.remove('active');
 }
 
-// ── Button State ───────────────────────────────────────────
+// ── Button UI ──────────────────────────────────────────────
 function updateButton() {
   const btn = DOM.actionBtn; if (!btn) return;
-  const textEl = btn.querySelector('.btn-text');
-  const subEl  = btn.querySelector('.btn-sub');
+  const text = btn.querySelector('.btn-text');
+  const sub  = btn.querySelector('.btn-sub');
 
   if (AppState.phase === PHASE.IDLE || AppState.phase === PHASE.DONE) {
     btn.className = 'action-btn btn-start';
-    if (textEl) textEl.textContent = AppState.phase === PHASE.DONE ? '▶ UNDIAN BERIKUTNYA' : '▶ MULAI UNDIAN';
-    if (subEl)  subEl.textContent  = 'Klik untuk memutar semua slot';
+    text.textContent = AppState.phase === PHASE.DONE ? 'Next Draw' : 'Start Draw';
+    sub.textContent  = 'Spin all digits';
     btn.disabled = false;
   } else {
     btn.className = 'action-btn btn-stop';
-    if (textEl) textEl.textContent = '⏹ STOP';
-    if (subEl)  subEl.textContent  = `Kunci digit ke-${AppState.stoppedCount + 1} dari 6`;
+    text.textContent = 'Stop';
+    sub.textContent  = `Lock digit ${AppState.stoppedCount + 1} of 6`;
     btn.disabled = false;
   }
 }
 
-// ── START — semua slot berputar ────────────────────────────
+// ── START ──────────────────────────────────────────────────
 function startAllSpinning() {
   const winner = DB.pickRandom();
-  if (!winner) { setStatus('⚠️ Semua peserta sudah menang!', 'warning'); return; }
+  if (!winner) { setStatus('All participants have won!', 'warning'); return; }
 
   SoundEngine.unlock();
   AppState.currentWinner = winner;
   AppState.stoppedCount  = 0;
   AppState.phase         = PHASE.SPINNING;
 
+  // Dismiss winner panel if visible
   DOM.winnerPanel.classList.remove('visible');
   resetDigitDisplay();
-  setStatus('🎰 Semua slot berputar! Tekan STOP untuk mengunci digit.', 'spinning');
+  DOM.digitsStage?.classList.add('active');
 
-  // Putar semua 6 slot sekaligus
+  setStatus('Spinning...', 'spinning');
+
+  // Start rolling all 6 slots
   DOM.digitSlots.forEach((slot, i) => {
     const display = slot.querySelector('.digit-display');
     slot.classList.add('rolling');
-    slot.classList.remove('revealed','locked');
-    display.textContent = Math.floor(Math.random() * 10);
-    const speed = 55 + i * 7; // sedikit berbeda tiap slot
+    slot.classList.remove('revealed', 'locked');
+    const speed = 50 + i * 8;
     AppState.rollIntervals[i] = setInterval(() => {
       display.textContent = Math.floor(Math.random() * 10);
     }, speed);
   });
 
-  // Suara tick bersama (bukan per slot — supaya tidak terlalu berisik)
+  // Tick sound
   AppState.tickInterval = setInterval(() => {
-    SoundEngine.playTick(0.7 + Math.random() * 0.5);
-  }, 110);
+    SoundEngine.playTick(0.6 + Math.random() * 0.5);
+  }, 100);
 
   updateButton();
   updateStats();
   SyncEngine.emit('phase_change', { phase: PHASE.SPINNING, stoppedCount: 0 });
 }
 
-// ── STOP — kunci 1 slot ────────────────────────────────────
+// ── STOP (one slot) ────────────────────────────────────────
 function stopNextSlot() {
   const idx = AppState.stoppedCount;
   if (idx >= 6 || AppState.phase !== PHASE.SPINNING) return;
 
   const targetDigit = AppState.currentWinner.id[idx];
-
-  // Hentikan interval slot ini
   clearInterval(AppState.rollIntervals[idx]);
   AppState.rollIntervals[idx] = null;
 
-  // Set digit akhir + animasi lock
   const slot    = DOM.digitSlots[idx];
   const display = slot.querySelector('.digit-display');
   display.textContent = targetDigit;
   slot.classList.remove('rolling');
-  slot.classList.add('revealed');
-  setTimeout(() => { slot.classList.add('locked'); SoundEngine.playLock(); }, 60);
+  slot.classList.add('locked');
+  SoundEngine.playLock();
 
   AppState.stoppedCount++;
 
   if (AppState.stoppedCount < 6) {
-    setStatus(`🔒 Digit ${AppState.stoppedCount} terkunci! Tekan STOP lagi...`, 'spinning');
+    setStatus(`Digit ${AppState.stoppedCount} locked`, 'spinning');
     updateButton();
   }
 
   SyncEngine.emit('phase_change', { phase: PHASE.SPINNING, stoppedCount: AppState.stoppedCount });
 
-  // Semua terkunci → tampilkan pemenang
+  // All locked → winner
   if (AppState.stoppedCount === 6) {
     clearInterval(AppState.tickInterval);
     AppState.tickInterval = null;
     AppState.phase = PHASE.DONE;
-    setTimeout(() => showWinner(AppState.currentWinner), 700);
+    DOM.digitsStage?.classList.remove('active');
+    setTimeout(() => showWinner(AppState.currentWinner), 600);
   }
 }
 
-// ── Show Winner ────────────────────────────────────────────
+// ── WINNER REVEAL ──────────────────────────────────────────
 function showWinner(winner) {
   DB.markWinner(winner);
-  DOM.winnerName.textContent = winner.name;
   DOM.winnerId.textContent   = winner.id;
+  DOM.winnerName.textContent = winner.name;
   DOM.winnerDept.textContent = winner.department;
   DOM.winnerPanel.classList.add('visible');
+
   SoundEngine.playWinner();
   launchConfetti();
-  setStatus('🏆 SELAMAT KEPADA PEMENANG!', 'winner');
+
   document.body.classList.add('flash');
-  setTimeout(() => document.body.classList.remove('flash'), 600);
+  setTimeout(() => document.body.classList.remove('flash'), 500);
+
   AppState.prizeRound++;
   updateStats();
   updateWinnersList();
@@ -202,7 +226,13 @@ function showWinner(winner) {
   SyncEngine.emit('winner_revealed', { winner });
 }
 
-// ── Main action dispatcher ─────────────────────────────────
+// ── Dismiss winner panel ───────────────────────────────────
+function dismissWinner() {
+  DOM.winnerPanel.classList.remove('visible');
+  setStatus('Ready', 'idle');
+}
+
+// ── Action dispatcher ──────────────────────────────────────
 function handleAction() {
   if (AppState.phase === PHASE.IDLE || AppState.phase === PHASE.DONE) {
     startAllSpinning();
@@ -211,48 +241,47 @@ function handleAction() {
   }
 }
 
-// ── Reset semua ────────────────────────────────────────────
-function stopAllIntervals() {
+// ── Reset ──────────────────────────────────────────────────
+function resetAll() {
   AppState.rollIntervals.forEach(id => clearInterval(id));
   AppState.rollIntervals = [];
   clearInterval(AppState.tickInterval);
   AppState.tickInterval = null;
-}
 
-function resetAll() {
-  stopAllIntervals();
-  if (!confirm('Reset semua data pemenang? Semua peserta kembali ke pool.')) return;
-  AppState.phase        = PHASE.IDLE;
+  if (!confirm('Reset all winners?')) return;
+
+  AppState.phase = PHASE.IDLE;
   AppState.stoppedCount = 0;
   AppState.currentWinner = null;
-  AppState.prizeRound    = 1;
+  AppState.prizeRound = 1;
   DB.resetWinners();
   resetDigitDisplay();
   DOM.winnerPanel.classList.remove('visible');
-  setStatus('✨ Siap untuk memulai undian!', 'idle');
+  setStatus('Ready', 'idle');
   updateButton();
   updateStats();
   updateWinnersList();
 }
 
-// ── QR Code ────────────────────────────────────────────────
-function generateQR() {
-  const qrContainer = document.getElementById('qr-container'); if (!qrContainer) return;
-  const url = SyncEngine.getRemoteURL();
-  qrContainer.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(url)}" alt="QR Remote" class="qr-image"><p class="qr-url">${url}</p>`;
-}
-
-// ── Event Bindings ─────────────────────────────────────────
+// ── Bindings ───────────────────────────────────────────────
 function bindEvents() {
   DOM.actionBtn?.addEventListener('click', () => { SoundEngine.unlock(); SyncEngine.emit('action'); });
   DOM.resetBtn?.addEventListener('click', resetAll);
+  DOM.winnerDismiss?.addEventListener('click', dismissWinner);
+
   DOM.soundBtn?.addEventListener('click', () => {
     const on = SoundEngine.toggle();
     DOM.soundBtn.textContent = on ? '🔊' : '🔇';
   });
+
   window.addEventListener('doorprize:action', handleAction);
+
   document.addEventListener('keydown', e => {
-    if (e.code === 'Space') { e.preventDefault(); SoundEngine.unlock(); SyncEngine.emit('action'); }
+    if (e.code === 'Space') {
+      e.preventDefault();
+      SoundEngine.unlock();
+      SyncEngine.emit('action');
+    }
   });
 }
 
@@ -263,10 +292,9 @@ function init() {
   updateStats();
   updateWinnersList();
   bindEvents();
-  generateQR();
   updateButton();
-  setStatus('✨ Siap untuk memulai undian!', 'idle');
-  setTimeout(() => document.body.classList.add('loaded'), 300);
+  setStatus('Ready', 'idle');
+  setTimeout(() => document.body.classList.add('loaded'), 200);
 }
 
 document.addEventListener('DOMContentLoaded', init);

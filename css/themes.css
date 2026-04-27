@@ -1,328 +1,215 @@
-/* ═══════════════════════════════════════════════════════
-   THEME SWITCHER UI
-═══════════════════════════════════════════════════════ */
-.theme-switcher-wrap {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  z-index: 100;
-  display: flex;
-  justify-content: center;
-  padding: .6rem 1rem;
-  background: rgba(0,0,0,0.45);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-}
-
-#theme-switcher {
-  display: flex;
-  gap: .4rem;
-  overflow-x: auto;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  max-width: 900px;
-  width: 100%;
-}
-#theme-switcher::-webkit-scrollbar { display: none; }
-
-.theme-btn {
-  display: flex;
-  align-items: center;
-  gap: .4rem;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 100px;
-  padding: .32rem .8rem .32rem .45rem;
-  color: rgba(255,255,255,0.5);
-  font-family: 'Inter', sans-serif;
-  font-size: .7rem;
-  font-weight: 500;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: all .2s ease;
-  flex-shrink: 0;
-}
-.theme-btn:hover {
-  background: rgba(255,255,255,0.08);
-  color: rgba(255,255,255,0.85);
-  border-color: rgba(255,255,255,0.15);
-}
-.theme-btn.active {
-  background: rgba(255,255,255,0.1);
-  border-color: rgba(255,255,255,0.25);
-  color: #fff;
-}
-.theme-swatch {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  flex-shrink: 0;
-  box-shadow: 0 0 6px rgba(255,255,255,0.15);
-}
-.theme-label { letter-spacing: .02em; }
-
-/* Push main content below fixed bar */
-.main-wrapper { padding-top: 3.5rem; }
+/* ═══════════════════════════════════════════
+   THEME SWITCHER UI (minimal circles in top bar)
+═══════════════════════════════════════════ */
+/* Handled in style.css for .theme-btn */
 
 
-/* ═══════════════════════════════════════════════════════
-   THEME 1: ELEGANT NIGHT (default, already in style.css)
-   — no overrides needed, it IS the default
-═══════════════════════════════════════════════════════ */
-body.theme-elegant {
-  /* This is already the default in style.css */
-}
+/* ═══════════════════════════════════════════
+   THEME 1: ELEGANT (Default — no overrides)
+═══════════════════════════════════════════ */
 
 
-/* ═══════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════
    THEME 2: NEON ARCADE
-   — jet black, neon green/cyan, full Orbitron, scanlines
-═══════════════════════════════════════════════════════ */
+   Jet black, neon green, scanlines
+═══════════════════════════════════════════ */
 body.theme-arcade {
-  --bg:          #050508;
-  --surface:     #09090f;
-  --surface2:    #0e0e18;
+  --bg:          #020205;
+  --bg-mid:      #050510;
+  --surface:     rgba(0,255,136,0.03);
+  --surface-2:   rgba(0,255,136,0.06);
   --border:      rgba(0,255,136,0.1);
-  --border-gold: rgba(0,255,136,0.3);
-  --gold:        #00FF88;
-  --gold-bright: #00FFBB;
-  --gold-glow:   rgba(0,255,136,0.15);
-  --text:        #DFFFEC;
-  --text-muted:  #3A7A5A;
-  --text-dim:    rgba(0,255,136,0.2);
+  --accent:      #00FF88;
+  --accent-hot:  #00FFAA;
+  --accent-dim:  rgba(0,255,136,0.12);
+  --accent-glow: rgba(0,255,136,0.35);
   --green:       #00FF88;
-  --red:         #FF0066;
-  --red-glow:    rgba(255,0,102,0.3);
-
-  font-family: 'Orbitron', monospace;
-  background-image:
-    radial-gradient(ellipse 60% 40% at 50% 0%,   rgba(0,255,136,0.07) 0%, transparent 65%),
-    radial-gradient(ellipse 40% 30% at 85% 80%,  rgba(0,100,255,0.06) 0%, transparent 60%);
+  --green-dim:   rgba(0,255,136,0.08);
+  --green-glow:  rgba(0,255,136,0.35);
+  --red:         #FF0055;
+  --text:        #D0FFE8;
+  --text-2:      rgba(208,255,232,0.5);
+  --text-3:      rgba(0,255,136,0.2);
 }
 
-/* Scanline overlay */
-body.theme-arcade::before {
+body.theme-arcade::after {
   content: '';
   position: fixed;
   inset: 0;
   background: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 2px,
-    rgba(0,0,0,0.12) 2px,
-    rgba(0,0,0,0.12) 4px
+    0deg, transparent, transparent 2px,
+    rgba(0,0,0,0.12) 2px, rgba(0,0,0,0.12) 4px
   );
   pointer-events: none;
-  z-index: 0;
-  animation: scanMove 8s linear infinite;
+  z-index: 3;
+  animation: scanDrift 10s linear infinite;
 }
-@keyframes scanMove {
+@keyframes scanDrift {
   from { background-position: 0 0; }
-  to   { background-position: 0 100px; }
+  to   { background-position: 0 80px; }
 }
 
-body.theme-arcade .site-title {
-  font-family: 'Orbitron', monospace;
-  font-size: clamp(1.8rem, 5vw, 3.2rem);
-  font-weight: 900;
-  color: var(--gold);
-  text-shadow: 0 0 20px rgba(0,255,136,0.5), 0 0 60px rgba(0,255,136,0.2);
-  letter-spacing: .12em;
+body.theme-arcade .hero-title {
+  color: var(--accent);
+  text-shadow: 0 0 30px var(--accent-glow), 0 0 80px rgba(0,255,136,0.15);
+  font-family: var(--font-mono);
+  letter-spacing: 0.05em;
 }
-body.theme-arcade .title-accent { color: #00BBFF; text-shadow: 0 0 10px rgba(0,187,255,0.4); }
-body.theme-arcade .event-tag { color: #00BBFF; border-color: rgba(0,187,255,0.3); background: rgba(0,187,255,0.06); }
-body.theme-arcade .digit-slot.rolling { box-shadow: 0 0 20px rgba(0,255,136,0.3) inset, 0 0 30px rgba(0,255,136,0.2); }
-body.theme-arcade .winner-id-display { text-shadow: 0 0 30px rgba(0,255,136,0.5); }
-body.theme-arcade .btn-start { background: var(--gold); color: #050508; box-shadow: 0 4px 24px rgba(0,255,136,0.4); }
-body.theme-arcade .stats-strip { border-color: rgba(0,255,136,0.15); }
+body.theme-arcade .hero-sub { color: #00BBFF; }
+body.theme-arcade .event-badge { color: #00BBFF; }
+body.theme-arcade .btn-start { background: var(--accent); color: #020205; }
+body.theme-arcade .light-beam { background: linear-gradient(180deg, transparent, rgba(0,255,136,0.12), transparent); }
 
 
-/* ═══════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════
    THEME 3: COSMIC DREAM
-   — deep space purple, violet stars, nebula glow
-═══════════════════════════════════════════════════════ */
+   Deep purple, violet nebula, twinkling stars
+═══════════════════════════════════════════ */
 body.theme-cosmic {
-  --bg:          #060412;
-  --surface:     #0d0920;
-  --surface2:    #150f2e;
-  --border:      rgba(139,92,246,0.12);
-  --border-gold: rgba(167,139,250,0.28);
-  --gold:        #A78BFA;
-  --gold-bright: #C4B5FD;
-  --gold-glow:   rgba(167,139,250,0.15);
-  --text:        #EDE9FE;
-  --text-muted:  #7C6FAA;
-  --text-dim:    rgba(167,139,250,0.25);
+  --bg:          #04020e;
+  --bg-mid:      #0a0620;
+  --surface:     rgba(139,92,246,0.04);
+  --surface-2:   rgba(139,92,246,0.07);
+  --border:      rgba(139,92,246,0.1);
+  --accent:      #A78BFA;
+  --accent-hot:  #C4B5FD;
+  --accent-dim:  rgba(167,139,250,0.12);
+  --accent-glow: rgba(167,139,250,0.35);
   --green:       #34D399;
+  --green-dim:   rgba(52,211,153,0.08);
+  --green-glow:  rgba(52,211,153,0.35);
   --red:         #F472B6;
-  --red-glow:    rgba(244,114,182,0.3);
-
-  background-image:
-    radial-gradient(ellipse 80% 50% at 50% -5%,  rgba(139,92,246,0.2)  0%, transparent 60%),
-    radial-gradient(ellipse 50% 40% at 10% 60%,  rgba(236,72,153,0.08) 0%, transparent 55%),
-    radial-gradient(ellipse 40% 30% at 90% 30%,  rgba(59,130,246,0.08) 0%, transparent 55%);
+  --text:        #EDE9FE;
+  --text-2:      rgba(237,233,254,0.5);
+  --text-3:      rgba(167,139,250,0.2);
 }
 
-/* Star field */
-body.theme-cosmic::before {
+body.theme-cosmic .stage-bg::before {
+  background:
+    radial-gradient(ellipse 40% 30% at 50% 10%, rgba(139,92,246,0.15) 0%, transparent 70%),
+    radial-gradient(ellipse 30% 25% at 20% 70%, rgba(236,72,153,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 30% 25% at 80% 40%, rgba(59,130,246,0.06) 0%, transparent 60%);
+}
+
+/* Stars */
+body.theme-cosmic::after {
   content: '';
   position: fixed;
   inset: 0;
   background-image:
-    radial-gradient(circle 1px at 20%  15%, rgba(255,255,255,0.7) 0%, transparent 100%),
-    radial-gradient(circle 1px at 80%  25%, rgba(255,255,255,0.5) 0%, transparent 100%),
-    radial-gradient(circle 1px at 45%  60%, rgba(255,255,255,0.6) 0%, transparent 100%),
-    radial-gradient(circle 1px at 70%  80%, rgba(255,255,255,0.4) 0%, transparent 100%),
-    radial-gradient(circle 1px at 15%  75%, rgba(255,255,255,0.5) 0%, transparent 100%),
-    radial-gradient(circle 1px at 60%  10%, rgba(255,255,255,0.7) 0%, transparent 100%),
-    radial-gradient(circle 1px at 35%  90%, rgba(255,255,255,0.4) 0%, transparent 100%),
-    radial-gradient(circle 2px at 90%  60%, rgba(167,139,250,0.8) 0%, transparent 100%),
-    radial-gradient(circle 2px at 25%  40%, rgba(196,181,253,0.6) 0%, transparent 100%),
-    radial-gradient(circle 1px at 55%  35%, rgba(255,255,255,0.5) 0%, transparent 100%);
+    radial-gradient(circle 1px at 15% 20%, rgba(255,255,255,0.6) 0%, transparent 100%),
+    radial-gradient(circle 1px at 75% 15%, rgba(255,255,255,0.5) 0%, transparent 100%),
+    radial-gradient(circle 1px at 40% 55%, rgba(255,255,255,0.4) 0%, transparent 100%),
+    radial-gradient(circle 1px at 65% 75%, rgba(255,255,255,0.5) 0%, transparent 100%),
+    radial-gradient(circle 2px at 88% 50%, rgba(167,139,250,0.7) 0%, transparent 100%),
+    radial-gradient(circle 1px at 25% 85%, rgba(255,255,255,0.3) 0%, transparent 100%),
+    radial-gradient(circle 2px at 50% 30%, rgba(196,181,253,0.5) 0%, transparent 100%);
   pointer-events: none;
-  z-index: 0;
-  animation: twinkle 4s ease-in-out infinite alternate;
+  z-index: 1;
+  animation: twinkle 5s ease-in-out infinite alternate;
 }
-@keyframes twinkle {
-  from { opacity: 0.6; }
-  to   { opacity: 1; }
-}
+@keyframes twinkle { from { opacity: 0.5; } to { opacity: 1; } }
 
-body.theme-cosmic .site-title {
+body.theme-cosmic .hero-title {
   background: linear-gradient(135deg, #C4B5FD, #F0ABFC, #93C5FD);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  filter: drop-shadow(0 0 20px rgba(167,139,250,0.4));
 }
-body.theme-cosmic .title-accent { color: #F0ABFC; }
-body.theme-cosmic .event-tag { color: #C084FC; border-color: rgba(192,132,252,0.3); background: rgba(192,132,252,0.06); }
-body.theme-cosmic .winner-id-display { color: #C4B5FD; text-shadow: 0 0 24px rgba(167,139,250,0.4); }
-body.theme-cosmic .btn-start { background: linear-gradient(135deg, #7C3AED, #A855F7); color: #fff; box-shadow: 0 4px 24px rgba(124,58,237,0.4); }
-body.theme-cosmic .digit-slot.rolling { border-color: rgba(167,139,250,0.5); box-shadow: 0 0 20px rgba(167,139,250,0.2); }
-body.theme-cosmic .digit-slot.locked { border-color: rgba(52,211,153,0.4); box-shadow: 0 0 18px rgba(52,211,153,0.2); }
-body.theme-cosmic .stat-value.highlight { color: #F0ABFC; }
+body.theme-cosmic .hero-sub { color: #F0ABFC; }
+body.theme-cosmic .btn-start { background: linear-gradient(135deg, #7C3AED, #A855F7); color: #fff; }
+body.theme-cosmic .light-beam { background: linear-gradient(180deg, transparent, rgba(139,92,246,0.1), transparent); }
 
 
-/* ═══════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════
    THEME 4: EMBER GLOW
-   — charcoal black, hot orange/amber, fire energy
-═══════════════════════════════════════════════════════ */
+   Charcoal + hot orange, fire energy
+═══════════════════════════════════════════ */
 body.theme-ember {
-  --bg:          #090400;
-  --surface:     #130800;
-  --surface2:    #1e0e00;
-  --border:      rgba(255,107,0,0.1);
-  --border-gold: rgba(255,150,50,0.28);
-  --gold:        #FF6B00;
-  --gold-bright: #FFAA44;
-  --gold-glow:   rgba(255,107,0,0.15);
-  --text:        #FFF0E0;
-  --text-muted:  #7A4A2A;
-  --text-dim:    rgba(255,150,50,0.2);
+  --bg:          #060200;
+  --bg-mid:      #0e0500;
+  --surface:     rgba(255,107,0,0.03);
+  --surface-2:   rgba(255,107,0,0.06);
+  --border:      rgba(255,107,0,0.08);
+  --accent:      #FF6B00;
+  --accent-hot:  #FFAA44;
+  --accent-dim:  rgba(255,107,0,0.12);
+  --accent-glow: rgba(255,107,0,0.35);
   --green:       #FFD700;
+  --green-dim:   rgba(255,215,0,0.08);
+  --green-glow:  rgba(255,215,0,0.35);
   --red:         #FF2200;
-  --red-glow:    rgba(255,34,0,0.35);
-
-  background-image:
-    radial-gradient(ellipse 70% 50% at 50% 100%, rgba(255,80,0,0.14)  0%, transparent 65%),
-    radial-gradient(ellipse 50% 40% at 50%   0%, rgba(255,150,0,0.06) 0%, transparent 60%);
+  --text:        #FFF0E0;
+  --text-2:      rgba(255,240,224,0.5);
+  --text-3:      rgba(255,150,50,0.2);
 }
 
-/* Ember particles via box-shadow trick */
-body.theme-ember::before {
-  content: '';
-  position: fixed;
-  bottom: 0; left: 0; right: 0;
-  height: 30vh;
-  background: linear-gradient(to top, rgba(255,60,0,0.06) 0%, transparent 100%);
-  pointer-events: none;
-  z-index: 0;
+body.theme-ember .stage-bg::before {
+  background:
+    radial-gradient(ellipse 50% 30% at 50% 100%, rgba(255,60,0,0.1) 0%, transparent 70%),
+    radial-gradient(ellipse 35% 25% at 50% 0%, rgba(255,150,0,0.05) 0%, transparent 65%);
 }
 
-body.theme-ember .site-title {
-  font-family: 'Playfair Display', serif;
+body.theme-ember .hero-title {
   background: linear-gradient(135deg, #FF9A3C, #FFD480, #FF6B00);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  filter: drop-shadow(0 0 20px rgba(255,107,0,0.4));
 }
-body.theme-ember .title-accent { color: #FF9A3C; }
-body.theme-ember .event-tag { color: #FF9A3C; border-color: rgba(255,150,50,0.3); background: rgba(255,107,0,0.06); }
-body.theme-ember .winner-id-display { color: var(--gold-bright); text-shadow: 0 0 20px rgba(255,107,0,0.5); }
-body.theme-ember .btn-start { background: linear-gradient(135deg, #FF6B00, #FF9500); color: #fff; box-shadow: 0 4px 24px rgba(255,107,0,0.45); }
-body.theme-ember .digit-slot.rolling { border-color: rgba(255,107,0,0.5); box-shadow: 0 0 20px rgba(255,107,0,0.25); }
-body.theme-ember .digit-slot.rolling .digit-display { color: #FF9A3C; }
-body.theme-ember .digit-slot.locked { border-color: rgba(255,215,0,0.45); box-shadow: 0 0 18px rgba(255,215,0,0.2); }
-body.theme-ember .digit-slot.locked .digit-display { color: #FFD700; }
-body.theme-ember .stat-value.highlight { color: #FF9A3C; }
-body.theme-ember .panel-title::before { background: #FF6B00; }
-body.theme-ember .wl-id { color: #FF9A3C; }
+body.theme-ember .hero-sub { color: #FF9A3C; }
+body.theme-ember .btn-start { background: linear-gradient(135deg, #FF6B00, #FF9500); color: #fff; }
+body.theme-ember .light-beam { background: linear-gradient(180deg, transparent, rgba(255,107,0,0.1), transparent); }
 
 
-/* ═══════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════
    THEME 5: GLACIER
-   — deep blue steel, ice blue, frosted glass, crystal
-═══════════════════════════════════════════════════════ */
+   Deep blue steel, ice crystal
+═══════════════════════════════════════════ */
 body.theme-glacier {
-  --bg:          #060b14;
-  --surface:     #0c1422;
-  --surface2:    #121c2e;
-  --border:      rgba(96,165,250,0.1);
-  --border-gold: rgba(147,197,253,0.22);
-  --gold:        #60A5FA;
-  --gold-bright: #BAE6FD;
-  --gold-glow:   rgba(96,165,250,0.15);
-  --text:        #E0F2FE;
-  --text-muted:  #486080;
-  --text-dim:    rgba(96,165,250,0.2);
+  --bg:          #030810;
+  --bg-mid:      #060e1a;
+  --surface:     rgba(96,165,250,0.03);
+  --surface-2:   rgba(96,165,250,0.06);
+  --border:      rgba(96,165,250,0.08);
+  --accent:      #60A5FA;
+  --accent-hot:  #BAE6FD;
+  --accent-dim:  rgba(96,165,250,0.12);
+  --accent-glow: rgba(96,165,250,0.35);
   --green:       #22D3EE;
+  --green-dim:   rgba(34,211,238,0.08);
+  --green-glow:  rgba(34,211,238,0.35);
   --red:         #F87171;
-  --red-glow:    rgba(248,113,113,0.3);
-
-  background-image:
-    radial-gradient(ellipse 70% 50% at 50% 0%,    rgba(56,189,248,0.09) 0%, transparent 65%),
-    radial-gradient(ellipse 40% 30% at 15% 100%,  rgba(14,165,233,0.06) 0%, transparent 55%),
-    radial-gradient(ellipse 40% 30% at 85%  50%,  rgba(99,102,241,0.05) 0%, transparent 55%);
+  --text:        #E0F2FE;
+  --text-2:      rgba(224,242,254,0.5);
+  --text-3:      rgba(96,165,250,0.2);
 }
 
-/* Ice crystal sheen */
-body.theme-glacier::before {
+body.theme-glacier .stage-bg::before {
+  background:
+    radial-gradient(ellipse 50% 35% at 50% 0%, rgba(56,189,248,0.08) 0%, transparent 65%),
+    radial-gradient(ellipse 30% 25% at 15% 90%, rgba(14,165,233,0.05) 0%, transparent 55%);
+}
+
+/* Crystal sheen */
+body.theme-glacier::after {
   content: '';
   position: fixed;
   inset: 0;
   background: linear-gradient(
     125deg,
-    rgba(186,230,253,0.025) 0%,
-    transparent 40%,
-    rgba(186,230,253,0.015) 60%,
-    transparent 100%
+    rgba(186,230,253,0.02) 0%, transparent 35%,
+    rgba(186,230,253,0.015) 55%, transparent 100%
   );
   pointer-events: none;
-  z-index: 0;
+  z-index: 1;
 }
 
-body.theme-glacier .site-title {
-  background: linear-gradient(135deg, #BAE6FD, #e0f2fe, #93C5FD);
+body.theme-glacier .hero-title {
+  background: linear-gradient(135deg, #BAE6FD, #E0F2FE, #93C5FD);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  filter: drop-shadow(0 0 20px rgba(96,165,250,0.35));
 }
-body.theme-glacier .title-accent { color: #7DD3FC; }
-body.theme-glacier .event-tag { color: #7DD3FC; border-color: rgba(125,211,252,0.28); background: rgba(56,189,248,0.05); }
-body.theme-glacier .winner-id-display { color: var(--gold-bright); text-shadow: 0 0 24px rgba(96,165,250,0.4); }
-body.theme-glacier .btn-start { background: linear-gradient(135deg, #1D4ED8, #3B82F6); color: #fff; box-shadow: 0 4px 24px rgba(59,130,246,0.4); }
-body.theme-glacier .digit-slot { backdrop-filter: blur(8px); }
-body.theme-glacier .digit-slot.rolling { border-color: rgba(96,165,250,0.5); box-shadow: 0 0 20px rgba(96,165,250,0.2), 0 0 6px rgba(186,230,253,0.15) inset; }
-body.theme-glacier .digit-slot.rolling .digit-display { color: #7DD3FC; }
-body.theme-glacier .digit-slot.locked { border-color: rgba(34,211,238,0.45); box-shadow: 0 0 20px rgba(34,211,238,0.2); }
-body.theme-glacier .digit-slot.locked .digit-display { color: #22D3EE; }
-body.theme-glacier .stat-value.highlight { color: #7DD3FC; }
-body.theme-glacier .panel-title::before { background: #3B82F6; }
-body.theme-glacier .wl-id { color: #7DD3FC; }
-body.theme-glacier .winner-divider { background: rgba(96,165,250,0.3); }
-body.theme-glacier .winner-tag { color: #7DD3FC; }
-body.theme-glacier .winner-tag::before,
-body.theme-glacier .winner-tag::after { background: rgba(96,165,250,0.3); }
+body.theme-glacier .hero-sub { color: #7DD3FC; }
+body.theme-glacier .btn-start { background: linear-gradient(135deg, #1D4ED8, #3B82F6); color: #fff; }
+body.theme-glacier .light-beam { background: linear-gradient(180deg, transparent, rgba(96,165,250,0.1), transparent); }

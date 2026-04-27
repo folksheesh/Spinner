@@ -3,317 +3,191 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Remote — Door Prize</title>
+  <title>Remote — Live Draw</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Inter:wght@400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@600;700;800&display=swap');
 
     :root {
-      --bg:      #0b0b12;
-      --surface: #13131e;
-      --surface2:#1a1a28;
-      --border:  rgba(255,255,255,0.07);
-      --bg2:     rgba(255,255,255,0.06);
-      --gold:    #C9A84C;
-      --goldb:   #E8C96A;
-      --green:   #2ECC71;
-      --red:     #E74C3C;
-      --text:    #EAEAF2;
-      --muted:   #6B6B8A;
+      --bg:#04040a; --surface:rgba(255,255,255,0.04); --border:rgba(255,255,255,0.06);
+      --accent:#D4A843; --accent-hot:#F0C45A; --accent-glow:rgba(212,168,67,0.35);
+      --green:#3BE8A0; --red:#F04444;
+      --text:#F0EDE6; --text-2:rgba(240,237,230,0.5); --text-3:rgba(240,237,230,0.2);
     }
-
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 
     body {
-      min-height: 100vh;
-      min-height: 100dvh;
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'Inter', sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 2rem 1.5rem;
-      background-image: radial-gradient(ellipse 80% 50% at 50% -5%, rgba(201,168,76,0.08) 0%, transparent 70%);
-      -webkit-tap-highlight-color: transparent;
+      min-height:100vh; min-height:100dvh;
+      background:var(--bg); color:var(--text);
+      font-family:'Space Grotesk',sans-serif;
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      padding:2rem 1.5rem;
+      background-image:radial-gradient(ellipse 80% 50% at 50% -5%,rgba(212,168,67,0.06) 0%,transparent 70%);
+      -webkit-tap-highlight-color:transparent;
     }
 
-    /* ── Header ── */
-    .remote-header {
-      text-align: center;
-      margin-bottom: 2.5rem;
-    }
-    .remote-eyebrow {
-      font-size: .65rem;
-      font-weight: 600;
-      letter-spacing: .2em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: .5rem;
-    }
-    .remote-title {
-      font-size: 1.3rem;
-      font-weight: 700;
-      color: var(--text);
-      letter-spacing: -.01em;
-    }
+    /* Header */
+    .r-header { text-align:center; margin-bottom:2.5rem; }
+    .r-eyebrow { font-size:.6rem; font-weight:600; letter-spacing:.25em; text-transform:uppercase; color:var(--text-3); margin-bottom:.5rem; }
+    .r-title { font-family:'Outfit',sans-serif; font-size:1.5rem; font-weight:800; color:var(--text); letter-spacing:-.02em; }
 
-    /* ── Conn indicator ── */
-    .conn-bar {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: .45rem;
-      font-size: .72rem;
-      color: var(--muted);
-      margin-bottom: 2.5rem;
-    }
-    .conn-dot {
-      width: 7px; height: 7px;
-      border-radius: 50%;
-      background: var(--green);
-      animation: blink 1.8s infinite;
-    }
-    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+    /* Connection */
+    .conn { display:flex; align-items:center; justify-content:center; gap:.4rem; font-size:.7rem; color:var(--text-2); margin-bottom:3rem; }
+    .conn-dot { width:6px; height:6px; border-radius:50%; background:var(--green); animation:blink 2s infinite; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.15} }
 
-    /* ── Big Button ── */
+    /* Big Button */
     .big-btn {
-      width: 100%;
-      max-width: 320px;
-      border: none;
-      border-radius: 16px;
-      padding: 2rem 1rem;
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: .4rem;
-      touch-action: manipulation;
-      transition: transform .12s ease, box-shadow .15s ease;
-      position: relative;
-      overflow: hidden;
-      margin-bottom: 1.5rem;
-      -webkit-tap-highlight-color: transparent;
+      width:100%; max-width:320px; border:none; border-radius:16px;
+      padding:2.2rem 1rem; cursor:pointer;
+      display:flex; flex-direction:column; align-items:center; justify-content:center; gap:.4rem;
+      touch-action:manipulation; transition:transform .12s; position:relative; overflow:hidden;
+      -webkit-tap-highlight-color:transparent; margin-bottom:1.5rem;
     }
-    .big-btn::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(180deg, rgba(255,255,255,0.1) 0%, transparent 50%);
-      pointer-events: none;
-    }
-    .big-btn:active   { transform: scale(0.96); }
-    .big-btn:disabled { opacity: .3; cursor: not-allowed; transform: none; }
+    .big-btn::after { content:''; position:absolute; top:0; left:0; right:0; height:50%; background:linear-gradient(180deg,rgba(255,255,255,0.1),transparent); pointer-events:none; border-radius:16px 16px 0 0; }
+    .big-btn:active { transform:scale(0.96); }
+    .big-btn:disabled { opacity:.3; cursor:not-allowed; transform:none; }
 
     .big-btn.state-start {
-      background: var(--gold);
-      color: #0b0b12;
-      box-shadow: 0 6px 28px rgba(201,168,76,0.35);
+      background:var(--accent); color:var(--bg);
+      box-shadow:0 6px 28px var(--accent-glow);
     }
     .big-btn.state-stop {
-      background: var(--red);
-      color: #fff;
-      box-shadow: 0 6px 28px rgba(231,76,60,0.4);
-      animation: stopGlow 1s infinite;
+      background:var(--red); color:#fff;
+      box-shadow:0 6px 28px rgba(240,68,68,0.4);
+      animation:stopGlow 1s infinite;
     }
-    @keyframes stopGlow {
-      0%,100% { box-shadow: 0 6px 28px rgba(231,76,60,0.35); }
-      50%     { box-shadow: 0 6px 40px rgba(231,76,60,0.6); }
-    }
+    @keyframes stopGlow { 0%,100%{box-shadow:0 6px 28px rgba(240,68,68,0.35)} 50%{box-shadow:0 6px 44px rgba(240,68,68,0.6)} }
 
-    .btn-icon   { font-size: 2rem; line-height: 1; }
-    .btn-label  { font-size: 1.3rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
-    .btn-caption{ font-size: .72rem; font-weight: 500; opacity: .75; letter-spacing: .03em; }
+    .btn-icon { font-size:1.8rem; line-height:1; }
+    .btn-label { font-size:1.3rem; font-weight:800; letter-spacing:.06em; text-transform:uppercase; }
+    .btn-caption { font-size:.7rem; font-weight:500; opacity:.7; }
 
-    /* ── Progress dots ── */
-    .progress-section {
-      width: 100%; max-width: 320px;
-      margin-bottom: 1.5rem;
-      opacity: 0;
-      transition: opacity .3s;
-    }
-    .progress-section.show { opacity: 1; }
-    .progress-label {
-      font-size: .65rem;
-      font-weight: 600;
-      letter-spacing: .15em;
-      text-transform: uppercase;
-      color: var(--muted);
-      text-align: center;
-      margin-bottom: .7rem;
-    }
-    .progress-dots {
-      display: flex;
-      justify-content: center;
-      gap: .5rem;
-    }
+    /* Progress */
+    .progress { width:100%; max-width:320px; margin-bottom:1.5rem; opacity:0; transition:opacity .3s; }
+    .progress.show { opacity:1; }
+    .p-label { font-size:.6rem; font-weight:600; letter-spacing:.18em; text-transform:uppercase; color:var(--text-3); text-align:center; margin-bottom:.6rem; }
+    .p-dots { display:flex; justify-content:center; gap:.5rem; }
     .p-dot {
-      width: 28px; height: 28px;
-      border-radius: 50%;
-      border: 1.5px solid rgba(255,255,255,0.12);
-      display: flex; align-items: center; justify-content: center;
-      font-family: 'Orbitron', monospace;
-      font-size: .7rem;
-      color: var(--muted);
-      transition: all .3s;
+      width:28px; height:28px; border-radius:50%;
+      border:1.5px solid var(--border);
+      display:flex; align-items:center; justify-content:center;
+      font-family:'JetBrains Mono',monospace; font-size:.65rem; font-weight:700; color:var(--text-3);
+      transition:all .25s;
     }
-    .p-dot.locked {
-      background: rgba(46,204,113,0.12);
-      border-color: var(--green);
-      color: var(--green);
-      box-shadow: 0 0 10px rgba(46,204,113,0.25);
-    }
+    .p-dot.locked { background:rgba(59,232,160,0.1); border-color:var(--green); color:var(--green); box-shadow:0 0 10px rgba(59,232,160,0.2); }
 
-    /* ── Toast feedback ── */
+    /* Toast */
     .toast {
-      position: fixed;
-      bottom: 2rem;
-      left: 50%;
-      transform: translateX(-50%) translateY(60px);
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 100px;
-      padding: .55rem 1.3rem;
-      font-size: .78rem;
-      font-weight: 500;
-      color: var(--text);
-      white-space: nowrap;
-      transition: transform .3s cubic-bezier(.16,1,.3,1), opacity .3s;
-      opacity: 0;
-      pointer-events: none;
+      position:fixed; bottom:2rem; left:50%;
+      transform:translateX(-50%) translateY(50px);
+      background:rgba(255,255,255,0.06); border:1px solid var(--border);
+      border-radius:100px; padding:.5rem 1.2rem;
+      font-size:.75rem; font-weight:500; color:var(--text); white-space:nowrap;
+      transition:all .3s cubic-bezier(.16,1,.3,1); opacity:0; pointer-events:none;
+      backdrop-filter:blur(12px);
     }
-    .toast.show {
-      transform: translateX(-50%) translateY(0);
-      opacity: 1;
-    }
+    .toast.show { transform:translateX(-50%) translateY(0); opacity:1; }
 
-    /* ── Winner mini card ── */
-    .winner-card {
-      width: 100%; max-width: 320px;
-      background: var(--surface);
-      border: 1px solid rgba(201,168,76,0.2);
-      border-radius: 16px;
-      padding: 1.2rem;
-      text-align: center;
-      display: none;
-      animation: fadeUp .4s ease;
+    /* Winner card */
+    .win-card {
+      width:100%; max-width:320px;
+      background:var(--surface); border:1px solid rgba(212,168,67,0.15);
+      border-radius:16px; padding:1.2rem; text-align:center;
+      display:none; animation:fadeUp .4s ease;
     }
-    .winner-card.show { display: block; }
-    @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:none} }
-    .wc-tag  { font-size: .62rem; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: var(--gold); margin-bottom: .6rem; }
-    .wc-id   { font-family: 'Orbitron', monospace; font-size: 1.5rem; font-weight: 900; color: var(--goldb); }
-    .wc-name { font-size: .95rem; font-weight: 600; margin: .3rem 0 .2rem; }
-    .wc-dept { font-size: .72rem; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; }
+    .win-card.show { display:block; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
+    .wc-tag { font-size:.58rem; font-weight:700; letter-spacing:.22em; text-transform:uppercase; color:var(--accent); margin-bottom:.5rem; }
+    .wc-id { font-family:'JetBrains Mono',monospace; font-size:1.5rem; font-weight:800; color:var(--accent-hot); }
+    .wc-name { font-size:.9rem; font-weight:600; margin:.3rem 0 .15rem; }
+    .wc-dept { font-size:.68rem; color:var(--text-2); letter-spacing:.08em; text-transform:uppercase; }
   </style>
 </head>
 <body>
 
-  <div class="remote-header">
-    <p class="remote-eyebrow">Door Prize 2025</p>
-    <h1 class="remote-title">Remote Control</h1>
+  <div class="r-header">
+    <p class="r-eyebrow">Door Prize 2025</p>
+    <h1 class="r-title">Remote Control</h1>
   </div>
 
-  <div class="conn-bar">
-    <span class="conn-dot"></span>
-    Terhubung ke layar utama
-  </div>
+  <div class="conn"><span class="conn-dot"></span> Connected to main display</div>
 
-  <!-- BIG BUTTON -->
   <button class="big-btn state-start" id="big-btn">
     <span class="btn-icon" id="btn-icon">▶</span>
-    <span class="btn-label" id="btn-label">Mulai</span>
-    <span class="btn-caption" id="btn-caption">Putar semua slot</span>
+    <span class="btn-label" id="btn-label">Start</span>
+    <span class="btn-caption" id="btn-caption">Spin all digits</span>
   </button>
 
-  <!-- PROGRESS DOTS -->
-  <div class="progress-section" id="progress-section">
-    <p class="progress-label">Digit Terkunci</p>
-    <div class="progress-dots" id="progress-dots">
-      <div class="p-dot" data-idx="0">1</div>
-      <div class="p-dot" data-idx="1">2</div>
-      <div class="p-dot" data-idx="2">3</div>
-      <div class="p-dot" data-idx="3">4</div>
-      <div class="p-dot" data-idx="4">5</div>
-      <div class="p-dot" data-idx="5">6</div>
+  <div class="progress" id="progress">
+    <p class="p-label">Digits Locked</p>
+    <div class="p-dots" id="p-dots">
+      <div class="p-dot">1</div><div class="p-dot">2</div><div class="p-dot">3</div>
+      <div class="p-dot">4</div><div class="p-dot">5</div><div class="p-dot">6</div>
     </div>
   </div>
 
-  <!-- WINNER CARD -->
-  <div class="winner-card" id="winner-card">
-    <p class="wc-tag">✦ Pemenang ✦</p>
-    <div class="wc-id"   id="wc-id">—</div>
+  <div class="win-card" id="win-card">
+    <p class="wc-tag">✦ Winner ✦</p>
+    <div class="wc-id" id="wc-id">—</div>
     <div class="wc-name" id="wc-name">—</div>
     <div class="wc-dept" id="wc-dept">—</div>
   </div>
 
-  <!-- TOAST -->
-  <div class="toast" id="toast">✓ Terkirim</div>
+  <div class="toast" id="toast">✓ Sent</div>
 
   <script src="js/database.js"></script>
   <script src="js/sync.js"></script>
   <script>
     SyncEngine.init('remote');
 
-    const bigBtn   = document.getElementById('big-btn');
-    const btnIcon  = document.getElementById('btn-icon');
-    const btnLabel = document.getElementById('btn-label');
-    const btnCaption = document.getElementById('btn-caption');
-    const progress = document.getElementById('progress-section');
-    const dots     = document.querySelectorAll('.p-dot');
-    const toast    = document.getElementById('toast');
-    const winCard  = document.getElementById('winner-card');
-
+    const btn = document.getElementById('big-btn');
+    const icon = document.getElementById('btn-icon');
+    const label = document.getElementById('btn-label');
+    const caption = document.getElementById('btn-caption');
+    const progress = document.getElementById('progress');
+    const dots = document.querySelectorAll('.p-dot');
+    const toast = document.getElementById('toast');
+    const winCard = document.getElementById('win-card');
     let cooldown = false;
-    let remotePhase = 'idle';
-    let stopped = 0;
 
-    function showToast(msg, ok = true) {
-      toast.textContent = (ok ? '✓ ' : '⚠ ') + msg;
-      toast.style.color = ok ? '' : '#E74C3C';
+    function showToast(msg) {
+      toast.textContent = '✓ ' + msg;
       toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 1800);
+      setTimeout(() => toast.classList.remove('show'), 1600);
     }
 
-    function setUI(phase, stoppedCount = 0) {
-      remotePhase = phase;
-      stopped = stoppedCount;
-
+    function setUI(phase, stopped = 0) {
       if (phase === 'idle' || phase === 'done') {
-        bigBtn.className = 'big-btn state-start';
-        btnIcon.textContent  = '▶';
-        btnLabel.textContent = phase === 'done' ? 'Berikutnya' : 'Mulai';
-        btnCaption.textContent = 'Putar semua slot';
+        btn.className = 'big-btn state-start';
+        icon.textContent = '▶';
+        label.textContent = phase === 'done' ? 'Next' : 'Start';
+        caption.textContent = 'Spin all digits';
         progress.classList.remove('show');
         dots.forEach(d => d.classList.remove('locked'));
         if (phase === 'idle') winCard.classList.remove('show');
       } else {
-        bigBtn.className = 'big-btn state-stop';
-        btnIcon.textContent  = '⏹';
-        btnLabel.textContent = 'Stop';
-        btnCaption.textContent = `Kunci digit ${stoppedCount + 1} dari 6`;
+        btn.className = 'big-btn state-stop';
+        icon.textContent = '⏹';
+        label.textContent = 'Stop';
+        caption.textContent = `Lock digit ${stopped + 1} of 6`;
         progress.classList.add('show');
-        dots.forEach((d, i) => i < stoppedCount ? d.classList.add('locked') : d.classList.remove('locked'));
+        dots.forEach((d, i) => d.classList.toggle('locked', i < stopped));
       }
     }
 
-    bigBtn.addEventListener('click', () => {
-      if (cooldown) { showToast('Tunggu sebentar...', false); return; }
+    btn.addEventListener('click', () => {
+      if (cooldown) return;
       cooldown = true;
       SyncEngine.emit('action');
-      showToast('Perintah terkirim!');
-      setTimeout(() => { cooldown = false; }, 600);
+      showToast('Sent');
+      setTimeout(() => cooldown = false, 500);
     });
 
-    // Sync events from host
-    window.addEventListener('doorprize:phase_change', e => {
-      setUI(e.detail.phase, e.detail.stoppedCount || 0);
-    });
-
+    window.addEventListener('doorprize:phase_change', e => setUI(e.detail.phase, e.detail.stoppedCount || 0));
     window.addEventListener('doorprize:winner_revealed', e => {
       const w = e.detail.winner;
       setUI('done', 6);
-      document.getElementById('wc-id').textContent   = w.id;
+      document.getElementById('wc-id').textContent = w.id;
       document.getElementById('wc-name').textContent = w.name;
       document.getElementById('wc-dept').textContent = w.department;
       winCard.classList.add('show');

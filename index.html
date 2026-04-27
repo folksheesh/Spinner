@@ -3,56 +3,49 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Door Prize — Live Draw</title>
-  <meta name="description" content="Sistem undian door prize digital dengan animasi live draw." />
+  <title>Live Draw — Door Prize</title>
+  <meta name="description" content="Premium live draw door prize system." />
   <link rel="stylesheet" href="css/style.css" />
   <link rel="stylesheet" href="css/themes.css" />
 </head>
 <body class="theme-elegant">
-  <!-- THEME SWITCHER -->
-  <div class="theme-switcher-wrap">
-    <div id="theme-switcher"></div>
-  </div>
 
+  <!-- ═══ STAGE BACKGROUND ═══ -->
+  <div class="stage-bg">
+    <div class="light-beam"></div>
+    <div class="light-beam"></div>
+    <div class="light-beam"></div>
+  </div>
   <div id="particles"></div>
   <div id="confetti-container"></div>
 
+  <!-- ═══ TOP BAR ═══ -->
+  <div class="top-bar">
+    <div class="top-left">
+      <div class="stat-pill">Peserta <span class="num" id="stat-total">0</span></div>
+      <div class="stat-pill">Sisa <span class="num" id="stat-remaining">0</span></div>
+      <div class="stat-pill">Pemenang <span class="num gold" id="stat-winners">0</span></div>
+    </div>
+    <div class="top-right">
+      <div id="theme-switcher"></div>
+      <button class="top-btn" id="sound-btn">🔊</button>
+      <button class="top-btn" id="reset-btn">Reset</button>
+    </div>
+  </div>
+
+  <!-- ═══ MAIN WRAPPER ═══ -->
   <div class="main-wrapper">
+    <div class="stage-center">
 
-    <!-- ── HEADER ── -->
-    <header>
-      <div class="event-tag">
-        <span>✦</span> Annual Company Event 2025 <span>✦</span>
-      </div>
-      <h1 class="site-title">Door Prize</h1>
-      <p class="title-accent">Live Draw</p>
-    </header>
+      <p class="event-badge">Annual Company Event 2025</p>
+      <h1 class="hero-title">Door Prize</h1>
+      <p class="hero-sub">Live Draw</p>
 
-    <!-- ── STATS ── -->
-    <div class="stats-strip" role="region" aria-label="Statistik Undian">
-      <div class="stat-item">
-        <div class="stat-label">Peserta</div>
-        <div class="stat-value" id="stat-total">0</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-label">Tersisa</div>
-        <div class="stat-value" id="stat-remaining">0</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-label">Pemenang</div>
-        <div class="stat-value highlight" id="stat-winners">0</div>
-      </div>
-    </div>
+      <p class="round-indicator" id="prize-round">Draw #1</p>
+      <p class="status-line" id="status-text">Ready</p>
 
-    <!-- ── STATUS ── -->
-    <div class="status-bar">
-      <p class="status-text status-idle" id="status-text">Siap memulai undian</p>
-    </div>
-
-    <!-- ── DIGIT DISPLAY ── -->
-    <section class="digit-section" aria-label="ID Karyawan">
-      <p class="round-label" id="prize-round">Undian Ke-1</p>
-      <div class="digits-wrapper">
+      <!-- ═══ DIGIT DISPLAY ═══ -->
+      <div class="digits-stage" id="digits-stage">
         <div class="digit-slot" id="slot-0"><span class="digit-display">?</span></div>
         <div class="digit-slot" id="slot-1"><span class="digit-display">?</span></div>
         <div class="digit-slot" id="slot-2"><span class="digit-display">?</span></div>
@@ -61,47 +54,37 @@
         <div class="digit-slot" id="slot-4"><span class="digit-display">?</span></div>
         <div class="digit-slot" id="slot-5"><span class="digit-display">?</span></div>
       </div>
-    </section>
 
-    <!-- ── WINNER PANEL ── -->
-    <div class="winner-panel" id="winner-panel" role="region" aria-live="polite">
-      <div class="winner-tag">Pemenang</div>
-      <div class="winner-id-display" id="winner-id-display">——————</div>
-      <div class="winner-divider"></div>
+      <!-- ═══ CONTROLS ═══ -->
+      <button class="action-btn btn-start" id="action-btn">
+        <span class="btn-text">Start Draw</span>
+        <span class="btn-sub">Spin all digits</span>
+      </button>
+      <div class="secondary-controls">
+        <p class="hint-line">Press <kbd>Space</kbd> to Start / Stop</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ WINNER PANEL (Full-screen overlay) ═══ -->
+  <div class="winner-panel" id="winner-panel">
+    <div class="winner-inner">
+      <div class="winner-eyebrow">Winner</div>
+      <div class="winner-id" id="winner-id-display">------</div>
+      <div class="winner-line"></div>
       <div class="winner-name" id="winner-name">—</div>
       <div class="winner-dept" id="winner-dept">—</div>
+      <button class="winner-dismiss" id="winner-dismiss">Continue</button>
     </div>
+  </div>
 
-    <!-- ── CONTROLS ── -->
-    <div class="controls-section">
-      <button class="action-btn btn-start" id="action-btn" aria-label="Mulai Undian">
-        <span class="btn-text">Mulai Undian</span>
-        <span class="btn-sub">Putar semua slot serentak</span>
-      </button>
-      <div class="controls-row">
-        <button class="icon-btn" id="sound-btn">🔊 Suara</button>
-        <button class="icon-btn" id="reset-btn">↺ Reset</button>
-      </div>
-      <p class="kbd-hint">Tekan <kbd>Space</kbd> untuk Start / Stop</p>
+  <!-- ═══ BOTTOM TRAY ═══ -->
+  <div class="bottom-tray">
+    <span class="bottom-label">Winners</span>
+    <div class="winners-scroll" id="winners-list">
+      <span class="empty-tray">No winners yet</span>
     </div>
-
-    <!-- ── BOTTOM GRID ── -->
-    <div class="bottom-grid">
-      <div class="panel-card">
-        <div class="panel-title">Remote HP</div>
-        <div id="qr-container">
-          <p class="qr-url" style="text-align:center;margin-bottom:.5rem;">Buka <strong>remote.html</strong><br>di browser HP kamu</p>
-        </div>
-      </div>
-      <div class="panel-card">
-        <div class="panel-title">Daftar Pemenang</div>
-        <div class="winners-list" id="winners-list">
-          <p class="empty-state">Belum ada pemenang</p>
-        </div>
-      </div>
-    </div>
-
-  </div><!-- /main-wrapper -->
+  </div>
 
   <script src="js/database.js"></script>
   <script src="js/sound.js"></script>
