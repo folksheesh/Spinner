@@ -459,11 +459,35 @@ function bindEvents() {
 
   window.addEventListener('doorprize:action', handleAction);
 
+  // ── Click anywhere = Start/Stop (works with mouse, PPT remote, etc.) ──
+  let cursorHidden = false;
+  document.addEventListener('click', (e) => {
+    // Don't trigger action for UI buttons / summary panel / winner panel
+    const target = e.target;
+    if (target.closest('.action-btn') ||
+        target.closest('#reset-btn') ||
+        target.closest('#sound-btn') ||
+        target.closest('#summary-btn') ||
+        target.closest('#summary-panel') ||
+        target.closest('#winner-panel') ||
+        target.closest('.theme-dot') ||
+        target.closest('#remote-pill')) return;
+
+    e.preventDefault();
+    SoundEngine.unlock();
+    SyncEngine.emit('action');
+  });
+
   document.addEventListener('keydown', e => {
     if (e.code === 'Space') {
       e.preventDefault();
       SoundEngine.unlock();
       SyncEngine.emit('action');
+    }
+    // F key toggles cursor visibility (display only)
+    if (e.code === 'KeyF') {
+      cursorHidden = !cursorHidden;
+      document.body.style.cursor = cursorHidden ? 'none' : '';
     }
   });
 
