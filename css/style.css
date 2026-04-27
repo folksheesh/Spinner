@@ -736,7 +736,15 @@ body.flash {
 /* Keep tread texture visible when locked! */
 .digit-slot.locked::before {
   opacity: 0.45;
-  /* Much more visible than before */
+  /* Keep the animation but pause it exactly where it was */
+  animation: tireScroll 0.45s linear infinite;
+  animation-play-state: paused !important;
+}
+
+.digit-slot.locked .tire-edge-left,
+.digit-slot.locked .tire-edge-right {
+  animation: edgeScroll 0.45s linear infinite;
+  animation-play-state: paused !important;
 }
 
 .digit-slot.locked::after {
@@ -794,12 +802,12 @@ body.flash {
   z-index: 1;
   /* Below digit-slot (z-index: 2) */
   opacity: 0;
-  border-radius: 50%;
+  border-radius: 0; /* Square/pixel blocky feel */
+  image-rendering: pixelated;
   background:
-    radial-gradient(ellipse 80% 60% at 40% 50%, rgba(255, 255, 255, 0.85) 0%, transparent 55%),
-    radial-gradient(ellipse 60% 70% at 65% 45%, rgba(240, 240, 240, 0.6) 0%, transparent 50%),
-    radial-gradient(ellipse 90% 50% at 50% 55%, rgba(220, 220, 220, 0.4) 0%, transparent 60%);
-  filter: blur(2px);
+    radial-gradient(ellipse 80% 60% at 40% 50%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.95) 48%, transparent 50%),
+    radial-gradient(ellipse 60% 70% at 65% 45%, rgba(240, 240, 240, 0.8) 0%, rgba(240, 240, 240, 0.8) 48%, transparent 50%),
+    radial-gradient(ellipse 90% 50% at 50% 55%, rgba(220, 220, 220, 0.6) 0%, rgba(220, 220, 220, 0.6) 48%, transparent 50%);
   animation: brakeSmoke 1.8s cubic-bezier(0.05, 0.5, 0.15, 1) forwards;
 }
 
@@ -809,9 +817,8 @@ body.flash {
   height: 40px;
   margin-left: -50px;
   background:
-    radial-gradient(ellipse 70% 50% at 35% 50%, rgba(255, 255, 255, 0.7) 0%, transparent 50%),
-    radial-gradient(ellipse 50% 60% at 70% 40%, rgba(230, 230, 230, 0.5) 0%, transparent 45%);
-  filter: blur(3px);
+    radial-gradient(ellipse 70% 50% at 35% 50%, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.7) 48%, transparent 50%),
+    radial-gradient(ellipse 50% 60% at 70% 40%, rgba(230, 230, 230, 0.5) 0%, rgba(230, 230, 230, 0.5) 48%, transparent 50%);
 }
 
 @keyframes brakeSmoke {
@@ -828,18 +835,15 @@ body.flash {
     /* Smoke expands wide and flat along ground */
     transform: translate(var(--smoke-x), -10px) scaleX(2) scaleY(0.8);
     opacity: 0.7;
-    filter: blur(3px);
   }
 
   50% {
     opacity: 0.3;
-    filter: blur(6px);
   }
 
   100% {
     transform: translate(var(--smoke-x), var(--smoke-y)) scaleX(var(--smoke-s, 3)) scaleY(1.5);
     opacity: 0;
-    filter: blur(10px);
   }
 }
 

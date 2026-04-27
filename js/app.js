@@ -197,10 +197,79 @@ function stopNextSlot() {
   let slowDelay = 60;
   let slowsLeft = 7; // Number of slowing ticks
   
+    const stage = DOM.digitsStage;
+    const slotRect = slot.getBoundingClientRect();
+    const stageRect = stage.getBoundingClientRect();
+    const slotCenterX = slotRect.left - stageRect.left + slotRect.width / 2;
+    const slotBottom  = slotRect.bottom - stageRect.top;
+
+    const emitSmoke = (count) => {
+      for (let i = 0; i < count; i++) {
+        const smoke = document.createElement('div');
+        smoke.className = 'smoke-particle';
+        smoke.style.position = 'absolute';
+        smoke.style.left = (slotCenterX + (Math.random() * 80 - 40)) + 'px';
+        smoke.style.top  = (slotBottom - 30 - Math.random() * 40) + 'px';
+        smoke.style.setProperty('--smoke-x', (Math.random() * 240 - 120) + 'px');
+        smoke.style.setProperty('--smoke-y', (-20 - Math.random() * 60) + 'px');
+        smoke.style.setProperty('--smoke-s', (2.5 + Math.random() * 2).toFixed(1));
+        smoke.style.animationDelay = (Math.random() * 0.1) + 's';
+        stage.appendChild(smoke);
+        setTimeout(() => smoke.remove(), 2200);
+      }
+    };
+
+    const emitSparks = (count) => {
+      for (let i = 0; i < count; i++) {
+        const spark = document.createElement('div');
+        spark.className = 'spark-pixel';
+        spark.style.position = 'absolute';
+        spark.style.left = (slotCenterX + (Math.random() * 80 - 40)) + 'px';
+        spark.style.top  = (slotBottom - 30 - Math.random() * 50) + 'px';
+        const angle = Math.random() * Math.PI * 2;
+        const dist  = 40 + Math.random() * 120;
+        spark.style.setProperty('--spark-x', Math.cos(angle) * dist + 'px');
+        spark.style.setProperty('--spark-y', Math.sin(angle) * dist + 'px');
+        spark.style.animationDelay = (Math.random() * 0.2) + 's';
+        const size = 3 + Math.random() * 5;
+        spark.style.width  = size + 'px';
+        spark.style.height = size + 'px';
+        stage.appendChild(spark);
+        setTimeout(() => spark.remove(), 1200);
+      }
+    };
+
+    const emitDots = (count) => {
+      for (let i = 0; i < count; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'smoke-dot';
+        dot.style.position = 'absolute';
+        dot.style.left = (slotCenterX + (Math.random() * 100 - 50)) + 'px';
+        dot.style.top  = (slotBottom - 30 - Math.random() * 40) + 'px';
+        const angle = -Math.PI / 2 + (Math.random() * Math.PI - Math.PI / 2);
+        const dist  = 20 + Math.random() * 80;
+        dot.style.setProperty('--dot-x', Math.cos(angle) * dist + 'px');
+        dot.style.setProperty('--dot-y', Math.sin(angle) * dist + 'px');
+        dot.style.animationDelay = (Math.random() * 0.3) + 's';
+        const sz = 1 + Math.random() * 2;
+        dot.style.width  = sz + 'px';
+        dot.style.height = sz + 'px';
+        stage.appendChild(dot);
+        setTimeout(() => dot.remove(), 1800);
+      }
+    };
+  
   const tickSlow = () => {
     display.textContent = Math.floor(Math.random() * 10);
     slowsLeft--;
     slowDelay += 35; // 60, 95, 130, 165, 200, 235, 270...
+    
+    // Emit braking smoke gradually while slowing down
+    if (slowsLeft % 2 === 0) {
+      emitSmoke(2);
+      emitDots(4);
+      emitSparks(2);
+    }
     
     if (slowsLeft > 0) {
       AppState.rollIntervals[idx] = setTimeout(tickSlow, slowDelay);
@@ -213,64 +282,10 @@ function stopNextSlot() {
       slot.classList.add('locked');
       SoundEngine.playLock();
       
-      // ── Brake smoke (appended to parent so it renders BEHIND the slot) ──
-    const stage = DOM.digitsStage;
-    const slotRect = slot.getBoundingClientRect();
-    const stageRect = stage.getBoundingClientRect();
-    const slotCenterX = slotRect.left - stageRect.left + slotRect.width / 2;
-    const slotBottom  = slotRect.bottom - stageRect.top;
-
-    for (let i = 0; i < 12; i++) {
-      const smoke = document.createElement('div');
-      smoke.className = 'smoke-particle';
-      smoke.style.position = 'absolute';
-      smoke.style.left = (slotCenterX + (Math.random() * 80 - 40)) + 'px';
-      smoke.style.top  = (slotBottom - 30 - Math.random() * 40) + 'px';
-      smoke.style.setProperty('--smoke-x', (Math.random() * 240 - 120) + 'px');
-      smoke.style.setProperty('--smoke-y', (-20 - Math.random() * 60) + 'px');
-      smoke.style.setProperty('--smoke-s', (2.5 + Math.random() * 2).toFixed(1));
-      smoke.style.animationDelay = (Math.random() * 0.2) + 's';
-      stage.appendChild(smoke);
-      setTimeout(() => smoke.remove(), 2200);
-    }
-
-    // ── Pixel debris (chunky pieces flying out) ──
-    for (let i = 0; i < 20; i++) {
-      const spark = document.createElement('div');
-      spark.className = 'spark-pixel';
-      spark.style.position = 'absolute';
-      spark.style.left = (slotCenterX + (Math.random() * 80 - 40)) + 'px';
-      spark.style.top  = (slotBottom - 30 - Math.random() * 50) + 'px';
-      const angle = Math.random() * Math.PI * 2;
-      const dist  = 40 + Math.random() * 120;
-      spark.style.setProperty('--spark-x', Math.cos(angle) * dist + 'px');
-      spark.style.setProperty('--spark-y', Math.sin(angle) * dist + 'px');
-      spark.style.animationDelay = (Math.random() * 0.2) + 's';
-      const size = 3 + Math.random() * 5;
-      spark.style.width  = size + 'px';
-      spark.style.height = size + 'px';
-      stage.appendChild(spark);
-      setTimeout(() => spark.remove(), 1200);
-    }
-
-    // ── Smoke micro-pixels (tiny dots inside the smoke cloud for texture) ──
-    for (let i = 0; i < 30; i++) {
-      const dot = document.createElement('div');
-      dot.className = 'smoke-dot';
-      dot.style.position = 'absolute';
-      dot.style.left = (slotCenterX + (Math.random() * 100 - 50)) + 'px';
-      dot.style.top  = (slotBottom - 30 - Math.random() * 40) + 'px';
-      const angle = -Math.PI / 2 + (Math.random() * Math.PI - Math.PI / 2);
-      const dist  = 20 + Math.random() * 80;
-      dot.style.setProperty('--dot-x', Math.cos(angle) * dist + 'px');
-      dot.style.setProperty('--dot-y', Math.sin(angle) * dist + 'px');
-      dot.style.animationDelay = (Math.random() * 0.3) + 's';
-      const sz = 1 + Math.random() * 2;
-      dot.style.width  = sz + 'px';
-      dot.style.height = sz + 'px';
-      stage.appendChild(dot);
-      setTimeout(() => dot.remove(), 1800);
-    }
+      // Emit the final big burst of smoke
+      emitSmoke(8);
+      emitSparks(15);
+      emitDots(20);
 
     if (!isLastSlot) {
       setStatus(`Digit ${idx + 1} locked`, 'spinning');
