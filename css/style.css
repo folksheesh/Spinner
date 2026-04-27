@@ -385,7 +385,7 @@ body.flash {
 
 /* ── Sponsor Logo (No background) ── */
 .sponsor-logo {
-  height: 60px;
+  height: 40px;
   width: auto;
   margin-bottom: 0.5rem;
   background: none;
@@ -706,21 +706,21 @@ body.flash {
 
 /* ── SLOWING (Braking before stop) ── */
 .digit-slot.slowing::before {
-  animation: tireScroll 0.3s linear infinite;
+  animation: tireScroll 0.45s linear infinite;
   opacity: 0.8;
 }
 
 .digit-slot.slowing .tire-edge-left,
 .digit-slot.slowing .tire-edge-right {
-  animation: edgeScroll 0.3s linear infinite;
+  animation: edgeScroll 0.45s linear infinite;
 }
 
 .digit-slot.slowing .digit-display {
   color: #fff;
-  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
   filter: blur(0px);
-  transform: scaleY(1);
-  transition: all 0.3s ease-out;
+  transform: scaleY(1.1);
+  transition: all 0.8s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 /* ── LOCKED (Dunlop Yellow + White Tread Still Visible) ── */

@@ -191,24 +191,29 @@ function stopNextSlot() {
   slot.classList.remove('rolling');
   slot.classList.add('slowing');
 
-  // Slow down the digit shuffling
+  // Gradual slow down of the digit shuffling
   clearInterval(AppState.rollIntervals[idx]);
-  AppState.rollIntervals[idx] = setInterval(() => {
+  
+  let slowDelay = 60;
+  let slowsLeft = 7; // Number of slowing ticks
+  
+  const tickSlow = () => {
     display.textContent = Math.floor(Math.random() * 10);
-  }, 120);
-
-  // Wait 400ms for the slowing down animation, then finally lock
-  setTimeout(() => {
-    clearInterval(AppState.rollIntervals[idx]);
-    AppState.rollIntervals[idx] = null;
-
-    const targetDigit = AppState.currentWinner.id[idx];
-    display.textContent = targetDigit;
-    slot.classList.remove('slowing');
-    slot.classList.add('locked');
-    SoundEngine.playLock();
+    slowsLeft--;
+    slowDelay += 35; // 60, 95, 130, 165, 200, 235, 270...
     
-    // ── Brake smoke (appended to parent so it renders BEHIND the slot) ──
+    if (slowsLeft > 0) {
+      AppState.rollIntervals[idx] = setTimeout(tickSlow, slowDelay);
+    } else {
+      // Final lock
+      AppState.rollIntervals[idx] = null;
+      const targetDigit = AppState.currentWinner.id[idx];
+      display.textContent = targetDigit;
+      slot.classList.remove('slowing');
+      slot.classList.add('locked');
+      SoundEngine.playLock();
+      
+      // ── Brake smoke (appended to parent so it renders BEHIND the slot) ──
     const stage = DOM.digitsStage;
     const slotRect = slot.getBoundingClientRect();
     const stageRect = stage.getBoundingClientRect();
@@ -282,7 +287,10 @@ function stopNextSlot() {
       DOM.digitsStage?.classList.remove('active');
       setTimeout(() => showWinner(AppState.currentWinner), 600);
     }
-  }, 400); // 400ms slowing down duration
+  } // end else
+  }; // end tickSlow
+
+  AppState.rollIntervals[idx] = setTimeout(tickSlow, slowDelay);
 }
 
 // ── WINNER REVEAL ──────────────────────────────────────────
