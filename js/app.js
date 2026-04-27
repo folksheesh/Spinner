@@ -191,17 +191,17 @@ function stopNextSlot() {
   slot.classList.add('locked');
   SoundEngine.playLock();
   
-  // ── White brake smoke (behind digit, like hard braking) ──
-  for (let i = 0; i < 10; i++) {
+  // ── Brake smoke (from bottom, spreads sideways like tire lockup on asphalt) ──
+  for (let i = 0; i < 12; i++) {
     const smoke = document.createElement('div');
     smoke.className = 'smoke-particle';
-    // Spread smoke outward and upward
-    smoke.style.setProperty('--smoke-x', (Math.random() * 140 - 70) + 'px');
-    smoke.style.setProperty('--smoke-y', (Math.random() * -120 - 30) + 'px');
-    smoke.style.setProperty('--smoke-s', (2 + Math.random() * 3).toFixed(1));
-    smoke.style.animationDelay = (Math.random() * 0.25) + 's';
+    // Wide horizontal spread, slight upward rise (ground smoke)
+    smoke.style.setProperty('--smoke-x', (Math.random() * 180 - 90) + 'px');
+    smoke.style.setProperty('--smoke-y', (-15 - Math.random() * 40) + 'px');
+    smoke.style.setProperty('--smoke-s', (2.5 + Math.random() * 2).toFixed(1));
+    smoke.style.animationDelay = (Math.random() * 0.2) + 's';
     slot.appendChild(smoke);
-    setTimeout(() => smoke.remove(), 2500);
+    setTimeout(() => smoke.remove(), 2200);
   }
 
   // ── Pixel debris chunks (behind digit, pixelated brake dust) ──

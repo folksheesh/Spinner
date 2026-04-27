@@ -524,40 +524,41 @@ body.flash {
     inset 0 0 15px rgba(0,0,0,0.6);
 }
 
-/* ── Serrated Gear Teeth on Left & Right Edges ── */
+/* ── Refined Tire Sidewall Texture ── */
 .digit-slot .tire-edge-left,
 .digit-slot .tire-edge-right {
   position: absolute;
-  top: 10%;
-  bottom: 10%;
-  width: 8px;
+  top: 15%;
+  bottom: 15%;
+  width: 5px;
   z-index: 4;
   pointer-events: none;
   background: repeating-linear-gradient(
     180deg,
-    transparent 0px,
-    transparent 4px,
-    rgba(255,255,255,0.25) 4px,
-    rgba(255,255,255,0.25) 6px,
-    #333 6px,
-    #333 10px,
-    rgba(255,255,255,0.15) 10px,
-    rgba(255,255,255,0.15) 12px,
-    transparent 12px,
-    transparent 16px
+    rgba(255,255,255,0.06) 0px,
+    rgba(255,255,255,0.12) 2px,
+    rgba(80,80,80,0.4) 2px,
+    rgba(80,80,80,0.4) 4px,
+    rgba(255,255,255,0.08) 4px,
+    rgba(255,255,255,0.08) 5px,
+    transparent 5px,
+    transparent 8px
   );
+  /* Fade top/bottom for smooth blend */
+  mask-image: linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%);
 }
-.digit-slot .tire-edge-left  { left: -4px; }
-.digit-slot .tire-edge-right { right: -4px; }
+.digit-slot .tire-edge-left  { left: -3px; border-radius: 2px 0 0 2px; }
+.digit-slot .tire-edge-right { right: -3px; border-radius: 0 2px 2px 0; }
 
-/* Rolling: serrated teeth scroll */
+/* Rolling: teeth scroll smoothly */
 .digit-slot.rolling .tire-edge-left,
 .digit-slot.rolling .tire-edge-right {
-  animation: edgeScroll 0.08s linear infinite;
+  animation: edgeScroll 0.06s linear infinite;
 }
 @keyframes edgeScroll {
   0%   { background-position: 0 0; }
-  100% { background-position: 0 16px; }
+  100% { background-position: 0 8px; }
 }
 
 /* HD Tire Tread — Bold White Accent Lines */
@@ -740,58 +741,61 @@ body.flash {
 }
 
 /* ═══════════════════════════════════════════
-   BRAKE SMOKE — Multi-layered White Clouds
+   BRAKE SMOKE — Ground-level tire lock-up
+   Smoke rises from BOTTOM like braking on asphalt
 ═══════════════════════════════════════════ */
 .smoke-particle {
   position: absolute;
-  bottom: 20%;
+  bottom: -15px; /* Start at ground level below the tire */
   left: 50%;
-  margin-left: -60px;
-  width: 120px;
-  height: 120px;
+  margin-left: -40px;
+  width: 80px;
+  height: 50px; /* Flat/wide = ground smoke */
   pointer-events: none;
   z-index: -1;
   opacity: 0;
   border-radius: 50%;
-  /* Multi-layer cloud texture (not just one radial gradient) */
   background: 
-    radial-gradient(ellipse 60% 50% at 30% 40%, rgba(255,255,255,0.9) 0%, transparent 60%),
-    radial-gradient(ellipse 50% 60% at 70% 50%, rgba(240,240,240,0.7) 0%, transparent 55%),
-    radial-gradient(ellipse 70% 40% at 50% 60%, rgba(220,220,220,0.5) 0%, transparent 50%),
-    radial-gradient(circle at 50% 50%, rgba(200,200,200,0.3) 0%, transparent 70%);
-  filter: blur(3px);
-  animation: brakeSmoke 2.2s cubic-bezier(0.05, 0.6, 0.2, 1) forwards;
+    radial-gradient(ellipse 80% 60% at 40% 50%, rgba(255,255,255,0.85) 0%, transparent 55%),
+    radial-gradient(ellipse 60% 70% at 65% 45%, rgba(240,240,240,0.6) 0%, transparent 50%),
+    radial-gradient(ellipse 90% 50% at 50% 55%, rgba(220,220,220,0.4) 0%, transparent 60%);
+  filter: blur(2px);
+  animation: brakeSmoke 1.8s cubic-bezier(0.05, 0.5, 0.15, 1) forwards;
 }
 
-/* Some particles use a denser cloud */
+/* Alternate particles — wider spread */
 .smoke-particle:nth-child(2n) {
+  width: 100px;
+  height: 40px;
+  margin-left: -50px;
   background: 
-    radial-gradient(ellipse 55% 55% at 40% 35%, rgba(255,255,255,0.85) 0%, transparent 55%),
-    radial-gradient(ellipse 45% 50% at 65% 60%, rgba(230,230,230,0.6) 0%, transparent 50%),
-    radial-gradient(circle at 50% 50%, rgba(210,210,210,0.35) 0%, transparent 65%);
-  filter: blur(4px);
+    radial-gradient(ellipse 70% 50% at 35% 50%, rgba(255,255,255,0.7) 0%, transparent 50%),
+    radial-gradient(ellipse 50% 60% at 70% 40%, rgba(230,230,230,0.5) 0%, transparent 45%);
+  filter: blur(3px);
 }
 
 @keyframes brakeSmoke {
   0% {
-    transform: translate(0, 0) scale(0.15);
+    transform: translate(0, 0) scaleX(0.5) scaleY(0.3);
     opacity: 0;
   }
-  5% {
-    opacity: 0.95;
+  6% {
+    opacity: 0.9;
   }
-  25% {
+  20% {
+    /* Smoke expands wide and flat along ground */
+    transform: translate(var(--smoke-x), -10px) scaleX(2) scaleY(0.8);
     opacity: 0.7;
-    filter: blur(4px);
+    filter: blur(3px);
   }
-  60% {
-    opacity: 0.25;
-    filter: blur(8px);
+  50% {
+    opacity: 0.3;
+    filter: blur(6px);
   }
   100% {
-    transform: translate(var(--smoke-x), var(--smoke-y)) scale(var(--smoke-s, 3.5));
+    transform: translate(var(--smoke-x), var(--smoke-y)) scaleX(var(--smoke-s, 3)) scaleY(1.5);
     opacity: 0;
-    filter: blur(12px);
+    filter: blur(10px);
   }
 }
 
