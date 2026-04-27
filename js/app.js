@@ -111,7 +111,7 @@ function updateWinnersList() {
 
 function resetDigitDisplay() {
   DOM.digitSlots.forEach(slot => {
-    slot.classList.remove('revealed','rolling','locked');
+    slot.classList.remove('revealed','rolling','locked','slowing');
     const d = slot.querySelector('.digit-display');
     if (d) d.textContent = '?';
   });
@@ -165,10 +165,8 @@ function startAllSpinning() {
     }, speed);
   });
 
-  // Tick sound
-  AppState.tickInterval = setInterval(() => {
-    SoundEngine.playTick(0.6 + Math.random() * 0.5);
-  }, 100);
+  // Fast spinning click sounds
+  SoundEngine.startTension();
 
   updateButton();
   updateStats();
@@ -208,13 +206,17 @@ function stopNextSlot() {
         const smoke = document.createElement('div');
         smoke.className = 'smoke-particle';
         smoke.style.position = 'absolute';
-        smoke.style.left = (slotCenterX + (Math.random() * 80 - 40)) + 'px';
-        smoke.style.top  = (slotBottom - 30 - Math.random() * 40) + 'px';
-        const size = Math.floor(15 + Math.random() * 20);
+        smoke.style.left = (slotCenterX + (Math.random() * 120 - 60)) + 'px';
+        smoke.style.top  = (slotBottom - 25 - Math.random() * 50) + 'px';
+        const size = Math.floor(12 + Math.random() * 24);
         smoke.style.setProperty('--size', size + 'px');
-        smoke.style.setProperty('--smoke-x', (Math.random() * 180 - 90) + 'px');
-        smoke.style.setProperty('--smoke-y', (-20 - Math.random() * 80) + 'px');
-        smoke.style.animationDelay = (Math.random() * 0.1) + 's';
+        smoke.style.setProperty('--smoke-x', (Math.random() * 200 - 100) + 'px');
+        smoke.style.setProperty('--smoke-y', (-15 - Math.random() * 90) + 'px');
+        smoke.style.animationDelay = (Math.random() * 0.15) + 's';
+        // ~8% of smoke puffs appear IN FRONT of the tire for subtle depth
+        if (Math.random() < 0.08) {
+          smoke.style.zIndex = '3';
+        }
         stage.appendChild(smoke);
         setTimeout(() => smoke.remove(), 2200);
       }
@@ -267,7 +269,7 @@ function stopNextSlot() {
     
     // Emit braking smoke gradually while slowing down
     if (slowsLeft % 2 === 0) {
-      emitSmoke(5);
+      emitSmoke(8);
       emitDots(8);
       emitSparks(3);
     }
@@ -284,7 +286,7 @@ function stopNextSlot() {
       SoundEngine.playLock();
       
       // Emit the final big burst of smoke
-      emitSmoke(18);
+      emitSmoke(25);
       emitSparks(20);
       emitDots(30);
 
@@ -412,12 +414,20 @@ function exportCSV() {
 
 // ── Reset ──────────────────────────────────────────────────
 function resetAll() {
-  AppState.rollIntervals.forEach(id => clearInterval(id));
-  AppState.rollIntervals = [];
-  clearInterval(AppState.tickInterval);
-  AppState.tickInterval = null;
+  if (!confirm('Peringatan: Ini akan menghapus semua daftar pemenang. Lanjutkan?')) return;
 
-  if (!confirm('Reset all winners?')) return;
+  // Stop all active intervals and timeouts
+  AppState.rollIntervals.forEach(id => {
+    clearInterval(id);
+    clearTimeout(id);
+  });
+  AppState.rollIntervals = [];
+
+  // Stop any playing sounds
+  SoundEngine.stopTension();
+
+  // Remove any active smoke or particles from the stage
+  document.querySelectorAll('.smoke-particle, .spark-pixel, .smoke-dot').forEach(el => el.remove());
 
   AppState.phase = PHASE.IDLE;
   AppState.stoppedCount = 0;
