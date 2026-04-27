@@ -1,6 +1,6 @@
 /**
- * SYNC ENGINE — Real-time Remote Trigger via Ntfy (HTTP SSE)
- * 100% reliable cross-device communication without WebRTC firewall issues.
+ * SYNC ENGINE v10 — WebSocket-based (replaces broken SSE)
+ * Uses ntfy.sh WebSocket for subscribing + HTTP POST for publishing.
  */
 
 const SyncEngine = (() => {
@@ -8,7 +8,10 @@ const SyncEngine = (() => {
   let isHost = false;
   let pairingCode = null;
   let statusCallback = null;
-  let eventSource = null;
+  let ws = null;
+  let connected = false;
+  let pingInterval = null;
+  let connectionTimeout = null;
 
   function handleIncoming(payload) {
     if (!payload || !payload.type) return;
@@ -19,18 +22,17 @@ const SyncEngine = (() => {
 
   function emit(type, payload = {}) {
     const event = { type, payload, sender: isHost ? 'host' : 'remote', ts: Date.now() };
-    
+
     // Process locally for immediate UI response
     if (isHost || type === 'action') {
       handleIncoming(event);
     }
 
     if (pairingCode) {
-      // Send to server
-      fetch(`https://ntfy.sh/doorprize-v2-${pairingCode}`, {
+      fetch(`https://ntfy.sh/doorprize-v3-${pairingCode}`, {
         method: 'POST',
         body: JSON.stringify(event)
-      }).catch(console.error);
+      }).catch(err => console.warn('[Sync] POST error:', err));
     }
   }
 
@@ -40,57 +42,66 @@ const SyncEngine = (() => {
   function notifyStatus(status, text) { if (statusCallback) statusCallback(status, text); }
 
   function connectToRoom(code, asHost) {
-    if (eventSource) eventSource.close();
-    
-    eventSource = new EventSource(`https://ntfy.sh/doorprize-v2-${code}/sse`);
-    
-    eventSource.onopen = () => {
+    if (ws) { try { ws.close(); } catch(e){} }
+    connected = false;
+
+    const wsUrl = `wss://ntfy.sh/doorprize-v3-${code}/ws`;
+    ws = new WebSocket(wsUrl);
+
+    ws.onopen = () => {
+      console.log('[Sync] WebSocket open, role:', asHost ? 'host' : 'remote');
       if (asHost) {
         notifyStatus('ready', code);
         window.dispatchEvent(new CustomEvent('doorprize:pairing_code', { detail: code }));
       }
     };
 
-    eventSource.onerror = () => {
-      console.warn("Connection issue, retrying...");
+    ws.onerror = (err) => {
+      console.warn('[Sync] WebSocket error:', err);
     };
 
-    eventSource.onmessage = (e) => {
+    ws.onclose = () => {
+      console.warn('[Sync] WebSocket closed');
+    };
+
+    ws.onmessage = (e) => {
       try {
         const data = JSON.parse(e.data);
-        if (data.event === 'message') {
-          const payload = JSON.parse(data.message);
-          
-          // Ignore messages sent by ourselves
-          // BUG FIX: was using === instead of && for the second condition
-          if (asHost && payload.sender === 'host') return;
-          if (!asHost && payload.sender === 'remote') return;
-          
-          // Handshake logic
-          if (asHost && payload.type === 'ping') {
-            // Remote says hello, host replies with pong
-            window.dispatchEvent(new CustomEvent('doorprize:remote_connected'));
-            emit('pong');
-            return;
-          }
-          
-          // BUG FIX: was `!asHost && payload.type === 'pong'` which evaluates incorrectly
-          // due to operator precedence — `!asHost && payload.type` is always truthy/falsy string comparison
-          if (!asHost && payload.type === 'pong') {
-            // Host confirmed our ping, we are connected!
-            notifyStatus('connected', 'Connected to main display');
-            window.dispatchEvent(new CustomEvent('doorprize:connected'));
-            return;
-          }
-          
-          if (asHost && payload.type === 'action') {
-            window.dispatchEvent(new CustomEvent('doorprize:remote_connected'));
-          }
+        if (data.event !== 'message') return;
 
-          handleIncoming(payload);
+        const payload = JSON.parse(data.message);
+        if (!payload || !payload.type) return;
+
+        // Ignore our own messages
+        if (asHost && payload.sender === 'host') return;
+        if (!asHost && payload.sender === 'remote') return;
+
+        // Handshake: host receives ping -> sends pong
+        if (asHost && payload.type === 'ping') {
+          console.log('[Sync] Got ping, sending pong');
+          window.dispatchEvent(new CustomEvent('doorprize:remote_connected'));
+          emit('pong');
+          return;
         }
+
+        // Handshake: remote receives pong -> mark connected
+        if (!asHost && payload.type === 'pong') {
+          console.log('[Sync] Got pong — CONNECTED!');
+          connected = true;
+          clearInterval(pingInterval);
+          clearTimeout(connectionTimeout);
+          notifyStatus('connected', 'Connected to main display');
+          window.dispatchEvent(new CustomEvent('doorprize:connected'));
+          return;
+        }
+
+        if (asHost && payload.type === 'action') {
+          window.dispatchEvent(new CustomEvent('doorprize:remote_connected'));
+        }
+
+        handleIncoming(payload);
       } catch (err) {
-        console.warn('SyncEngine parse error:', err);
+        // ignore non-JSON messages (keepalive, open events)
       }
     };
   }
@@ -105,28 +116,43 @@ const SyncEngine = (() => {
   function connectRemote(code) {
     isHost = false;
     pairingCode = code;
-    notifyStatus('connecting', 'Connecting...');
+    connected = false;
+    notifyStatus('connecting', 'Verifying code...');
     connectToRoom(code, false);
-    
-    // Send initial ping immediately
-    setTimeout(() => emit('ping'), 500);
 
-    // Then send ping every 2 seconds until we receive a pong
-    const pingInterval = setInterval(() => {
-      emit('ping');
+    // Send ping after WebSocket is ready, then retry every 2s
+    clearInterval(pingInterval);
+    pingInterval = setInterval(() => {
+      if (!connected && ws && ws.readyState === WebSocket.OPEN) {
+        console.log('[Sync] Sending ping...');
+        emit('ping');
+      }
     }, 2000);
-    
-    // Stop pinging once connected
-    window.addEventListener('doorprize:connected', () => {
-      clearInterval(pingInterval);
-    }, { once: true });
+
+    // First ping after 1s
+    setTimeout(() => {
+      if (!connected && ws && ws.readyState === WebSocket.OPEN) {
+        emit('ping');
+      }
+    }, 1000);
+
+    // Timeout after 12 seconds
+    clearTimeout(connectionTimeout);
+    connectionTimeout = setTimeout(() => {
+      if (!connected) {
+        clearInterval(pingInterval);
+        if (ws) ws.close();
+        pairingCode = null;
+        notifyStatus('error', 'Kode salah / Host tidak aktif');
+        window.dispatchEvent(new CustomEvent('doorprize:error'));
+      }
+    }, 12000);
   }
 
-  // Fallback signature for old calls
   function init(role) {
     if (role === 'host') initHost();
   }
-  
+
   function getRole() {
     return isHost ? 'host' : 'remote';
   }
