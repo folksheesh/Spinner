@@ -5,16 +5,18 @@
 ═══════════════════════════════════════════ */
 :root {
   /* Dunlop branded — dark asphalt background */
-  --bg: #1e1e24; 
+  --bg: #1e1e24;
   --bg-mid: #2a2a32;
   --surface: rgba(255, 255, 255, 0.04);
   --surface-2: rgba(255, 255, 255, 0.07);
   --border: rgba(255, 255, 255, 0.08);
-  --accent: #FFED00; /* Dunlop Yellow as DEFAULT */
+  --accent: #FFED00;
+  /* Dunlop Yellow as DEFAULT */
   --accent-hot: #FFF44F;
   --accent-dim: rgba(255, 237, 0, 0.15);
   --accent-glow: rgba(255, 237, 0, 0.4);
-  --green: #FFED00; /* Dunlop Yellow */
+  --green: #FFED00;
+  /* Dunlop Yellow */
   --green-dim: rgba(255, 237, 0, 0.15);
   --green-glow: rgba(255, 237, 0, 0.4);
 
@@ -76,8 +78,7 @@ body {
     radial-gradient(ellipse 35% 25% at 50% 10%, rgba(255, 237, 0, 0.08) 0%, transparent 70%),
     radial-gradient(ellipse 25% 20% at 20% 85%, rgba(227, 0, 15, 0.04) 0%, transparent 60%),
     /* Tire Track Pattern */
-    repeating-linear-gradient(
-      -45deg,
+    repeating-linear-gradient(-45deg,
       transparent,
       transparent 40px,
       rgba(255, 255, 255, 0.015) 40px,
@@ -85,10 +86,8 @@ body {
       transparent 50px,
       transparent 60px,
       rgba(255, 255, 255, 0.01) 60px,
-      rgba(255, 255, 255, 0.01) 70px
-    ),
-    repeating-linear-gradient(
-      45deg,
+      rgba(255, 255, 255, 0.01) 70px),
+    repeating-linear-gradient(45deg,
       transparent,
       transparent 40px,
       rgba(255, 255, 255, 0.015) 40px,
@@ -96,15 +95,19 @@ body {
       transparent 50px,
       transparent 60px,
       rgba(255, 255, 255, 0.01) 60px,
-      rgba(255, 255, 255, 0.01) 70px
-    );
+      rgba(255, 255, 255, 0.01) 70px);
   background-blend-mode: screen;
   animation: ambientShift 15s ease-in-out infinite alternate;
 }
 
 @keyframes ambientShift {
-  0% { transform: translate(0, 0) scale(1) rotate(0deg); }
-  100% { transform: translate(-2%, 2%) scale(1.05) rotate(1deg); }
+  0% {
+    transform: translate(0, 0) scale(1) rotate(0deg);
+  }
+
+  100% {
+    transform: translate(-2%, 2%) scale(1.05) rotate(1deg);
+  }
 }
 
 /* Sweeping light beam */
@@ -382,7 +385,7 @@ body.flash {
 
 /* ── Sponsor Logo (No background) ── */
 .sponsor-logo {
-  height: 100px;
+  height: 60px;
   width: auto;
   margin-bottom: 0.5rem;
   background: none;
@@ -519,10 +522,11 @@ body.flash {
   overflow: visible;
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   flex-shrink: 0;
-  z-index: 2; /* Above smoke/debris siblings */
-  box-shadow: 
-    0 8px 25px rgba(0,0,0,0.9),
-    inset 0 0 15px rgba(0,0,0,0.6);
+  z-index: 2;
+  /* Above smoke/debris siblings */
+  box-shadow:
+    0 8px 25px rgba(0, 0, 0, 0.9),
+    inset 0 0 15px rgba(0, 0, 0, 0.6);
 }
 
 /* ── Refined Tire Sidewall Texture ── */
@@ -534,32 +538,44 @@ body.flash {
   width: 5px;
   z-index: 4;
   pointer-events: none;
-  background: repeating-linear-gradient(
-    180deg,
-    rgba(255,255,255,0.06) 0px,
-    rgba(255,255,255,0.12) 2px,
-    rgba(80,80,80,0.4) 2px,
-    rgba(80,80,80,0.4) 4px,
-    rgba(255,255,255,0.08) 4px,
-    rgba(255,255,255,0.08) 5px,
-    transparent 5px,
-    transparent 8px
-  );
+  background: repeating-linear-gradient(180deg,
+      rgba(255, 255, 255, 0.06) 0px,
+      rgba(255, 255, 255, 0.12) 2px,
+      rgba(80, 80, 80, 0.4) 2px,
+      rgba(80, 80, 80, 0.4) 4px,
+      rgba(255, 255, 255, 0.08) 4px,
+      rgba(255, 255, 255, 0.08) 5px,
+      transparent 5px,
+      transparent 8px);
   /* Fade top/bottom for smooth blend */
   mask-image: linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%);
   -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%);
 }
-.digit-slot .tire-edge-left  { left: -3px; border-radius: 2px 0 0 2px; }
-.digit-slot .tire-edge-right { right: -3px; border-radius: 0 2px 2px 0; }
+
+.digit-slot .tire-edge-left {
+  left: -3px;
+  border-radius: 2px 0 0 2px;
+}
+
+.digit-slot .tire-edge-right {
+  right: -3px;
+  border-radius: 0 2px 2px 0;
+}
 
 /* Rolling: teeth scroll smoothly */
 .digit-slot.rolling .tire-edge-left,
 .digit-slot.rolling .tire-edge-right {
   animation: edgeScroll 0.06s linear infinite;
 }
+
 @keyframes edgeScroll {
-  0%   { background-position: 0 0; }
-  100% { background-position: 0 8px; }
+  0% {
+    background-position: 0 0;
+  }
+
+  100% {
+    background-position: 0 8px;
+  }
 }
 
 /* HD Tire Tread — Bold White Accent Lines */
@@ -568,43 +584,38 @@ body.flash {
   position: absolute;
   inset: 0;
   border-radius: 40% / 8%;
-  background-image: 
+  background-image:
     /* Left V-groove — bright white edge */
-    linear-gradient(150deg, 
-      transparent 34%, 
-      rgba(255,255,255,0.4) 34%, rgba(255,255,255,0.4) 37%,
+    linear-gradient(150deg,
+      transparent 34%,
+      rgba(255, 255, 255, 0.4) 34%, rgba(255, 255, 255, 0.4) 37%,
       #2a2a2a 37%, #2a2a2a 42%,
-      rgba(255,255,255,0.2) 42%, rgba(255,255,255,0.2) 44%,
-      transparent 44%
-    ),
+      rgba(255, 255, 255, 0.2) 42%, rgba(255, 255, 255, 0.2) 44%,
+      transparent 44%),
     /* Right V-groove — bright white edge */
-    linear-gradient(210deg, 
-      transparent 34%, 
-      rgba(255,255,255,0.4) 34%, rgba(255,255,255,0.4) 37%,
+    linear-gradient(210deg,
+      transparent 34%,
+      rgba(255, 255, 255, 0.4) 34%, rgba(255, 255, 255, 0.4) 37%,
       #2a2a2a 37%, #2a2a2a 42%,
-      rgba(255,255,255,0.2) 42%, rgba(255,255,255,0.2) 44%,
-      transparent 44%
-    ),
+      rgba(255, 255, 255, 0.2) 42%, rgba(255, 255, 255, 0.2) 44%,
+      transparent 44%),
     /* Center channel with white rim */
-    linear-gradient(90deg, 
-      transparent 44%, 
-      rgba(255,255,255,0.25) 44%, rgba(255,255,255,0.25) 46%,
+    linear-gradient(90deg,
+      transparent 44%,
+      rgba(255, 255, 255, 0.25) 44%, rgba(255, 255, 255, 0.25) 46%,
       #111 46%, #111 54%,
-      rgba(255,255,255,0.25) 54%, rgba(255,255,255,0.25) 56%,
-      transparent 56%
-    ),
+      rgba(255, 255, 255, 0.25) 54%, rgba(255, 255, 255, 0.25) 56%,
+      transparent 56%),
     /* Shoulder white lines — left */
-    linear-gradient(90deg, 
-      transparent 2%, rgba(255,255,255,0.15) 2%, rgba(255,255,255,0.15) 5%, 
-      #1a1a1a 5%, #1a1a1a 9%, rgba(255,255,255,0.1) 9%, rgba(255,255,255,0.1) 11%, 
-      transparent 11%
-    ),
+    linear-gradient(90deg,
+      transparent 2%, rgba(255, 255, 255, 0.15) 2%, rgba(255, 255, 255, 0.15) 5%,
+      #1a1a1a 5%, #1a1a1a 9%, rgba(255, 255, 255, 0.1) 9%, rgba(255, 255, 255, 0.1) 11%,
+      transparent 11%),
     /* Shoulder white lines — right */
-    linear-gradient(90deg, 
-      transparent 89%, rgba(255,255,255,0.1) 89%, rgba(255,255,255,0.1) 91%, 
-      #1a1a1a 91%, #1a1a1a 95%, rgba(255,255,255,0.15) 95%, rgba(255,255,255,0.15) 98%, 
-      transparent 98%
-    );
+    linear-gradient(90deg,
+      transparent 89%, rgba(255, 255, 255, 0.1) 89%, rgba(255, 255, 255, 0.1) 91%,
+      #1a1a1a 91%, #1a1a1a 95%, rgba(255, 255, 255, 0.15) 95%, rgba(255, 255, 255, 0.15) 98%,
+      transparent 98%);
   background-size: 50% 32px, 50% 32px, 100% 100%, 100% 100%, 100% 100%;
   background-position: 0 0, 100% 0, 0 0, 0 0, 0 0;
   background-repeat: repeat-y, repeat-y, no-repeat, no-repeat, no-repeat;
@@ -618,37 +629,35 @@ body.flash {
   position: absolute;
   inset: 0;
   border-radius: 40% / 8%;
-  background: 
+  background:
     /* Heavy top/bottom shadow for concave illusion */
-    linear-gradient(to bottom, 
-      #000 0%, 
-      rgba(0,0,0,0.98) 4%,
-      rgba(0,0,0,0.85) 10%,
-      rgba(0,0,0,0.4) 25%, 
-      rgba(0,0,0,0.05) 42%, 
-      rgba(0,0,0,0) 48%, 
-      rgba(0,0,0,0) 52%, 
-      rgba(0,0,0,0.05) 58%,
-      rgba(0,0,0,0.4) 75%,
-      rgba(0,0,0,0.85) 90%,
-      rgba(0,0,0,0.98) 96%,
-      #000 100%
-    ),
+    linear-gradient(to bottom,
+      #000 0%,
+      rgba(0, 0, 0, 0.98) 4%,
+      rgba(0, 0, 0, 0.85) 10%,
+      rgba(0, 0, 0, 0.4) 25%,
+      rgba(0, 0, 0, 0.05) 42%,
+      rgba(0, 0, 0, 0) 48%,
+      rgba(0, 0, 0, 0) 52%,
+      rgba(0, 0, 0, 0.05) 58%,
+      rgba(0, 0, 0, 0.4) 75%,
+      rgba(0, 0, 0, 0.85) 90%,
+      rgba(0, 0, 0, 0.98) 96%,
+      #000 100%),
     /* Side-to-side curvature (barrel effect) */
     linear-gradient(to right,
-      rgba(0,0,0,0.5) 0%,
-      rgba(0,0,0,0.15) 15%,
-      rgba(0,0,0,0) 30%,
-      rgba(0,0,0,0) 70%,
-      rgba(0,0,0,0.15) 85%,
-      rgba(0,0,0,0.5) 100%
-    );
+      rgba(0, 0, 0, 0.5) 0%,
+      rgba(0, 0, 0, 0.15) 15%,
+      rgba(0, 0, 0, 0) 30%,
+      rgba(0, 0, 0, 0) 70%,
+      rgba(0, 0, 0, 0.15) 85%,
+      rgba(0, 0, 0, 0.5) 100%);
   background-blend-mode: multiply;
   pointer-events: none;
   z-index: 2;
-  box-shadow: 
-    inset 8px 0 15px rgba(255,255,255,0.05), 
-    inset -8px 0 15px rgba(255,255,255,0.05);
+  box-shadow:
+    inset 8px 0 15px rgba(255, 255, 255, 0.05),
+    inset -8px 0 15px rgba(255, 255, 255, 0.05);
 }
 
 .digit-display {
@@ -665,13 +674,13 @@ body.flash {
 /* Separator */
 .digit-sep {
   font-size: clamp(0.8rem, 1.5vw, 1.2rem);
-  color: rgba(255,255,255,0.05);
+  color: rgba(255, 255, 255, 0.05);
   user-select: none;
   flex-shrink: 0;
 }
 
 /* ── ROLLING ── */
-.digit-slot.rolling { }
+.digit-slot.rolling {}
 
 .digit-slot.rolling::before {
   animation: tireScroll 0.08s linear infinite;
@@ -679,21 +688,45 @@ body.flash {
 }
 
 @keyframes tireScroll {
-  0%   { background-position: 0 0px, 100% 0px, 0 0, 0 0, 0 0; }
-  100% { background-position: 0 32px, 100% 32px, 0 0, 0 0, 0 0; }
+  0% {
+    background-position: 0 0px, 100% 0px, 0 0, 0 0, 0 0;
+  }
+
+  100% {
+    background-position: 0 32px, 100% 32px, 0 0, 0 0, 0 0;
+  }
 }
 
 .digit-slot.rolling .digit-display {
   color: #fff;
-  text-shadow: 0 0 20px rgba(255,255,255,0.8);
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
   filter: blur(1px);
   transform: scaleY(1.6);
+}
+
+/* ── SLOWING (Braking before stop) ── */
+.digit-slot.slowing::before {
+  animation: tireScroll 0.3s linear infinite;
+  opacity: 0.8;
+}
+
+.digit-slot.slowing .tire-edge-left,
+.digit-slot.slowing .tire-edge-right {
+  animation: edgeScroll 0.3s linear infinite;
+}
+
+.digit-slot.slowing .digit-display {
+  color: #fff;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+  filter: blur(0px);
+  transform: scaleY(1);
+  transition: all 0.3s ease-out;
 }
 
 /* ── LOCKED (Dunlop Yellow + White Tread Still Visible) ── */
 .digit-slot.locked {
   background: linear-gradient(180deg, #1a1800 0%, #151200 30%, #1a1a1a 100%);
-  box-shadow: 
+  box-shadow:
     0 0 35px rgba(255, 237, 0, 0.25),
     0 0 70px rgba(255, 237, 0, 0.1),
     inset 0 0 25px rgba(255, 237, 0, 0.06);
@@ -702,33 +735,32 @@ body.flash {
 
 /* Keep tread texture visible when locked! */
 .digit-slot.locked::before {
-  opacity: 0.45; /* Much more visible than before */
+  opacity: 0.45;
+  /* Much more visible than before */
 }
 
 .digit-slot.locked::after {
-  background: 
-    linear-gradient(to bottom, 
-      rgba(0,0,0,0.9) 0%, 
-      rgba(0,0,0,0.3) 20%,
-      rgba(0,0,0,0) 40%, 
-      rgba(0,0,0,0) 60%, 
-      rgba(0,0,0,0.3) 80%,
-      rgba(0,0,0,0.9) 100%
-    ),
+  background:
+    linear-gradient(to bottom,
+      rgba(0, 0, 0, 0.9) 0%,
+      rgba(0, 0, 0, 0.3) 20%,
+      rgba(0, 0, 0, 0) 40%,
+      rgba(0, 0, 0, 0) 60%,
+      rgba(0, 0, 0, 0.3) 80%,
+      rgba(0, 0, 0, 0.9) 100%),
     linear-gradient(to right,
-      rgba(0,0,0,0.4) 0%,
-      rgba(0,0,0,0) 25%,
-      rgba(0,0,0,0) 75%,
-      rgba(0,0,0,0.4) 100%
-    );
-  box-shadow: 
+      rgba(0, 0, 0, 0.4) 0%,
+      rgba(0, 0, 0, 0) 25%,
+      rgba(0, 0, 0, 0) 75%,
+      rgba(0, 0, 0, 0.4) 100%);
+  box-shadow:
     inset 6px 0 15px rgba(255, 237, 0, 0.08),
     inset -6px 0 15px rgba(255, 237, 0, 0.08);
 }
 
 .digit-slot.locked .digit-display {
   color: #FFED00;
-  text-shadow: 
+  text-shadow:
     0 0 15px rgba(255, 237, 0, 0.9),
     0 0 40px rgba(255, 237, 0, 0.5),
     0 0 80px rgba(255, 237, 0, 0.2);
@@ -736,9 +768,17 @@ body.flash {
 }
 
 @keyframes lockBounce {
-  0% { transform: scale(1); }
-  40% { transform: scale(1.08); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+
+  40% {
+    transform: scale(1.08);
+  }
+
+  100% {
+    transform: scale(1);
+  }
 }
 
 /* ═══════════════════════════════════════════
@@ -751,13 +791,14 @@ body.flash {
   height: 50px;
   margin-left: -40px;
   pointer-events: none;
-  z-index: 1; /* Below digit-slot (z-index: 2) */
+  z-index: 1;
+  /* Below digit-slot (z-index: 2) */
   opacity: 0;
   border-radius: 50%;
-  background: 
-    radial-gradient(ellipse 80% 60% at 40% 50%, rgba(255,255,255,0.85) 0%, transparent 55%),
-    radial-gradient(ellipse 60% 70% at 65% 45%, rgba(240,240,240,0.6) 0%, transparent 50%),
-    radial-gradient(ellipse 90% 50% at 50% 55%, rgba(220,220,220,0.4) 0%, transparent 60%);
+  background:
+    radial-gradient(ellipse 80% 60% at 40% 50%, rgba(255, 255, 255, 0.85) 0%, transparent 55%),
+    radial-gradient(ellipse 60% 70% at 65% 45%, rgba(240, 240, 240, 0.6) 0%, transparent 50%),
+    radial-gradient(ellipse 90% 50% at 50% 55%, rgba(220, 220, 220, 0.4) 0%, transparent 60%);
   filter: blur(2px);
   animation: brakeSmoke 1.8s cubic-bezier(0.05, 0.5, 0.15, 1) forwards;
 }
@@ -767,9 +808,9 @@ body.flash {
   width: 100px;
   height: 40px;
   margin-left: -50px;
-  background: 
-    radial-gradient(ellipse 70% 50% at 35% 50%, rgba(255,255,255,0.7) 0%, transparent 50%),
-    radial-gradient(ellipse 50% 60% at 70% 40%, rgba(230,230,230,0.5) 0%, transparent 45%);
+  background:
+    radial-gradient(ellipse 70% 50% at 35% 50%, rgba(255, 255, 255, 0.7) 0%, transparent 50%),
+    radial-gradient(ellipse 50% 60% at 70% 40%, rgba(230, 230, 230, 0.5) 0%, transparent 45%);
   filter: blur(3px);
 }
 
@@ -778,19 +819,23 @@ body.flash {
     transform: translate(0, 0) scaleX(0.5) scaleY(0.3);
     opacity: 0;
   }
+
   6% {
     opacity: 0.9;
   }
+
   20% {
     /* Smoke expands wide and flat along ground */
     transform: translate(var(--smoke-x), -10px) scaleX(2) scaleY(0.8);
     opacity: 0.7;
     filter: blur(3px);
   }
+
   50% {
     opacity: 0.3;
     filter: blur(6px);
   }
+
   100% {
     transform: translate(var(--smoke-x), var(--smoke-y)) scaleX(var(--smoke-s, 3)) scaleY(1.5);
     opacity: 0;
@@ -806,26 +851,90 @@ body.flash {
   width: 5px;
   height: 5px;
   pointer-events: none;
-  z-index: 1; /* Below digit-slot (z-index: 2) */
+  z-index: 1;
+  /* Below digit-slot (z-index: 2) */
   opacity: 0;
   animation: pixelDebris 1.2s ease-out forwards;
   image-rendering: pixelated;
 }
 
-.spark-pixel:nth-child(3n)   { background: rgba(255,255,255,0.95); box-shadow: 0 0 3px rgba(255,255,255,0.5); }
-.spark-pixel:nth-child(3n+1) { background: rgba(200,200,200,0.85); }
-.spark-pixel:nth-child(3n+2) { background: rgba(255,237,0,0.75); box-shadow: 0 0 3px rgba(255,237,0,0.3); }
+.spark-pixel:nth-child(3n) {
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 0 3px rgba(255, 255, 255, 0.5);
+}
+
+.spark-pixel:nth-child(3n+1) {
+  background: rgba(200, 200, 200, 0.85);
+}
+
+.spark-pixel:nth-child(3n+2) {
+  background: rgba(255, 237, 0, 0.75);
+  box-shadow: 0 0 3px rgba(255, 237, 0, 0.3);
+}
 
 @keyframes pixelDebris {
   0% {
     transform: translate(0, 0) scale(1);
     opacity: 1;
   }
+
   30% {
     opacity: 0.9;
   }
+
   100% {
     transform: translate(var(--spark-x), var(--spark-y)) scale(0.2);
+    opacity: 0;
+  }
+}
+
+/* ═══════════════════════════════════════════
+   SMOKE MICRO-DOTS — Tiny pixel texture in smoke
+═══════════════════════════════════════════ */
+.smoke-dot {
+  position: absolute;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0;
+  image-rendering: pixelated;
+  animation: smokeDotFloat 1.5s ease-out forwards;
+}
+
+/* Color variations for realistic smoke grain */
+.smoke-dot:nth-child(4n) {
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.smoke-dot:nth-child(4n+1) {
+  background: rgba(220, 220, 220, 0.8);
+}
+
+.smoke-dot:nth-child(4n+2) {
+  background: rgba(180, 180, 180, 0.7);
+}
+
+.smoke-dot:nth-child(4n+3) {
+  background: rgba(255, 237, 0, 0.5);
+}
+
+/* Hint of Dunlop yellow */
+
+@keyframes smokeDotFloat {
+  0% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+
+  10% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.7;
+  }
+
+  100% {
+    transform: translate(var(--dot-x), var(--dot-y));
     opacity: 0;
   }
 }

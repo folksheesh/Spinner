@@ -180,77 +180,109 @@ function stopNextSlot() {
   const idx = AppState.stoppedCount;
   if (idx >= 6 || AppState.phase !== PHASE.SPINNING) return;
 
-  const targetDigit = AppState.currentWinner.id[idx];
-  clearInterval(AppState.rollIntervals[idx]);
-  AppState.rollIntervals[idx] = null;
+  // Increment immediately so fast clicks register the next slot correctly
+  AppState.stoppedCount++;
+  const isLastSlot = AppState.stoppedCount === 6;
 
   const slot    = DOM.digitSlots[idx];
   const display = slot.querySelector('.digit-display');
-  display.textContent = targetDigit;
+
+  // Switch to slowing phase
   slot.classList.remove('rolling');
-  slot.classList.add('locked');
-  SoundEngine.playLock();
-  
-  // ── Brake smoke (appended to parent so it renders BEHIND the slot) ──
-  const stage = DOM.digitsStage;
-  const slotRect = slot.getBoundingClientRect();
-  const stageRect = stage.getBoundingClientRect();
-  // Slot center relative to stage
-  const slotCenterX = slotRect.left - stageRect.left + slotRect.width / 2;
-  const slotBottom  = slotRect.bottom - stageRect.top;
+  slot.classList.add('slowing');
 
-  for (let i = 0; i < 12; i++) {
-    const smoke = document.createElement('div');
-    smoke.className = 'smoke-particle';
-    smoke.style.position = 'absolute';
-    smoke.style.left = slotCenterX + 'px';
-    smoke.style.top  = slotBottom + 'px';
-    // Wide horizontal spread, slight upward rise (ground smoke)
-    smoke.style.setProperty('--smoke-x', (Math.random() * 180 - 90) + 'px');
-    smoke.style.setProperty('--smoke-y', (-15 - Math.random() * 40) + 'px');
-    smoke.style.setProperty('--smoke-s', (2.5 + Math.random() * 2).toFixed(1));
-    smoke.style.animationDelay = (Math.random() * 0.2) + 's';
-    stage.appendChild(smoke);
-    setTimeout(() => smoke.remove(), 2200);
-  }
+  // Slow down the digit shuffling
+  clearInterval(AppState.rollIntervals[idx]);
+  AppState.rollIntervals[idx] = setInterval(() => {
+    display.textContent = Math.floor(Math.random() * 10);
+  }, 120);
 
-  // ── Pixel debris (also in parent, behind slots) ──
-  for (let i = 0; i < 20; i++) {
-    const spark = document.createElement('div');
-    spark.className = 'spark-pixel';
-    spark.style.position = 'absolute';
-    spark.style.left = (slotCenterX + (Math.random() * 40 - 20)) + 'px';
-    spark.style.top  = (slotBottom - 20 - Math.random() * 30) + 'px';
-    // Fly outward in all directions
-    const angle = Math.random() * Math.PI * 2;
-    const dist  = 30 + Math.random() * 100;
-    spark.style.setProperty('--spark-x', Math.cos(angle) * dist + 'px');
-    spark.style.setProperty('--spark-y', Math.sin(angle) * dist + 'px');
-    spark.style.animationDelay = (Math.random() * 0.2) + 's';
-    const size = 3 + Math.random() * 5;
-    spark.style.width  = size + 'px';
-    spark.style.height = size + 'px';
-    stage.appendChild(spark);
-    setTimeout(() => spark.remove(), 1200);
-  }
+  // Wait 400ms for the slowing down animation, then finally lock
+  setTimeout(() => {
+    clearInterval(AppState.rollIntervals[idx]);
+    AppState.rollIntervals[idx] = null;
 
-  AppState.stoppedCount++;
+    const targetDigit = AppState.currentWinner.id[idx];
+    display.textContent = targetDigit;
+    slot.classList.remove('slowing');
+    slot.classList.add('locked');
+    SoundEngine.playLock();
+    
+    // ── Brake smoke (appended to parent so it renders BEHIND the slot) ──
+    const stage = DOM.digitsStage;
+    const slotRect = slot.getBoundingClientRect();
+    const stageRect = stage.getBoundingClientRect();
+    const slotCenterX = slotRect.left - stageRect.left + slotRect.width / 2;
+    const slotBottom  = slotRect.bottom - stageRect.top;
 
-  if (AppState.stoppedCount < 6) {
-    setStatus(`Digit ${AppState.stoppedCount} locked`, 'spinning');
-    updateButton();
-  }
+    for (let i = 0; i < 12; i++) {
+      const smoke = document.createElement('div');
+      smoke.className = 'smoke-particle';
+      smoke.style.position = 'absolute';
+      smoke.style.left = (slotCenterX + (Math.random() * 80 - 40)) + 'px';
+      smoke.style.top  = (slotBottom - 30 - Math.random() * 40) + 'px';
+      smoke.style.setProperty('--smoke-x', (Math.random() * 240 - 120) + 'px');
+      smoke.style.setProperty('--smoke-y', (-20 - Math.random() * 60) + 'px');
+      smoke.style.setProperty('--smoke-s', (2.5 + Math.random() * 2).toFixed(1));
+      smoke.style.animationDelay = (Math.random() * 0.2) + 's';
+      stage.appendChild(smoke);
+      setTimeout(() => smoke.remove(), 2200);
+    }
 
-  SyncEngine.emit('phase_change', { phase: PHASE.SPINNING, stoppedCount: AppState.stoppedCount });
+    // ── Pixel debris (chunky pieces flying out) ──
+    for (let i = 0; i < 20; i++) {
+      const spark = document.createElement('div');
+      spark.className = 'spark-pixel';
+      spark.style.position = 'absolute';
+      spark.style.left = (slotCenterX + (Math.random() * 80 - 40)) + 'px';
+      spark.style.top  = (slotBottom - 30 - Math.random() * 50) + 'px';
+      const angle = Math.random() * Math.PI * 2;
+      const dist  = 40 + Math.random() * 120;
+      spark.style.setProperty('--spark-x', Math.cos(angle) * dist + 'px');
+      spark.style.setProperty('--spark-y', Math.sin(angle) * dist + 'px');
+      spark.style.animationDelay = (Math.random() * 0.2) + 's';
+      const size = 3 + Math.random() * 5;
+      spark.style.width  = size + 'px';
+      spark.style.height = size + 'px';
+      stage.appendChild(spark);
+      setTimeout(() => spark.remove(), 1200);
+    }
 
-  // All locked → winner
-  if (AppState.stoppedCount === 6) {
-    clearInterval(AppState.tickInterval);
-    AppState.tickInterval = null;
-    AppState.phase = PHASE.DONE;
-    DOM.digitsStage?.classList.remove('active');
-    setTimeout(() => showWinner(AppState.currentWinner), 600);
-  }
+    // ── Smoke micro-pixels (tiny dots inside the smoke cloud for texture) ──
+    for (let i = 0; i < 30; i++) {
+      const dot = document.createElement('div');
+      dot.className = 'smoke-dot';
+      dot.style.position = 'absolute';
+      dot.style.left = (slotCenterX + (Math.random() * 100 - 50)) + 'px';
+      dot.style.top  = (slotBottom - 30 - Math.random() * 40) + 'px';
+      const angle = -Math.PI / 2 + (Math.random() * Math.PI - Math.PI / 2);
+      const dist  = 20 + Math.random() * 80;
+      dot.style.setProperty('--dot-x', Math.cos(angle) * dist + 'px');
+      dot.style.setProperty('--dot-y', Math.sin(angle) * dist + 'px');
+      dot.style.animationDelay = (Math.random() * 0.3) + 's';
+      const sz = 1 + Math.random() * 2;
+      dot.style.width  = sz + 'px';
+      dot.style.height = sz + 'px';
+      stage.appendChild(dot);
+      setTimeout(() => dot.remove(), 1800);
+    }
+
+    if (!isLastSlot) {
+      setStatus(`Digit ${idx + 1} locked`, 'spinning');
+      updateButton();
+    }
+
+    SyncEngine.emit('phase_change', { phase: PHASE.SPINNING, stoppedCount: idx + 1 });
+
+    // All locked → winner
+    if (isLastSlot) {
+      clearInterval(AppState.tickInterval);
+      AppState.tickInterval = null;
+      AppState.phase = PHASE.DONE;
+      DOM.digitsStage?.classList.remove('active');
+      setTimeout(() => showWinner(AppState.currentWinner), 600);
+    }
+  }, 400); // 400ms slowing down duration
 }
 
 // ── WINNER REVEAL ──────────────────────────────────────────
