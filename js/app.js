@@ -191,37 +191,46 @@ function stopNextSlot() {
   slot.classList.add('locked');
   SoundEngine.playLock();
   
-  // ── Brake smoke (from bottom, spreads sideways like tire lockup on asphalt) ──
+  // ── Brake smoke (appended to parent so it renders BEHIND the slot) ──
+  const stage = DOM.digitsStage;
+  const slotRect = slot.getBoundingClientRect();
+  const stageRect = stage.getBoundingClientRect();
+  // Slot center relative to stage
+  const slotCenterX = slotRect.left - stageRect.left + slotRect.width / 2;
+  const slotBottom  = slotRect.bottom - stageRect.top;
+
   for (let i = 0; i < 12; i++) {
     const smoke = document.createElement('div');
     smoke.className = 'smoke-particle';
+    smoke.style.position = 'absolute';
+    smoke.style.left = slotCenterX + 'px';
+    smoke.style.top  = slotBottom + 'px';
     // Wide horizontal spread, slight upward rise (ground smoke)
     smoke.style.setProperty('--smoke-x', (Math.random() * 180 - 90) + 'px');
     smoke.style.setProperty('--smoke-y', (-15 - Math.random() * 40) + 'px');
     smoke.style.setProperty('--smoke-s', (2.5 + Math.random() * 2).toFixed(1));
     smoke.style.animationDelay = (Math.random() * 0.2) + 's';
-    slot.appendChild(smoke);
+    stage.appendChild(smoke);
     setTimeout(() => smoke.remove(), 2200);
   }
 
-  // ── Pixel debris chunks (behind digit, pixelated brake dust) ──
+  // ── Pixel debris (also in parent, behind slots) ──
   for (let i = 0; i < 20; i++) {
     const spark = document.createElement('div');
     spark.className = 'spark-pixel';
-    // Start from center-bottom of the tire
-    spark.style.left = (30 + Math.random() * 40) + '%';
-    spark.style.top  = (50 + Math.random() * 40) + '%';
+    spark.style.position = 'absolute';
+    spark.style.left = (slotCenterX + (Math.random() * 40 - 20)) + 'px';
+    spark.style.top  = (slotBottom - 20 - Math.random() * 30) + 'px';
     // Fly outward in all directions
     const angle = Math.random() * Math.PI * 2;
     const dist  = 30 + Math.random() * 100;
     spark.style.setProperty('--spark-x', Math.cos(angle) * dist + 'px');
     spark.style.setProperty('--spark-y', Math.sin(angle) * dist + 'px');
     spark.style.animationDelay = (Math.random() * 0.2) + 's';
-    // Vary pixel size (chunky)
     const size = 3 + Math.random() * 5;
     spark.style.width  = size + 'px';
     spark.style.height = size + 'px';
-    slot.appendChild(spark);
+    stage.appendChild(spark);
     setTimeout(() => spark.remove(), 1200);
   }
 

@@ -511,7 +511,7 @@ body.flash {
   height: clamp(120px, 17vw, 180px);
   background-color: #222;
   border: none;
-  border-radius: 40% / 8%; /* Oval! Wide horizontal curve, subtle vertical */
+  border-radius: 40% / 8%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -519,6 +519,7 @@ body.flash {
   overflow: visible;
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   flex-shrink: 0;
+  z-index: 2; /* Above smoke/debris siblings */
   box-shadow: 
     0 8px 25px rgba(0,0,0,0.9),
     inset 0 0 15px rgba(0,0,0,0.6);
@@ -746,13 +747,11 @@ body.flash {
 ═══════════════════════════════════════════ */
 .smoke-particle {
   position: absolute;
-  bottom: -15px; /* Start at ground level below the tire */
-  left: 50%;
-  margin-left: -40px;
   width: 80px;
-  height: 50px; /* Flat/wide = ground smoke */
+  height: 50px;
+  margin-left: -40px;
   pointer-events: none;
-  z-index: -1;
+  z-index: 1; /* Below digit-slot (z-index: 2) */
   opacity: 0;
   border-radius: 50%;
   background: 
@@ -807,7 +806,7 @@ body.flash {
   width: 5px;
   height: 5px;
   pointer-events: none;
-  z-index: -1;
+  z-index: 1; /* Below digit-slot (z-index: 2) */
   opacity: 0;
   animation: pixelDebris 1.2s ease-out forwards;
   image-rendering: pixelated;
