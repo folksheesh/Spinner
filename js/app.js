@@ -31,6 +31,11 @@ const DOM = {
   get confettiContainer() { return document.getElementById('confetti-container'); },
   get winnersList()       { return document.getElementById('winners-list'); },
   get particles()         { return document.getElementById('particles'); },
+  get summaryBtn()        { return document.getElementById('summary-btn'); },
+  get summaryPanel()      { return document.getElementById('summary-panel'); },
+  get closeSummaryBtn()   { return document.getElementById('close-summary'); },
+  get summaryContent()    { return document.getElementById('summary-content'); },
+  get exportBtn()         { return document.getElementById('export-btn'); },
 };
 
 // ── Particles (subtle, small) ──────────────────────────────
@@ -241,6 +246,55 @@ function handleAction() {
   }
 }
 
+// ── Summary Panel ──────────────────────────────────────────
+function openSummary() {
+  const content = DOM.summaryContent;
+  if (!content) return;
+  
+  if (DB.winners.length === 0) {
+    content.innerHTML = '<div class="summary-empty">Belum ada pemenang.</div>';
+  } else {
+    let html = '<table class="summary-table"><thead><tr><th>No</th><th>ID</th><th>Nama</th><th>Departemen</th></tr></thead><tbody>';
+    DB.winners.forEach((w, i) => {
+      html += `<tr>
+        <td>${i + 1}</td>
+        <td class="col-id">${w.id}</td>
+        <td>${w.name}</td>
+        <td>${w.department}</td>
+      </tr>`;
+    });
+    html += '</tbody></table>';
+    content.innerHTML = html;
+  }
+  
+  DOM.summaryPanel.classList.add('visible');
+}
+
+function closeSummary() {
+  DOM.summaryPanel.classList.remove('visible');
+}
+
+function exportCSV() {
+  if (DB.winners.length === 0) {
+    alert('Belum ada data pemenang untuk diekspor.');
+    return;
+  }
+  let csv = 'No,ID,Nama,Departemen\\n';
+  DB.winners.forEach((w, i) => {
+    csv += `${i + 1},${w.id},"${w.name}","${w.department}"\\n`;
+  });
+  
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.setAttribute('href', url);
+  link.setAttribute('download', 'Daftar_Pemenang_DoorPrize.csv');
+  link.style.visibility = 'hidden';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
 // ── Reset ──────────────────────────────────────────────────
 function resetAll() {
   AppState.rollIntervals.forEach(id => clearInterval(id));
@@ -268,6 +322,10 @@ function bindEvents() {
   DOM.actionBtn?.addEventListener('click', () => { SoundEngine.unlock(); SyncEngine.emit('action'); });
   DOM.resetBtn?.addEventListener('click', resetAll);
   DOM.winnerDismiss?.addEventListener('click', dismissWinner);
+  
+  DOM.summaryBtn?.addEventListener('click', openSummary);
+  DOM.closeSummaryBtn?.addEventListener('click', closeSummary);
+  DOM.exportBtn?.addEventListener('click', exportCSV);
 
   DOM.soundBtn?.addEventListener('click', () => {
     const on = SoundEngine.toggle();

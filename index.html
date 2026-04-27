@@ -28,6 +28,7 @@
     </div>
     <div class="top-right">
       <div id="theme-switcher"></div>
+      <button class="top-btn" id="summary-btn">🏆 Summary</button>
       <button class="top-btn" id="sound-btn">🔊</button>
       <button class="top-btn" id="reset-btn">Reset</button>
     </div>
@@ -75,6 +76,22 @@
       <div class="winner-name" id="winner-name">—</div>
       <div class="winner-dept" id="winner-dept">—</div>
       <button class="winner-dismiss" id="winner-dismiss">Continue</button>
+    </div>
+  </div>
+
+  <!-- ═══ SUMMARY PANEL ═══ -->
+  <div class="summary-panel" id="summary-panel">
+    <div class="summary-inner">
+      <div class="summary-header">
+        <h2 class="summary-title">Daftar Pemenang</h2>
+        <button class="close-btn" id="close-summary">&times;</button>
+      </div>
+      <div class="summary-content" id="summary-content">
+        <!-- Table will be injected here -->
+      </div>
+      <div class="summary-footer">
+        <button class="btn-export" id="export-btn">Export CSV</button>
+      </div>
     </div>
   </div>
 
