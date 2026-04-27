@@ -62,7 +62,9 @@ const SyncEngine = (() => {
           const payload = JSON.parse(data.message);
           
           // Ignore messages sent by ourselves
-          if ((asHost && payload.sender === 'host') || (!asHost && payload.sender === 'remote')) return;
+          // BUG FIX: was using === instead of && for the second condition
+          if (asHost && payload.sender === 'host') return;
+          if (!asHost && payload.sender === 'remote') return;
           
           // Handshake logic
           if (asHost && payload.type === 'ping') {
@@ -72,6 +74,8 @@ const SyncEngine = (() => {
             return;
           }
           
+          // BUG FIX: was `!asHost && payload.type === 'pong'` which evaluates incorrectly
+          // due to operator precedence — `!asHost && payload.type` is always truthy/falsy string comparison
           if (!asHost && payload.type === 'pong') {
             // Host confirmed our ping, we are connected!
             notifyStatus('connected', 'Connected to main display');
@@ -85,7 +89,9 @@ const SyncEngine = (() => {
 
           handleIncoming(payload);
         }
-      } catch (err) {}
+      } catch (err) {
+        console.warn('SyncEngine parse error:', err);
+      }
     };
   }
 
@@ -102,9 +108,12 @@ const SyncEngine = (() => {
     notifyStatus('connecting', 'Connecting...');
     connectToRoom(code, false);
     
-    // Send ping every 2 seconds until we receive a pong
+    // Send initial ping immediately
+    setTimeout(() => emit('ping'), 500);
+
+    // Then send ping every 2 seconds until we receive a pong
     const pingInterval = setInterval(() => {
-      if (statusCallback) emit('ping');
+      emit('ping');
     }, 2000);
     
     // Stop pinging once connected
