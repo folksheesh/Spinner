@@ -4,58 +4,32 @@
  * ID harus 6 digit angka
  */
 
-const EMPLOYEE_DATABASE = [
-  { id: "100001", name: "Ahmad Fauzi", department: "Engineering" },
-  { id: "100002", name: "Budi Santoso", department: "Marketing" },
-  { id: "100003", name: "Citra Dewi", department: "HR" },
-  { id: "100004", name: "Dian Pratiwi", department: "Finance" },
-  { id: "100005", name: "Eko Prasetyo", department: "Operations" },
-  { id: "100006", name: "Fitria Sari", department: "Engineering" },
-  { id: "100007", name: "Galih Wibowo", department: "Sales" },
-  { id: "100008", name: "Hana Kusuma", department: "Marketing" },
-  { id: "100009", name: "Irwan Hakim", department: "IT" },
-  { id: "100010", name: "Joko Widodo", department: "Operations" },
-  { id: "100011", name: "Kartika Sari", department: "Finance" },
-  { id: "100012", name: "Luthfi Anwar", department: "Engineering" },
-  { id: "100013", name: "Maya Putri", department: "HR" },
-  { id: "100014", name: "Nanda Rizki", department: "Sales" },
-  { id: "100015", name: "Oki Setiawan", department: "IT" },
-  { id: "100016", name: "Putri Rahayu", department: "Marketing" },
-  { id: "100017", name: "Qori Amalia", department: "Finance" },
-  { id: "100018", name: "Rizky Maulana", department: "Engineering" },
-  { id: "100019", name: "Sari Indah", department: "Operations" },
-  { id: "100020", name: "Taufik Hidayat", department: "Sales" },
-  { id: "100021", name: "Umi Kalsum", department: "HR" },
-  { id: "100022", name: "Vino Bastian", department: "Marketing" },
-  { id: "100023", name: "Wahyu Nugroho", department: "Engineering" },
-  { id: "100024", name: "Xena Putri", department: "IT" },
-  { id: "100025", name: "Yogi Pradana", department: "Finance" },
-  { id: "100026", name: "Zahra Nadia", department: "Operations" },
-  { id: "100027", name: "Arief Budiman", department: "Sales" },
-  { id: "100028", name: "Bella Safira", department: "Engineering" },
-  { id: "100029", name: "Cecep Kurniawan", department: "Marketing" },
-  { id: "100030", name: "Dewi Ratnasari", department: "HR" },
-  { id: "100031", name: "Eko Wahyudi", department: "IT" },
-  { id: "100032", name: "Fani Oktavia", department: "Finance" },
-  { id: "100033", name: "Gilang Ramadhan", department: "Operations" },
-  { id: "100034", name: "Hendra Gunawan", department: "Engineering" },
-  { id: "100035", name: "Indri Lestari", department: "Sales" },
-  { id: "100036", name: "Jaka Sembung", department: "Marketing" },
-  { id: "100037", name: "Kiki Amalia", department: "HR" },
-  { id: "100038", name: "Lili Kurnia", department: "Finance" },
-  { id: "100039", name: "Maman Suryaman", department: "Engineering" },
-  { id: "100040", name: "Nita Anggraini", department: "Operations" },
-  { id: "100041", name: "Omar Bakri", department: "IT" },
-  { id: "100042", name: "Peni Rahayu", department: "Sales" },
-  { id: "100043", name: "Qiqi Amara", department: "Marketing" },
-  { id: "100044", name: "Rendi Pratama", department: "Engineering" },
-  { id: "100045", name: "Siska Pertiwi", department: "HR" },
-  { id: "100046", name: "Toni Wahyudi", department: "Finance" },
-  { id: "100047", name: "Udin Sedunia", department: "Operations" },
-  { id: "100048", name: "Vivi Natalia", department: "Marketing" },
-  { id: "100049", name: "Wulan Sari", department: "Engineering" },
-  { id: "100050", name: "Yusuf Mansur", department: "Sales" },
-];
+// Generate 1200 dummy employees dynamically
+function generateEmployees(count) {
+  const depts = ['Engineering', 'Marketing', 'HR', 'Finance', 'Operations', 'Sales', 'IT', 'Legal', 'Product', 'Logistics'];
+  const firstNames = ['Ahmad', 'Budi', 'Citra', 'Dian', 'Eko', 'Fitria', 'Galih', 'Hana', 'Irwan', 'Joko', 'Kartika', 'Luthfi', 'Maya', 'Nanda', 'Oki', 'Putri', 'Qori', 'Rizky', 'Sari', 'Taufik', 'Umi', 'Vino', 'Wahyu', 'Xena', 'Yogi', 'Zahra', 'Aditya', 'Bella', 'Chandra', 'Desy', 'Reza', 'Kevin', 'Siska', 'Rini', 'Dodi', 'Tito', 'Andre'];
+  const lastNames = ['Fauzi', 'Santoso', 'Dewi', 'Pratiwi', 'Prasetyo', 'Sari', 'Wibowo', 'Kusuma', 'Hakim', 'Widodo', 'Anwar', 'Putri', 'Rizki', 'Setiawan', 'Rahayu', 'Amalia', 'Maulana', 'Indah', 'Hidayat', 'Kalsum', 'Bastian', 'Nugroho', 'Pradana', 'Nadia', 'Budiman', 'Safira', 'Kurniawan', 'Ramadhan', 'Wijaya', 'Siregar', 'Simanjuntak', 'Lestari', 'Saputra'];
+  
+  const data = [];
+  const usedIds = new Set();
+  
+  for (let i = 0; i < count; i++) {
+    let id;
+    do {
+      // Generate random 6-digit number (100000 to 999999)
+      id = String(Math.floor(100000 + Math.random() * 900000));
+    } while (usedIds.has(id));
+    usedIds.add(id);
+    
+    const fname = firstNames[Math.floor(Math.random() * firstNames.length)];
+    const lname = lastNames[Math.floor(Math.random() * lastNames.length)];
+    const dept = depts[Math.floor(Math.random() * depts.length)];
+    data.push({ id, name: `${fname} ${lname}`, department: dept });
+  }
+  return data;
+}
+
+const EMPLOYEE_DATABASE = generateEmployees(1200);
 
 // State management for winners
 const DB = {

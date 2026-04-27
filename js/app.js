@@ -252,21 +252,37 @@ function openSummary() {
   if (!content) return;
   
   if (DB.winners.length === 0) {
-    content.innerHTML = '<div class="summary-empty">Belum ada pemenang.</div>';
+    content.innerHTML = '<div class="summary-empty">Belum ada pemenang yang diundi.</div>';
   } else {
-    let html = '<table class="summary-table"><thead><tr><th>No</th><th>ID</th><th>Nama</th><th>Departemen</th></tr></thead><tbody>';
-    DB.winners.forEach((w, i) => {
-      html += `<tr>
-        <td>${i + 1}</td>
-        <td class="col-id">${w.id}</td>
-        <td>${w.name}</td>
-        <td>${w.department}</td>
-      </tr>`;
+    let html = '<div class="summary-list">';
+    [...DB.winners].reverse().forEach((w, i) => {
+      html += `
+        <div class="summary-card" style="animation-delay: ${i * 0.04}s">
+          <div class="sc-number">${String(i + 1).padStart(2, '0')}</div>
+          <div class="sc-details">
+            <div class="sc-id">${w.id}</div>
+            <div class="sc-info">
+              <span class="sc-name">${w.name}</span>
+              <span class="sc-dot">•</span>
+              <span class="sc-dept">${w.department}</span>
+            </div>
+          </div>
+        </div>
+      `;
     });
-    html += '</tbody></table>';
+    html += '</div>';
     content.innerHTML = html;
   }
   
+  const footer = DOM.summaryPanel.querySelector('.summary-footer');
+  let countEl = footer.querySelector('.summary-count');
+  if (!countEl) {
+    countEl = document.createElement('div');
+    countEl.className = 'summary-count';
+    footer.insertBefore(countEl, DOM.exportBtn);
+  }
+  countEl.innerHTML = `Total: <span>${DB.winners.length}</span> Winners`;
+
   DOM.summaryPanel.classList.add('visible');
 }
 
