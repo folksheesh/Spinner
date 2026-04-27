@@ -1,30 +1,37 @@
 /**
- * SYNC ENGINE — Real-time Remote Trigger via PeerJS (WebRTC)
- * Allows cross-device communication via internet without a custom backend.
+ * SYNC ENGINE — Real-time Remote Trigger via Ntfy (HTTP SSE)
+ * 100% reliable cross-device communication without WebRTC firewall issues.
  */
 
 const SyncEngine = (() => {
-  let peer = null;
-  let connection = null;
   let listeners = {};
   let isHost = false;
   let pairingCode = null;
   let statusCallback = null;
+  let eventSource = null;
 
-  function handleIncoming(data) {
-    if (!data || !data.type) return;
-    const handler = listeners[data.type];
-    if (handler) handler(data.payload);
-    window.dispatchEvent(new CustomEvent('doorprize:' + data.type, { detail: data.payload }));
+  function handleIncoming(payload) {
+    if (!payload || !payload.type) return;
+    const handler = listeners[payload.type];
+    if (handler) handler(payload.payload);
+    window.dispatchEvent(new CustomEvent('doorprize:' + payload.type, { detail: payload.payload }));
   }
 
   function emit(type, payload = {}) {
-    const event = { type, payload, ts: Date.now() };
-    if (connection && connection.open) {
-      connection.send(event);
+    const event = { type, payload, sender: isHost ? 'host' : 'remote', ts: Date.now() };
+    
+    // Process locally for immediate UI response
+    if (isHost || type === 'action') {
+      handleIncoming(event);
     }
-    // Also handle locally for host UI updates
-    if (isHost) handleIncoming(event);
+
+    if (pairingCode) {
+      // Send to server
+      fetch(`https://ntfy.sh/doorprize-v2-${pairingCode}`, {
+        method: 'POST',
+        body: JSON.stringify(event)
+      }).catch(console.error);
+    }
   }
 
   function on(type, handler) { listeners[type] = handler; }
@@ -32,74 +39,60 @@ const SyncEngine = (() => {
   function setStatusCallback(cb) { statusCallback = cb; }
   function notifyStatus(status, text) { if (statusCallback) statusCallback(status, text); }
 
+  function connectToRoom(code, asHost) {
+    if (eventSource) eventSource.close();
+    
+    eventSource = new EventSource(`https://ntfy.sh/doorprize-v2-${code}/sse`);
+    
+    eventSource.onopen = () => {
+      if (asHost) {
+        notifyStatus('ready', code);
+        window.dispatchEvent(new CustomEvent('doorprize:pairing_code', { detail: code }));
+      } else {
+        notifyStatus('connected', 'Connected to main display');
+        window.dispatchEvent(new CustomEvent('doorprize:connected'));
+      }
+    };
+
+    eventSource.onerror = () => {
+      // It auto-reconnects, but we can notify
+      console.warn("Connection issue, retrying...");
+    };
+
+    eventSource.onmessage = (e) => {
+      try {
+        const data = JSON.parse(e.data);
+        if (data.event === 'message') {
+          const payload = JSON.parse(data.message);
+          // Ignore our own messages
+          if ((asHost && payload.sender === 'host') || (!asHost && payload.sender === 'remote')) return;
+          
+          if (asHost && payload.type === 'action') {
+            window.dispatchEvent(new CustomEvent('doorprize:remote_connected'));
+          }
+          handleIncoming(payload);
+        }
+      } catch (err) {}
+    };
+  }
+
   function initHost() {
     isHost = true;
-    if (typeof Peer === 'undefined') {
-      console.warn('PeerJS not loaded. Remote will not work across internet.');
-      return;
-    }
-    
-    // Generate 4-digit code
     pairingCode = Math.floor(1000 + Math.random() * 9000).toString();
-    const peerId = 'doorprize-v1-' + pairingCode;
-    
     notifyStatus('connecting', 'Generating pairing code...');
-    
-    peer = new Peer(peerId);
-    
-    peer.on('open', (id) => {
-      notifyStatus('ready', pairingCode);
-      window.dispatchEvent(new CustomEvent('doorprize:pairing_code', { detail: pairingCode }));
-    });
-
-    peer.on('connection', (conn) => {
-      connection = conn; // Keep single remote connection
-      notifyStatus('connected', 'Remote connected!');
-      window.dispatchEvent(new CustomEvent('doorprize:remote_connected'));
-      
-      conn.on('data', handleIncoming);
-      conn.on('close', () => {
-        connection = null;
-        notifyStatus('ready', pairingCode);
-        window.dispatchEvent(new CustomEvent('doorprize:remote_disconnected'));
-      });
-    });
-
-    peer.on('error', (err) => {
-      console.error(err);
-      notifyStatus('error', 'Connection error');
-    });
+    connectToRoom(pairingCode, true);
   }
 
   function connectRemote(code) {
     isHost = false;
-    if (typeof Peer === 'undefined') return;
+    pairingCode = code;
     notifyStatus('connecting', 'Connecting to main display...');
+    connectToRoom(code, false);
     
-    peer = new Peer();
-    
-    peer.on('open', () => {
-      const targetId = 'doorprize-v1-' + code;
-      connection = peer.connect(targetId, { reliable: true });
-      
-      connection.on('open', () => {
-        notifyStatus('connected', 'Connected to main display');
-        window.dispatchEvent(new CustomEvent('doorprize:connected'));
-      });
-
-      connection.on('data', handleIncoming);
-      
-      connection.on('close', () => {
-        notifyStatus('error', 'Disconnected from main display');
-        window.dispatchEvent(new CustomEvent('doorprize:disconnected'));
-      });
-    });
-
-    peer.on('error', (err) => {
-      console.error(err);
-      notifyStatus('error', 'Connection failed');
-      window.dispatchEvent(new CustomEvent('doorprize:error'));
-    });
+    // Ping host to let them know we are here
+    setTimeout(() => {
+      emit('ping');
+    }, 1000);
   }
 
   // Fallback signature for old calls
