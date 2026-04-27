@@ -2,164 +2,321 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-  <title>Remote Control – Door Prize</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Remote — Door Prize</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Inter:wght@400;600;700&display=swap');
-    :root { --gold:#FFD700;--gold2:#FFA500;--bg:#06060f;--card:rgba(255,255,255,0.06);--accent:#7c3aed;--accent2:#a855f7;--green:#22c55e;--red:#ef4444;--text:#fff;--dim:rgba(255,255,255,.55); }
-    *{box-sizing:border-box;margin:0;padding:0}
-    body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem 1.5rem;background-image:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(124,58,237,0.3) 0%,transparent 70%)}
-    .logo{font-family:'Orbitron',monospace;font-size:.7rem;letter-spacing:.2em;color:var(--dim);text-transform:uppercase;margin-bottom:1.5rem}
-    .card{background:var(--card);border:1px solid rgba(255,215,0,0.2);border-radius:28px;padding:2rem 1.8rem;width:100%;max-width:360px;text-align:center;backdrop-filter:blur(16px)}
-    .card-title{font-family:'Orbitron',monospace;font-size:1.2rem;font-weight:900;background:linear-gradient(135deg,var(--gold),var(--gold2),#fff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:.3rem}
-    .card-sub{color:var(--dim);font-size:.82rem;margin-bottom:1.8rem}
-    .conn{font-size:.78rem;color:var(--dim);margin-bottom:1.5rem;display:flex;align-items:center;justify-content:center;gap:.4rem}
-    .dot{width:9px;height:9px;border-radius:50%;background:var(--green);animation:blink 1.5s infinite}
-    @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Inter:wght@400;500;600;700&display=swap');
 
-    /* === BIG ACTION BUTTON === */
-    .action-remote{width:100%;border:none;border-radius:18px;padding:0;font-family:'Orbitron',monospace;cursor:pointer;transition:all .15s;touch-action:manipulation;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:130px;gap:.4rem;overflow:hidden;position:relative}
-    .action-remote:active{transform:scale(0.95)}
-    .action-remote:disabled{opacity:.4;cursor:not-allowed;transform:none}
-    .btn-label{font-size:1.8rem;font-weight:900;letter-spacing:.06em}
-    .btn-hint{font-family:'Inter',sans-serif;font-size:.75rem;font-weight:500;opacity:.8}
+    :root {
+      --bg:      #0b0b12;
+      --surface: #13131e;
+      --surface2:#1a1a28;
+      --border:  rgba(255,255,255,0.07);
+      --bg2:     rgba(255,255,255,0.06);
+      --gold:    #C9A84C;
+      --goldb:   #E8C96A;
+      --green:   #2ECC71;
+      --red:     #E74C3C;
+      --text:    #EAEAF2;
+      --muted:   #6B6B8A;
+    }
 
-    /* START state — gold */
-    .action-remote.state-start{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#000;box-shadow:0 8px 32px rgba(255,165,0,0.45)}
-    /* STOP state — red pulsing */
-    .action-remote.state-stop{background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;box-shadow:0 8px 32px rgba(239,68,68,0.5);animation:stopGlow .9s infinite}
-    @keyframes stopGlow{0%,100%{box-shadow:0 8px 32px rgba(239,68,68,0.5)}50%{box-shadow:0 8px 50px rgba(239,68,68,0.85)}}
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    /* Feedback */
-    .feedback{margin-top:1.2rem;padding:.8rem;border-radius:12px;font-size:.82rem;font-weight:600;min-height:44px;display:flex;align-items:center;justify-content:center;gap:.4rem;opacity:0;transition:opacity .3s;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);color:var(--green)}
-    .feedback.show{opacity:1}
+    body {
+      min-height: 100vh;
+      min-height: 100dvh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1.5rem;
+      background-image: radial-gradient(ellipse 80% 50% at 50% -5%, rgba(201,168,76,0.08) 0%, transparent 70%);
+      -webkit-tap-highlight-color: transparent;
+    }
 
-    /* Stop counter */
-    .stop-counter{display:none;margin-top:1rem}
-    .stop-counter.show{display:block}
-    .stop-label{font-size:.72rem;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.5rem}
-    .stop-dots{display:flex;justify-content:center;gap:.5rem}
-    .stop-dot{width:22px;height:22px;border-radius:50%;border:2px solid rgba(255,255,255,.2);transition:all .3s}
-    .stop-dot.locked{background:var(--green);border-color:var(--green);box-shadow:0 0 8px rgba(34,197,94,.6)}
+    /* ── Header ── */
+    .remote-header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+    .remote-eyebrow {
+      font-size: .65rem;
+      font-weight: 600;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: .5rem;
+    }
+    .remote-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -.01em;
+    }
 
-    /* Winner mini */
-    .winner-mini{display:none;margin-top:1.2rem;padding:1rem;border-radius:14px;background:rgba(255,215,0,.06);border:1px solid rgba(255,215,0,.25);animation:fadeIn .4s ease}
-    .winner-mini.show{display:block}
-    @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-    .wm-tag{font-size:.65rem;letter-spacing:.15em;color:var(--gold2);text-transform:uppercase;margin-bottom:.4rem}
-    .wm-id{font-family:'Orbitron',monospace;font-size:1.4rem;color:var(--gold);font-weight:900}
-    .wm-name{font-size:.95rem;font-weight:600;margin-top:.2rem}
-    .wm-dept{font-size:.75rem;color:var(--accent2)}
+    /* ── Conn indicator ── */
+    .conn-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: .45rem;
+      font-size: .72rem;
+      color: var(--muted);
+      margin-bottom: 2.5rem;
+    }
+    .conn-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: blink 1.8s infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+
+    /* ── Big Button ── */
+    .big-btn {
+      width: 100%;
+      max-width: 320px;
+      border: none;
+      border-radius: 16px;
+      padding: 2rem 1rem;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: .4rem;
+      touch-action: manipulation;
+      transition: transform .12s ease, box-shadow .15s ease;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .big-btn::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(255,255,255,0.1) 0%, transparent 50%);
+      pointer-events: none;
+    }
+    .big-btn:active   { transform: scale(0.96); }
+    .big-btn:disabled { opacity: .3; cursor: not-allowed; transform: none; }
+
+    .big-btn.state-start {
+      background: var(--gold);
+      color: #0b0b12;
+      box-shadow: 0 6px 28px rgba(201,168,76,0.35);
+    }
+    .big-btn.state-stop {
+      background: var(--red);
+      color: #fff;
+      box-shadow: 0 6px 28px rgba(231,76,60,0.4);
+      animation: stopGlow 1s infinite;
+    }
+    @keyframes stopGlow {
+      0%,100% { box-shadow: 0 6px 28px rgba(231,76,60,0.35); }
+      50%     { box-shadow: 0 6px 40px rgba(231,76,60,0.6); }
+    }
+
+    .btn-icon   { font-size: 2rem; line-height: 1; }
+    .btn-label  { font-size: 1.3rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+    .btn-caption{ font-size: .72rem; font-weight: 500; opacity: .75; letter-spacing: .03em; }
+
+    /* ── Progress dots ── */
+    .progress-section {
+      width: 100%; max-width: 320px;
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      transition: opacity .3s;
+    }
+    .progress-section.show { opacity: 1; }
+    .progress-label {
+      font-size: .65rem;
+      font-weight: 600;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-align: center;
+      margin-bottom: .7rem;
+    }
+    .progress-dots {
+      display: flex;
+      justify-content: center;
+      gap: .5rem;
+    }
+    .p-dot {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(255,255,255,0.12);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Orbitron', monospace;
+      font-size: .7rem;
+      color: var(--muted);
+      transition: all .3s;
+    }
+    .p-dot.locked {
+      background: rgba(46,204,113,0.12);
+      border-color: var(--green);
+      color: var(--green);
+      box-shadow: 0 0 10px rgba(46,204,113,0.25);
+    }
+
+    /* ── Toast feedback ── */
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(60px);
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: .55rem 1.3rem;
+      font-size: .78rem;
+      font-weight: 500;
+      color: var(--text);
+      white-space: nowrap;
+      transition: transform .3s cubic-bezier(.16,1,.3,1), opacity .3s;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    /* ── Winner mini card ── */
+    .winner-card {
+      width: 100%; max-width: 320px;
+      background: var(--surface);
+      border: 1px solid rgba(201,168,76,0.2);
+      border-radius: 16px;
+      padding: 1.2rem;
+      text-align: center;
+      display: none;
+      animation: fadeUp .4s ease;
+    }
+    .winner-card.show { display: block; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:none} }
+    .wc-tag  { font-size: .62rem; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: var(--gold); margin-bottom: .6rem; }
+    .wc-id   { font-family: 'Orbitron', monospace; font-size: 1.5rem; font-weight: 900; color: var(--goldb); }
+    .wc-name { font-size: .95rem; font-weight: 600; margin: .3rem 0 .2rem; }
+    .wc-dept { font-size: .72rem; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; }
   </style>
 </head>
 <body>
-  <div class="logo">📱 Door Prize Remote</div>
 
-  <div class="card">
-    <div class="card-title">REMOTE CONTROL</div>
-    <p class="card-sub">Kontrol layar besar dari HP</p>
+  <div class="remote-header">
+    <p class="remote-eyebrow">Door Prize 2025</p>
+    <h1 class="remote-title">Remote Control</h1>
+  </div>
 
-    <div class="conn"><span class="dot"></span> Terhubung ke layar utama</div>
+  <div class="conn-bar">
+    <span class="conn-dot"></span>
+    Terhubung ke layar utama
+  </div>
 
-    <!-- BIG BUTTON -->
-    <button class="action-remote state-start" id="action-remote-btn" aria-label="Mulai / Stop">
-      <span class="btn-label" id="rbtn-label">▶ MULAI</span>
-      <span class="btn-hint" id="rbtn-hint">Putar semua slot</span>
-    </button>
+  <!-- BIG BUTTON -->
+  <button class="big-btn state-start" id="big-btn">
+    <span class="btn-icon" id="btn-icon">▶</span>
+    <span class="btn-label" id="btn-label">Mulai</span>
+    <span class="btn-caption" id="btn-caption">Putar semua slot</span>
+  </button>
 
-    <!-- Stop progress dots -->
-    <div class="stop-counter" id="stop-counter">
-      <div class="stop-label">Digit terkunci</div>
-      <div class="stop-dots" id="stop-dots">
-        <div class="stop-dot" data-idx="0"></div>
-        <div class="stop-dot" data-idx="1"></div>
-        <div class="stop-dot" data-idx="2"></div>
-        <div class="stop-dot" data-idx="3"></div>
-        <div class="stop-dot" data-idx="4"></div>
-        <div class="stop-dot" data-idx="5"></div>
-      </div>
-    </div>
-
-    <div class="feedback" id="r-feedback">✅ Terkirim!</div>
-
-    <div class="winner-mini" id="winner-mini">
-      <div class="wm-tag">🏆 Pemenang</div>
-      <div class="wm-id"  id="wm-id">—</div>
-      <div class="wm-name" id="wm-name">—</div>
-      <div class="wm-dept" id="wm-dept">—</div>
+  <!-- PROGRESS DOTS -->
+  <div class="progress-section" id="progress-section">
+    <p class="progress-label">Digit Terkunci</p>
+    <div class="progress-dots" id="progress-dots">
+      <div class="p-dot" data-idx="0">1</div>
+      <div class="p-dot" data-idx="1">2</div>
+      <div class="p-dot" data-idx="2">3</div>
+      <div class="p-dot" data-idx="3">4</div>
+      <div class="p-dot" data-idx="4">5</div>
+      <div class="p-dot" data-idx="5">6</div>
     </div>
   </div>
+
+  <!-- WINNER CARD -->
+  <div class="winner-card" id="winner-card">
+    <p class="wc-tag">✦ Pemenang ✦</p>
+    <div class="wc-id"   id="wc-id">—</div>
+    <div class="wc-name" id="wc-name">—</div>
+    <div class="wc-dept" id="wc-dept">—</div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast">✓ Terkirim</div>
 
   <script src="js/database.js"></script>
   <script src="js/sync.js"></script>
   <script>
     SyncEngine.init('remote');
 
-    const btn      = document.getElementById('action-remote-btn');
-    const label    = document.getElementById('rbtn-label');
-    const hint     = document.getElementById('rbtn-hint');
-    const feedback = document.getElementById('r-feedback');
-    const counter  = document.getElementById('stop-counter');
-    const dots     = document.querySelectorAll('.stop-dot');
+    const bigBtn   = document.getElementById('big-btn');
+    const btnIcon  = document.getElementById('btn-icon');
+    const btnLabel = document.getElementById('btn-label');
+    const btnCaption = document.getElementById('btn-caption');
+    const progress = document.getElementById('progress-section');
+    const dots     = document.querySelectorAll('.p-dot');
+    const toast    = document.getElementById('toast');
+    const winCard  = document.getElementById('winner-card');
 
-    let remotePhase   = 'idle';    // idle | spinning | done
-    let stoppedCount  = 0;
-    let cooldown      = false;
+    let cooldown = false;
+    let remotePhase = 'idle';
+    let stopped = 0;
 
-    function setBtn(phase, stopped = 0) {
-      remotePhase  = phase;
-      stoppedCount = stopped;
+    function showToast(msg, ok = true) {
+      toast.textContent = (ok ? '✓ ' : '⚠ ') + msg;
+      toast.style.color = ok ? '' : '#E74C3C';
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 1800);
+    }
+
+    function setUI(phase, stoppedCount = 0) {
+      remotePhase = phase;
+      stopped = stoppedCount;
 
       if (phase === 'idle' || phase === 'done') {
-        btn.className = 'action-remote state-start';
-        label.textContent = phase === 'done' ? '▶ BERIKUTNYA' : '▶ MULAI';
-        hint.textContent  = 'Putar semua slot';
-        counter.classList.remove('show');
+        bigBtn.className = 'big-btn state-start';
+        btnIcon.textContent  = '▶';
+        btnLabel.textContent = phase === 'done' ? 'Berikutnya' : 'Mulai';
+        btnCaption.textContent = 'Putar semua slot';
+        progress.classList.remove('show');
         dots.forEach(d => d.classList.remove('locked'));
+        if (phase === 'idle') winCard.classList.remove('show');
       } else {
-        btn.className = 'action-remote state-stop';
-        label.textContent = '⏹ STOP';
-        hint.textContent  = `Kunci digit ke-${stopped + 1} dari 6`;
-        counter.classList.add('show');
-        // Update dots
-        dots.forEach((d, i) => { i < stopped ? d.classList.add('locked') : d.classList.remove('locked'); });
+        bigBtn.className = 'big-btn state-stop';
+        btnIcon.textContent  = '⏹';
+        btnLabel.textContent = 'Stop';
+        btnCaption.textContent = `Kunci digit ${stoppedCount + 1} dari 6`;
+        progress.classList.add('show');
+        dots.forEach((d, i) => i < stoppedCount ? d.classList.add('locked') : d.classList.remove('locked'));
       }
     }
 
-    function showFeedback(msg, ok = true) {
-      feedback.textContent  = ok ? '✅ ' + msg : '⚠️ ' + msg;
-      feedback.style.color  = ok ? 'var(--green)' : '#f87171';
-      feedback.classList.add('show');
-      setTimeout(() => feedback.classList.remove('show'), 2000);
-    }
-
-    btn.addEventListener('click', () => {
-      if (cooldown) { showFeedback('Tunggu sebentar...', false); return; }
+    bigBtn.addEventListener('click', () => {
+      if (cooldown) { showToast('Tunggu sebentar...', false); return; }
       cooldown = true;
       SyncEngine.emit('action');
-      showFeedback('Perintah terkirim!');
+      showToast('Perintah terkirim!');
       setTimeout(() => { cooldown = false; }, 600);
     });
 
-    // Sync updates from host
+    // Sync events from host
     window.addEventListener('doorprize:phase_change', e => {
-      setBtn(e.detail.phase, e.detail.stoppedCount || 0);
+      setUI(e.detail.phase, e.detail.stoppedCount || 0);
     });
 
     window.addEventListener('doorprize:winner_revealed', e => {
       const w = e.detail.winner;
-      setBtn('done', 6);
-      document.getElementById('wm-id').textContent   = w.id;
-      document.getElementById('wm-name').textContent = w.name;
-      document.getElementById('wm-dept').textContent = w.department;
-      document.getElementById('winner-mini').classList.add('show');
-      // Hide winner mini after next start
-    });
-
-    window.addEventListener('doorprize:phase_change', e => {
-      if (e.detail.phase === 'spinning' && e.detail.stoppedCount === 0) {
-        document.getElementById('winner-mini').classList.remove('show');
-      }
+      setUI('done', 6);
+      document.getElementById('wc-id').textContent   = w.id;
+      document.getElementById('wc-name').textContent = w.name;
+      document.getElementById('wc-dept').textContent = w.department;
+      winCard.classList.add('show');
     });
   </script>
 </body>

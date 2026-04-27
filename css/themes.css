@@ -1,0 +1,328 @@
+/* ═══════════════════════════════════════════════════════
+   THEME SWITCHER UI
+═══════════════════════════════════════════════════════ */
+.theme-switcher-wrap {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: center;
+  padding: .6rem 1rem;
+  background: rgba(0,0,0,0.45);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+#theme-switcher {
+  display: flex;
+  gap: .4rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  max-width: 900px;
+  width: 100%;
+}
+#theme-switcher::-webkit-scrollbar { display: none; }
+
+.theme-btn {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 100px;
+  padding: .32rem .8rem .32rem .45rem;
+  color: rgba(255,255,255,0.5);
+  font-family: 'Inter', sans-serif;
+  font-size: .7rem;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all .2s ease;
+  flex-shrink: 0;
+}
+.theme-btn:hover {
+  background: rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.85);
+  border-color: rgba(255,255,255,0.15);
+}
+.theme-btn.active {
+  background: rgba(255,255,255,0.1);
+  border-color: rgba(255,255,255,0.25);
+  color: #fff;
+}
+.theme-swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow: 0 0 6px rgba(255,255,255,0.15);
+}
+.theme-label { letter-spacing: .02em; }
+
+/* Push main content below fixed bar */
+.main-wrapper { padding-top: 3.5rem; }
+
+
+/* ═══════════════════════════════════════════════════════
+   THEME 1: ELEGANT NIGHT (default, already in style.css)
+   — no overrides needed, it IS the default
+═══════════════════════════════════════════════════════ */
+body.theme-elegant {
+  /* This is already the default in style.css */
+}
+
+
+/* ═══════════════════════════════════════════════════════
+   THEME 2: NEON ARCADE
+   — jet black, neon green/cyan, full Orbitron, scanlines
+═══════════════════════════════════════════════════════ */
+body.theme-arcade {
+  --bg:          #050508;
+  --surface:     #09090f;
+  --surface2:    #0e0e18;
+  --border:      rgba(0,255,136,0.1);
+  --border-gold: rgba(0,255,136,0.3);
+  --gold:        #00FF88;
+  --gold-bright: #00FFBB;
+  --gold-glow:   rgba(0,255,136,0.15);
+  --text:        #DFFFEC;
+  --text-muted:  #3A7A5A;
+  --text-dim:    rgba(0,255,136,0.2);
+  --green:       #00FF88;
+  --red:         #FF0066;
+  --red-glow:    rgba(255,0,102,0.3);
+
+  font-family: 'Orbitron', monospace;
+  background-image:
+    radial-gradient(ellipse 60% 40% at 50% 0%,   rgba(0,255,136,0.07) 0%, transparent 65%),
+    radial-gradient(ellipse 40% 30% at 85% 80%,  rgba(0,100,255,0.06) 0%, transparent 60%);
+}
+
+/* Scanline overlay */
+body.theme-arcade::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.12) 2px,
+    rgba(0,0,0,0.12) 4px
+  );
+  pointer-events: none;
+  z-index: 0;
+  animation: scanMove 8s linear infinite;
+}
+@keyframes scanMove {
+  from { background-position: 0 0; }
+  to   { background-position: 0 100px; }
+}
+
+body.theme-arcade .site-title {
+  font-family: 'Orbitron', monospace;
+  font-size: clamp(1.8rem, 5vw, 3.2rem);
+  font-weight: 900;
+  color: var(--gold);
+  text-shadow: 0 0 20px rgba(0,255,136,0.5), 0 0 60px rgba(0,255,136,0.2);
+  letter-spacing: .12em;
+}
+body.theme-arcade .title-accent { color: #00BBFF; text-shadow: 0 0 10px rgba(0,187,255,0.4); }
+body.theme-arcade .event-tag { color: #00BBFF; border-color: rgba(0,187,255,0.3); background: rgba(0,187,255,0.06); }
+body.theme-arcade .digit-slot.rolling { box-shadow: 0 0 20px rgba(0,255,136,0.3) inset, 0 0 30px rgba(0,255,136,0.2); }
+body.theme-arcade .winner-id-display { text-shadow: 0 0 30px rgba(0,255,136,0.5); }
+body.theme-arcade .btn-start { background: var(--gold); color: #050508; box-shadow: 0 4px 24px rgba(0,255,136,0.4); }
+body.theme-arcade .stats-strip { border-color: rgba(0,255,136,0.15); }
+
+
+/* ═══════════════════════════════════════════════════════
+   THEME 3: COSMIC DREAM
+   — deep space purple, violet stars, nebula glow
+═══════════════════════════════════════════════════════ */
+body.theme-cosmic {
+  --bg:          #060412;
+  --surface:     #0d0920;
+  --surface2:    #150f2e;
+  --border:      rgba(139,92,246,0.12);
+  --border-gold: rgba(167,139,250,0.28);
+  --gold:        #A78BFA;
+  --gold-bright: #C4B5FD;
+  --gold-glow:   rgba(167,139,250,0.15);
+  --text:        #EDE9FE;
+  --text-muted:  #7C6FAA;
+  --text-dim:    rgba(167,139,250,0.25);
+  --green:       #34D399;
+  --red:         #F472B6;
+  --red-glow:    rgba(244,114,182,0.3);
+
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -5%,  rgba(139,92,246,0.2)  0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 10% 60%,  rgba(236,72,153,0.08) 0%, transparent 55%),
+    radial-gradient(ellipse 40% 30% at 90% 30%,  rgba(59,130,246,0.08) 0%, transparent 55%);
+}
+
+/* Star field */
+body.theme-cosmic::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(circle 1px at 20%  15%, rgba(255,255,255,0.7) 0%, transparent 100%),
+    radial-gradient(circle 1px at 80%  25%, rgba(255,255,255,0.5) 0%, transparent 100%),
+    radial-gradient(circle 1px at 45%  60%, rgba(255,255,255,0.6) 0%, transparent 100%),
+    radial-gradient(circle 1px at 70%  80%, rgba(255,255,255,0.4) 0%, transparent 100%),
+    radial-gradient(circle 1px at 15%  75%, rgba(255,255,255,0.5) 0%, transparent 100%),
+    radial-gradient(circle 1px at 60%  10%, rgba(255,255,255,0.7) 0%, transparent 100%),
+    radial-gradient(circle 1px at 35%  90%, rgba(255,255,255,0.4) 0%, transparent 100%),
+    radial-gradient(circle 2px at 90%  60%, rgba(167,139,250,0.8) 0%, transparent 100%),
+    radial-gradient(circle 2px at 25%  40%, rgba(196,181,253,0.6) 0%, transparent 100%),
+    radial-gradient(circle 1px at 55%  35%, rgba(255,255,255,0.5) 0%, transparent 100%);
+  pointer-events: none;
+  z-index: 0;
+  animation: twinkle 4s ease-in-out infinite alternate;
+}
+@keyframes twinkle {
+  from { opacity: 0.6; }
+  to   { opacity: 1; }
+}
+
+body.theme-cosmic .site-title {
+  background: linear-gradient(135deg, #C4B5FD, #F0ABFC, #93C5FD);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 20px rgba(167,139,250,0.4));
+}
+body.theme-cosmic .title-accent { color: #F0ABFC; }
+body.theme-cosmic .event-tag { color: #C084FC; border-color: rgba(192,132,252,0.3); background: rgba(192,132,252,0.06); }
+body.theme-cosmic .winner-id-display { color: #C4B5FD; text-shadow: 0 0 24px rgba(167,139,250,0.4); }
+body.theme-cosmic .btn-start { background: linear-gradient(135deg, #7C3AED, #A855F7); color: #fff; box-shadow: 0 4px 24px rgba(124,58,237,0.4); }
+body.theme-cosmic .digit-slot.rolling { border-color: rgba(167,139,250,0.5); box-shadow: 0 0 20px rgba(167,139,250,0.2); }
+body.theme-cosmic .digit-slot.locked { border-color: rgba(52,211,153,0.4); box-shadow: 0 0 18px rgba(52,211,153,0.2); }
+body.theme-cosmic .stat-value.highlight { color: #F0ABFC; }
+
+
+/* ═══════════════════════════════════════════════════════
+   THEME 4: EMBER GLOW
+   — charcoal black, hot orange/amber, fire energy
+═══════════════════════════════════════════════════════ */
+body.theme-ember {
+  --bg:          #090400;
+  --surface:     #130800;
+  --surface2:    #1e0e00;
+  --border:      rgba(255,107,0,0.1);
+  --border-gold: rgba(255,150,50,0.28);
+  --gold:        #FF6B00;
+  --gold-bright: #FFAA44;
+  --gold-glow:   rgba(255,107,0,0.15);
+  --text:        #FFF0E0;
+  --text-muted:  #7A4A2A;
+  --text-dim:    rgba(255,150,50,0.2);
+  --green:       #FFD700;
+  --red:         #FF2200;
+  --red-glow:    rgba(255,34,0,0.35);
+
+  background-image:
+    radial-gradient(ellipse 70% 50% at 50% 100%, rgba(255,80,0,0.14)  0%, transparent 65%),
+    radial-gradient(ellipse 50% 40% at 50%   0%, rgba(255,150,0,0.06) 0%, transparent 60%);
+}
+
+/* Ember particles via box-shadow trick */
+body.theme-ember::before {
+  content: '';
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  height: 30vh;
+  background: linear-gradient(to top, rgba(255,60,0,0.06) 0%, transparent 100%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+body.theme-ember .site-title {
+  font-family: 'Playfair Display', serif;
+  background: linear-gradient(135deg, #FF9A3C, #FFD480, #FF6B00);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 20px rgba(255,107,0,0.4));
+}
+body.theme-ember .title-accent { color: #FF9A3C; }
+body.theme-ember .event-tag { color: #FF9A3C; border-color: rgba(255,150,50,0.3); background: rgba(255,107,0,0.06); }
+body.theme-ember .winner-id-display { color: var(--gold-bright); text-shadow: 0 0 20px rgba(255,107,0,0.5); }
+body.theme-ember .btn-start { background: linear-gradient(135deg, #FF6B00, #FF9500); color: #fff; box-shadow: 0 4px 24px rgba(255,107,0,0.45); }
+body.theme-ember .digit-slot.rolling { border-color: rgba(255,107,0,0.5); box-shadow: 0 0 20px rgba(255,107,0,0.25); }
+body.theme-ember .digit-slot.rolling .digit-display { color: #FF9A3C; }
+body.theme-ember .digit-slot.locked { border-color: rgba(255,215,0,0.45); box-shadow: 0 0 18px rgba(255,215,0,0.2); }
+body.theme-ember .digit-slot.locked .digit-display { color: #FFD700; }
+body.theme-ember .stat-value.highlight { color: #FF9A3C; }
+body.theme-ember .panel-title::before { background: #FF6B00; }
+body.theme-ember .wl-id { color: #FF9A3C; }
+
+
+/* ═══════════════════════════════════════════════════════
+   THEME 5: GLACIER
+   — deep blue steel, ice blue, frosted glass, crystal
+═══════════════════════════════════════════════════════ */
+body.theme-glacier {
+  --bg:          #060b14;
+  --surface:     #0c1422;
+  --surface2:    #121c2e;
+  --border:      rgba(96,165,250,0.1);
+  --border-gold: rgba(147,197,253,0.22);
+  --gold:        #60A5FA;
+  --gold-bright: #BAE6FD;
+  --gold-glow:   rgba(96,165,250,0.15);
+  --text:        #E0F2FE;
+  --text-muted:  #486080;
+  --text-dim:    rgba(96,165,250,0.2);
+  --green:       #22D3EE;
+  --red:         #F87171;
+  --red-glow:    rgba(248,113,113,0.3);
+
+  background-image:
+    radial-gradient(ellipse 70% 50% at 50% 0%,    rgba(56,189,248,0.09) 0%, transparent 65%),
+    radial-gradient(ellipse 40% 30% at 15% 100%,  rgba(14,165,233,0.06) 0%, transparent 55%),
+    radial-gradient(ellipse 40% 30% at 85%  50%,  rgba(99,102,241,0.05) 0%, transparent 55%);
+}
+
+/* Ice crystal sheen */
+body.theme-glacier::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(
+    125deg,
+    rgba(186,230,253,0.025) 0%,
+    transparent 40%,
+    rgba(186,230,253,0.015) 60%,
+    transparent 100%
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+body.theme-glacier .site-title {
+  background: linear-gradient(135deg, #BAE6FD, #e0f2fe, #93C5FD);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 20px rgba(96,165,250,0.35));
+}
+body.theme-glacier .title-accent { color: #7DD3FC; }
+body.theme-glacier .event-tag { color: #7DD3FC; border-color: rgba(125,211,252,0.28); background: rgba(56,189,248,0.05); }
+body.theme-glacier .winner-id-display { color: var(--gold-bright); text-shadow: 0 0 24px rgba(96,165,250,0.4); }
+body.theme-glacier .btn-start { background: linear-gradient(135deg, #1D4ED8, #3B82F6); color: #fff; box-shadow: 0 4px 24px rgba(59,130,246,0.4); }
+body.theme-glacier .digit-slot { backdrop-filter: blur(8px); }
+body.theme-glacier .digit-slot.rolling { border-color: rgba(96,165,250,0.5); box-shadow: 0 0 20px rgba(96,165,250,0.2), 0 0 6px rgba(186,230,253,0.15) inset; }
+body.theme-glacier .digit-slot.rolling .digit-display { color: #7DD3FC; }
+body.theme-glacier .digit-slot.locked { border-color: rgba(34,211,238,0.45); box-shadow: 0 0 20px rgba(34,211,238,0.2); }
+body.theme-glacier .digit-slot.locked .digit-display { color: #22D3EE; }
+body.theme-glacier .stat-value.highlight { color: #7DD3FC; }
+body.theme-glacier .panel-title::before { background: #3B82F6; }
+body.theme-glacier .wl-id { color: #7DD3FC; }
+body.theme-glacier .winner-divider { background: rgba(96,165,250,0.3); }
+body.theme-glacier .winner-tag { color: #7DD3FC; }
+body.theme-glacier .winner-tag::before,
+body.theme-glacier .winner-tag::after { background: rgba(96,165,250,0.3); }

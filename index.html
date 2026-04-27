@@ -3,114 +3,110 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Door Prize Live Draw</title>
-  <meta name="description" content="Sistem undian door prize digital dengan animasi live draw digit-by-digit." />
+  <title>Door Prize — Live Draw</title>
+  <meta name="description" content="Sistem undian door prize digital dengan animasi live draw." />
   <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/themes.css" />
 </head>
-<body>
+<body class="theme-elegant">
+  <!-- THEME SWITCHER -->
+  <div class="theme-switcher-wrap">
+    <div id="theme-switcher"></div>
+  </div>
+
   <div id="particles"></div>
   <div id="confetti-container"></div>
 
   <div class="main-wrapper">
-    <!-- HEADER -->
+
+    <!-- ── HEADER ── -->
     <header>
-      <div class="event-badge">🎉 Annual Company Event 2025</div>
-      <h1 class="site-title">DOOR PRIZE<br>LIVE DRAW</h1>
-      <p class="site-subtitle">Sistem Undian Digital Karyawan</p>
+      <div class="event-tag">
+        <span>✦</span> Annual Company Event 2025 <span>✦</span>
+      </div>
+      <h1 class="site-title">Door Prize</h1>
+      <p class="title-accent">Live Draw</p>
     </header>
 
-    <!-- STATS BAR -->
-    <div class="stats-bar" role="region" aria-label="Statistik Undian">
-      <div class="stat-card">
-        <div class="stat-label">Total Peserta</div>
+    <!-- ── STATS ── -->
+    <div class="stats-strip" role="region" aria-label="Statistik Undian">
+      <div class="stat-item">
+        <div class="stat-label">Peserta</div>
         <div class="stat-value" id="stat-total">0</div>
       </div>
-      <div class="stat-card">
-        <div class="stat-label">Sisa Peserta</div>
+      <div class="stat-item">
+        <div class="stat-label">Tersisa</div>
         <div class="stat-value" id="stat-remaining">0</div>
       </div>
-      <div class="stat-card">
+      <div class="stat-item">
         <div class="stat-label">Pemenang</div>
-        <div class="stat-value" id="stat-winners">0</div>
+        <div class="stat-value highlight" id="stat-winners">0</div>
       </div>
     </div>
 
-    <!-- STATUS -->
-    <p class="status-text status-idle" id="status-text">✨ Siap untuk memulai undian!</p>
+    <!-- ── STATUS ── -->
+    <div class="status-bar">
+      <p class="status-text status-idle" id="status-text">Siap memulai undian</p>
+    </div>
 
-    <!-- DIGIT DISPLAY -->
-    <section class="digit-section" aria-label="Layar ID Karyawan">
-      <div class="round-label" id="prize-round">Undian ke-1</div>
-      <div class="digits-wrapper" id="digits-wrapper">
-        <!-- 6 digit slots -->
-        <div class="digit-slot" id="slot-0" aria-label="Digit 1">
-          <span class="digit-display">?</span>
-        </div>
-        <div class="digit-slot" id="slot-1" aria-label="Digit 2">
-          <span class="digit-display">?</span>
-        </div>
-        <div class="digit-slot" id="slot-2" aria-label="Digit 3">
-          <span class="digit-display">?</span>
-        </div>
-        <div class="digit-sep">·</div>
-        <div class="digit-slot" id="slot-3" aria-label="Digit 4">
-          <span class="digit-display">?</span>
-        </div>
-        <div class="digit-slot" id="slot-4" aria-label="Digit 5">
-          <span class="digit-display">?</span>
-        </div>
-        <div class="digit-slot" id="slot-5" aria-label="Digit 6">
-          <span class="digit-display">?</span>
-        </div>
+    <!-- ── DIGIT DISPLAY ── -->
+    <section class="digit-section" aria-label="ID Karyawan">
+      <p class="round-label" id="prize-round">Undian Ke-1</p>
+      <div class="digits-wrapper">
+        <div class="digit-slot" id="slot-0"><span class="digit-display">?</span></div>
+        <div class="digit-slot" id="slot-1"><span class="digit-display">?</span></div>
+        <div class="digit-slot" id="slot-2"><span class="digit-display">?</span></div>
+        <span class="digit-sep">·</span>
+        <div class="digit-slot" id="slot-3"><span class="digit-display">?</span></div>
+        <div class="digit-slot" id="slot-4"><span class="digit-display">?</span></div>
+        <div class="digit-slot" id="slot-5"><span class="digit-display">?</span></div>
       </div>
     </section>
 
-    <!-- WINNER PANEL -->
-    <div class="winner-panel" id="winner-panel" role="region" aria-live="polite" aria-label="Pemenang">
-      <div class="winner-badge">🏆 PEMENANG</div>
-      <div class="winner-id-display" id="winner-id-display">------</div>
+    <!-- ── WINNER PANEL ── -->
+    <div class="winner-panel" id="winner-panel" role="region" aria-live="polite">
+      <div class="winner-tag">Pemenang</div>
+      <div class="winner-id-display" id="winner-id-display">——————</div>
+      <div class="winner-divider"></div>
       <div class="winner-name" id="winner-name">—</div>
       <div class="winner-dept" id="winner-dept">—</div>
     </div>
 
-    <!-- CONTROLS -->
+    <!-- ── CONTROLS ── -->
     <div class="controls-section">
       <button class="action-btn btn-start" id="action-btn" aria-label="Mulai Undian">
-        <span class="btn-text">▶ MULAI UNDIAN</span>
-        <span class="btn-sub">Klik untuk memutar semua slot</span>
+        <span class="btn-text">Mulai Undian</span>
+        <span class="btn-sub">Putar semua slot serentak</span>
       </button>
       <div class="controls-row">
-        <button class="icon-btn" id="sound-btn" title="Suara">🔊</button>
-        <button class="icon-btn" id="reset-btn" title="Reset Undian">↺ Reset</button>
+        <button class="icon-btn" id="sound-btn">🔊 Suara</button>
+        <button class="icon-btn" id="reset-btn">↺ Reset</button>
       </div>
-      <p class="hint-text">Tekan <kbd>Space</kbd> untuk Start / Stop · Atau gunakan remote di HP</p>
+      <p class="kbd-hint">Tekan <kbd>Space</kbd> untuk Start / Stop</p>
     </div>
 
-    <!-- BOTTOM GRID -->
+    <!-- ── BOTTOM GRID ── -->
     <div class="bottom-grid">
-      <!-- QR Remote -->
       <div class="panel-card">
-        <div class="panel-title">📱 Remote via HP</div>
+        <div class="panel-title">Remote HP</div>
         <div id="qr-container">
-          <p style="color:var(--text-dim);font-size:.85rem;text-align:center;">
-            Buka <strong>remote.html</strong> di browser HP<br>
-            atau scan QR di bawah ini
-          </p>
+          <p class="qr-url" style="text-align:center;margin-bottom:.5rem;">Buka <strong>remote.html</strong><br>di browser HP kamu</p>
         </div>
       </div>
-      <!-- Winners List -->
       <div class="panel-card">
-        <div class="panel-title">🏅 Daftar Pemenang</div>
+        <div class="panel-title">Daftar Pemenang</div>
         <div class="winners-list" id="winners-list">
-          <p style="color:var(--text-dim);font-size:.85rem;">Belum ada pemenang.</p>
+          <p class="empty-state">Belum ada pemenang</p>
         </div>
       </div>
     </div>
-  </div>
+
+  </div><!-- /main-wrapper -->
 
   <script src="js/database.js"></script>
   <script src="js/sound.js"></script>
   <script src="js/sync.js"></script>
+  <script src="js/themes.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>
