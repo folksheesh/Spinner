@@ -31,6 +31,7 @@
     </div>
     <div class="top-right">
       <div id="theme-switcher"></div>
+      <button class="top-btn" id="guide-btn">📖 Guide</button>
       <button class="top-btn" id="summary-btn">🏆 Summary</button>
       <button class="top-btn" id="sound-btn">🔊</button>
       <button class="top-btn" id="reset-btn">Reset</button>
@@ -95,6 +96,41 @@
       </div>
       <div class="summary-footer">
         <button class="btn-export" id="export-btn">Export CSV</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ GUIDE PANEL ═══ -->
+  <div class="summary-panel" id="guide-panel">
+    <div class="summary-inner">
+      <div class="summary-header">
+        <h2 class="summary-title">Panduan Penggunaan</h2>
+        <button class="close-btn" id="close-guide">&times;</button>
+      </div>
+      <div class="summary-content guide-content" style="text-align: left; line-height: 1.6; font-size: 0.85rem; overflow-y: auto;">
+        <h3 style="color: var(--accent); margin-bottom: 0.5rem; font-family: var(--font-display);">1. Kontrol Undian</h3>
+        <ul style="margin-left: 1.2rem; margin-bottom: 1rem; color: var(--text-2);">
+          <li style="margin-bottom: 0.3rem;"><b>Start / Stop:</b> Tekan <b>Spacebar</b> atau klik area tengah layar.</li>
+          <li style="margin-bottom: 0.3rem;"><b>Continue:</b> Saat pemenang muncul, tekan Spacebar / klik layar untuk lanjut.</li>
+        </ul>
+        
+        <h3 style="color: var(--accent); margin-bottom: 0.5rem; font-family: var(--font-display);">2. Mode Presentasi</h3>
+        <ul style="margin-left: 1.2rem; margin-bottom: 1rem; color: var(--text-2);">
+          <li style="margin-bottom: 0.3rem;">Tekan tombol <b>F</b> di keyboard untuk menyembunyikan kursor dan tombol-tombol antarmuka (UI).</li>
+          <li style="margin-bottom: 0.3rem;">Tekan <b>F</b> lagi untuk menampilkannya kembali.</li>
+        </ul>
+
+        <h3 style="color: var(--accent); margin-bottom: 0.5rem; font-family: var(--font-display);">3. Remote Control (HP)</h3>
+        <ul style="margin-left: 1.2rem; margin-bottom: 1rem; color: var(--text-2);">
+          <li style="margin-bottom: 0.3rem;">Buka <code>remote.html</code> di HP Anda.</li>
+          <li style="margin-bottom: 0.3rem;">Masukkan <b>Remote Code</b> yang tampil di sudut kiri atas layar utama.</li>
+          <li style="margin-bottom: 0.3rem;">Gunakan HP Anda sebagai remote nirkabel untuk mengontrol undian.</li>
+        </ul>
+
+        <h3 style="color: var(--accent); margin-bottom: 0.5rem; font-family: var(--font-display);">4. Ekspor Data</h3>
+        <ul style="margin-left: 1.2rem; margin-bottom: 1rem; color: var(--text-2);">
+          <li style="margin-bottom: 0.3rem;">Klik tombol <b>🏆 Summary</b> lalu klik <b>Export CSV</b> untuk mengunduh daftar pemenang.</li>
+        </ul>
       </div>
     </div>
   </div>

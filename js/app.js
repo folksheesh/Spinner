@@ -36,6 +36,9 @@ const DOM = {
   get closeSummaryBtn()   { return document.getElementById('close-summary'); },
   get summaryContent()    { return document.getElementById('summary-content'); },
   get exportBtn()         { return document.getElementById('export-btn'); },
+  get guideBtn()          { return document.getElementById('guide-btn'); },
+  get guidePanel()        { return document.getElementById('guide-panel'); },
+  get closeGuideBtn()     { return document.getElementById('close-guide'); },
 };
 
 // ── Particles (subtle, small) ──────────────────────────────
@@ -351,6 +354,17 @@ function handleAction() {
   }
 }
 
+// ── Guide Panel ────────────────────────────────────────────
+function openGuide() {
+  const panel = DOM.guidePanel;
+  if (panel) panel.classList.add('visible');
+}
+
+function closeGuide() {
+  const panel = DOM.guidePanel;
+  if (panel) panel.classList.remove('visible');
+}
+
 // ── Summary Panel ──────────────────────────────────────────
 function openSummary() {
   const content = DOM.summaryContent;
@@ -455,6 +469,9 @@ function bindEvents() {
   DOM.closeSummaryBtn?.addEventListener('click', closeSummary);
   DOM.exportBtn?.addEventListener('click', exportCSV);
 
+  DOM.guideBtn?.addEventListener('click', openGuide);
+  DOM.closeGuideBtn?.addEventListener('click', closeGuide);
+
   DOM.soundBtn?.addEventListener('click', () => {
     const on = SoundEngine.toggle();
     DOM.soundBtn.textContent = on ? '🔊' : '🔇';
@@ -474,6 +491,8 @@ function bindEvents() {
         target.closest('#sound-btn') ||
         target.closest('#summary-btn') ||
         target.closest('#summary-panel') ||
+        target.closest('#guide-btn') ||
+        target.closest('#guide-panel') ||
         target.closest('.theme-dot') ||
         target.closest('#remote-pill')) return;
 
