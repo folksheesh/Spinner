@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Podium — Door Prize</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/podium.css" />
+</head>
+<body class="theme-elegant" style="margin: 0; overflow: hidden; background: #0a0e27;">
+
+  <!-- ═══ PODIUM PANEL (Full-screen Quizizz-style) ═══ -->
+  <div class="podium-overlay visible" id="summary-panel" style="position: static; height: 100vh;">
+    <button class="podium-close-btn" id="close-summary" onclick="window.location.href='index.html'" title="Back to Draw">&times;</button>
+    <button class="podium-export-btn" id="export-btn">📥 Export CSV</button>
+
+    <!-- Animated background elements -->
+    <div class="podium-bg-effects">
+      <div class="podium-streak podium-streak-1"></div>
+      <div class="podium-streak podium-streak-2"></div>
+      <div class="podium-streak podium-streak-3"></div>
+      <div class="podium-streak podium-streak-4"></div>
+      <div class="podium-glow-orb podium-orb-1"></div>
+      <div class="podium-glow-orb podium-orb-2"></div>
+    </div>
+
+    <div class="podium-header">
+      <div class="podium-crown">👑</div>
+      <h1 class="podium-title">PODIUM</h1>
+      <p class="podium-subtitle">Door Prize Winners</p>
+    </div>
+
+    <div class="podium-content" id="summary-content">
+      <!-- Podium cards injected here by JS -->
+    </div>
+  </div>
+
+  <script src="js/database.js"></script>
+  <script src="js/podium.js"></script>
+</body>
+</html>
