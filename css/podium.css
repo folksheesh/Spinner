@@ -1,0 +1,476 @@
+/* ═══════════════════════════════════════════
+   PODIUM OVERLAY — Quizizz-style Winner Page
+═══════════════════════════════════════════ */
+.podium-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 600;
+  background: linear-gradient(160deg, #0a0e27 0%, #120f2e 30%, #1a0a2e 60%, #0d1117 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  overflow-y: auto;
+  overflow-x: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+  padding: 1.5rem 1rem 3rem;
+}
+
+.podium-overlay.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ── Close & Export Buttons ── */
+.podium-close-btn {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 650;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.25s;
+  backdrop-filter: blur(10px);
+}
+
+.podium-close-btn:hover {
+  background: rgba(240, 68, 68, 0.2);
+  color: #F04444;
+  border-color: rgba(240, 68, 68, 0.4);
+  transform: rotate(90deg) scale(1.1);
+}
+
+.podium-export-btn {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 650;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  padding: 0.5rem 1rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s;
+  backdrop-filter: blur(10px);
+  letter-spacing: 0.04em;
+}
+
+.podium-export-btn:hover {
+  background: rgba(255, 237, 0, 0.15);
+  color: var(--accent);
+  border-color: rgba(255, 237, 0, 0.3);
+  transform: translateY(-1px);
+}
+
+/* ── Background Effects ── */
+.podium-bg-effects {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.podium-streak {
+  position: absolute;
+  width: 3px;
+  height: 200%;
+  background: linear-gradient(180deg, transparent, rgba(255, 50, 100, 0.5), transparent);
+  filter: blur(3px);
+  opacity: 0.6;
+  animation: podiumStreakSweep 6s ease-in-out infinite;
+}
+
+.podium-streak-1 { left: 15%; animation-delay: 0s; animation-duration: 5s; background: linear-gradient(180deg, transparent, rgba(255, 50, 150, 0.6), transparent); }
+.podium-streak-2 { left: 40%; animation-delay: -1.5s; animation-duration: 7s; background: linear-gradient(180deg, transparent, rgba(50, 255, 150, 0.5), transparent); }
+.podium-streak-3 { left: 65%; animation-delay: -3s; animation-duration: 6s; background: linear-gradient(180deg, transparent, rgba(100, 150, 255, 0.5), transparent); }
+.podium-streak-4 { left: 85%; animation-delay: -4s; animation-duration: 8s; background: linear-gradient(180deg, transparent, rgba(255, 200, 50, 0.4), transparent); }
+
+@keyframes podiumStreakSweep {
+  0% { transform: translateY(-60%) rotate(-15deg); opacity: 0; }
+  20% { opacity: 0.6; }
+  80% { opacity: 0.6; }
+  100% { transform: translateY(20%) rotate(15deg); opacity: 0; }
+}
+
+.podium-glow-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.3;
+  animation: podiumOrbFloat 10s ease-in-out infinite alternate;
+}
+
+.podium-orb-1 {
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(130, 80, 255, 0.5), transparent);
+  top: 10%; left: -5%;
+  animation-delay: 0s;
+}
+
+.podium-orb-2 {
+  width: 350px; height: 350px;
+  background: radial-gradient(circle, rgba(255, 100, 150, 0.4), transparent);
+  bottom: 5%; right: -5%;
+  animation-delay: -5s;
+}
+
+@keyframes podiumOrbFloat {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(30px, -20px) scale(1.15); }
+}
+
+/* ── Header ── */
+.podium-header {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  margin-bottom: 2rem;
+  margin-top: 1rem;
+}
+
+.podium-crown {
+  font-size: 2.5rem;
+  margin-bottom: 0.3rem;
+  animation: podiumCrownBounce 2s ease-in-out infinite;
+  filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.5));
+}
+
+@keyframes podiumCrownBounce {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-6px) scale(1.05); }
+}
+
+.podium-title {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 900;
+  letter-spacing: 0.15em;
+  color: #fff;
+  text-shadow: 0 0 30px rgba(255, 255, 255, 0.3), 0 0 60px rgba(130, 80, 255, 0.3);
+  margin-bottom: 0.3rem;
+}
+
+.podium-subtitle {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* ── Content Area ── */
+.podium-content {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 1100px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+
+.podium-empty {
+  text-align: center;
+  padding: 4rem 1rem;
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 1.1rem;
+  font-family: var(--font-body);
+}
+
+/* ── Top 3 Podium ── */
+.podium-top3 {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: clamp(0.8rem, 2vw, 1.5rem);
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+/* ── Podium Card ── */
+.podium-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 18px;
+  padding: 1.5rem 1rem 1.2rem;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  animation: podiumCardEnter 0.7s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+
+.podium-card:hover {
+  transform: translateY(-5px) scale(1.03);
+}
+
+/* Card border glow effect */
+.podium-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 18px;
+  padding: 2px;
+  background: var(--card-border-gradient);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* Inner shimmer */
+.podium-card::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent 40%, rgba(255,255,255,0.05) 50%, transparent 60%);
+  animation: podiumShimmer 4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes podiumShimmer {
+  0% { transform: translateX(-100%) rotate(0deg); }
+  100% { transform: translateX(100%) rotate(0deg); }
+}
+
+@keyframes podiumCardEnter {
+  from { opacity: 0; transform: translateY(40px) scale(0.9); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ── 1st Place ── */
+.podium-card.place-1 {
+  --card-border-gradient: linear-gradient(135deg, #FFD700, #FFA500, #FFD700);
+  background: linear-gradient(180deg, rgba(255, 215, 0, 0.12) 0%, rgba(20, 15, 40, 0.95) 100%);
+  box-shadow: 0 0 40px rgba(255, 215, 0, 0.2), 0 20px 60px rgba(0, 0, 0, 0.5);
+  width: clamp(180px, 22vw, 260px);
+  min-height: 280px;
+  animation-delay: 0.3s;
+  z-index: 3;
+}
+
+/* ── 2nd Place ── */
+.podium-card.place-2 {
+  --card-border-gradient: linear-gradient(135deg, #C0C0C0, #E8E8E8, #C0C0C0);
+  background: linear-gradient(180deg, rgba(192, 192, 192, 0.1) 0%, rgba(20, 15, 40, 0.95) 100%);
+  box-shadow: 0 0 30px rgba(192, 192, 192, 0.15), 0 15px 50px rgba(0, 0, 0, 0.5);
+  width: clamp(160px, 20vw, 230px);
+  min-height: 250px;
+  animation-delay: 0.5s;
+  z-index: 2;
+}
+
+/* ── 3rd Place ── */
+.podium-card.place-3 {
+  --card-border-gradient: linear-gradient(135deg, #CD7F32, #E8A850, #CD7F32);
+  background: linear-gradient(180deg, rgba(205, 127, 50, 0.1) 0%, rgba(20, 15, 40, 0.95) 100%);
+  box-shadow: 0 0 30px rgba(205, 127, 50, 0.15), 0 15px 50px rgba(0, 0, 0, 0.5);
+  width: clamp(160px, 20vw, 230px);
+  min-height: 250px;
+  animation-delay: 0.7s;
+  z-index: 1;
+}
+
+/* ── Rank Badge ── */
+.podium-rank {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 1.8rem;
+  margin-bottom: 0.8rem;
+  position: relative;
+}
+
+.place-1 .podium-rank { color: #FFD700; text-shadow: 0 0 20px rgba(255, 215, 0, 0.5); font-size: 2.2rem; }
+.place-2 .podium-rank { color: #D0D0D0; text-shadow: 0 0 15px rgba(200, 200, 200, 0.3); }
+.place-3 .podium-rank { color: #E8A850; text-shadow: 0 0 15px rgba(205, 127, 50, 0.3); }
+
+.podium-rank-suffix {
+  font-size: 0.55em;
+  vertical-align: super;
+  opacity: 0.7;
+}
+
+/* ── Avatar Circle ── */
+.podium-avatar {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.8rem;
+  position: relative;
+  font-size: 1.8rem;
+  overflow: hidden;
+}
+
+.place-1 .podium-avatar {
+  width: 85px; height: 85px;
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 165, 0, 0.1));
+  border: 2px solid rgba(255, 215, 0, 0.4);
+  box-shadow: 0 0 25px rgba(255, 215, 0, 0.3);
+  font-size: 2.2rem;
+}
+
+.place-2 .podium-avatar {
+  background: linear-gradient(135deg, rgba(192, 192, 192, 0.15), rgba(200, 200, 200, 0.05));
+  border: 2px solid rgba(192, 192, 192, 0.3);
+  box-shadow: 0 0 20px rgba(192, 192, 192, 0.2);
+}
+
+.place-3 .podium-avatar {
+  background: linear-gradient(135deg, rgba(205, 127, 50, 0.15), rgba(180, 120, 50, 0.05));
+  border: 2px solid rgba(205, 127, 50, 0.3);
+  box-shadow: 0 0 20px rgba(205, 127, 50, 0.2);
+}
+
+/* ── Card Text ── */
+.podium-card-id {
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: #fff;
+  margin-bottom: 0.3rem;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.15);
+}
+
+.place-1 .podium-card-id { font-size: 1.3rem; }
+
+.podium-card-name {
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+  margin-bottom: 0.2rem;
+  text-align: center;
+  line-height: 1.3;
+}
+
+.podium-card-dept {
+  font-family: var(--font-body);
+  font-size: 0.65rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.4);
+  text-align: center;
+}
+
+/* ── Remaining Winners (4th-7th) ── */
+.podium-remaining {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.8rem;
+  width: 100%;
+  max-width: 960px;
+}
+
+.podium-remaining-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 0.9rem 1.2rem;
+  transition: all 0.3s ease;
+  animation: podiumCardEnter 0.6s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  position: relative;
+  overflow: hidden;
+}
+
+.podium-remaining-card:hover {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+}
+
+.podium-remaining-rank {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 1.3rem;
+  color: rgba(255, 255, 255, 0.25);
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+}
+
+.podium-remaining-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  overflow: hidden;
+}
+
+.podium-remaining-id {
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.08em;
+}
+
+.podium-remaining-name {
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.75);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.podium-remaining-dept {
+  font-family: var(--font-body);
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+/* ── Responsive ── */
+@media (max-width: 700px) {
+  .podium-top3 {
+    gap: 0.5rem;
+  }
+  .podium-card {
+    padding: 1rem 0.7rem 1rem;
+  }
+  .podium-card.place-1 { min-height: 240px; }
+  .podium-card.place-2,
+  .podium-card.place-3 { min-height: 210px; }
+  .podium-avatar { width: 55px; height: 55px; font-size: 1.4rem; }
+  .place-1 .podium-avatar { width: 65px; height: 65px; font-size: 1.7rem; }
+  .podium-remaining { grid-template-columns: 1fr; }
+}

@@ -7,6 +7,7 @@
   <meta name="description" content="Premium live draw door prize system." />
   <link rel="stylesheet" href="css/style.css" />
   <link rel="stylesheet" href="css/themes.css" />
+  <link rel="stylesheet" href="css/podium.css" />
 </head>
 <body class="theme-elegant">
 
@@ -32,7 +33,7 @@
     <div class="top-right">
       <div id="theme-switcher"></div>
       <button class="top-btn" id="guide-btn">📖 Guide</button>
-      <button class="top-btn" id="summary-btn">🏆 Summary</button>
+      <button class="top-btn" id="summary-btn">🏆 Podium</button>
       <button class="top-btn" id="sound-btn">🔊</button>
       <button class="top-btn" id="reset-btn">Reset</button>
     </div>
@@ -84,19 +85,29 @@
     </div>
   </div>
 
-  <!-- ═══ SUMMARY PANEL ═══ -->
-  <div class="summary-panel" id="summary-panel">
-    <div class="summary-inner">
-      <div class="summary-header">
-        <h2 class="summary-title">Daftar Pemenang</h2>
-        <button class="close-btn" id="close-summary">&times;</button>
-      </div>
-      <div class="summary-content" id="summary-content">
-        <!-- Table will be injected here -->
-      </div>
-      <div class="summary-footer">
-        <button class="btn-export" id="export-btn">Export CSV</button>
-      </div>
+  <!-- ═══ PODIUM PANEL (Full-screen Quizizz-style) ═══ -->
+  <div class="podium-overlay" id="summary-panel">
+    <button class="podium-close-btn" id="close-summary">&times;</button>
+    <button class="podium-export-btn" id="export-btn">📥 Export CSV</button>
+
+    <!-- Animated background elements -->
+    <div class="podium-bg-effects">
+      <div class="podium-streak podium-streak-1"></div>
+      <div class="podium-streak podium-streak-2"></div>
+      <div class="podium-streak podium-streak-3"></div>
+      <div class="podium-streak podium-streak-4"></div>
+      <div class="podium-glow-orb podium-orb-1"></div>
+      <div class="podium-glow-orb podium-orb-2"></div>
+    </div>
+
+    <div class="podium-header">
+      <div class="podium-crown">👑</div>
+      <h1 class="podium-title">PODIUM</h1>
+      <p class="podium-subtitle">Door Prize Winners</p>
+    </div>
+
+    <div class="podium-content" id="summary-content">
+      <!-- Podium cards injected here by JS -->
     </div>
   </div>
 
@@ -129,7 +140,7 @@
 
         <h3 style="color: var(--accent); margin-bottom: 0.5rem; font-family: var(--font-display);">4. Ekspor Data</h3>
         <ul style="margin-left: 1.2rem; margin-bottom: 1rem; color: var(--text-2);">
-          <li style="margin-bottom: 0.3rem;">Klik tombol <b>🏆 Summary</b> lalu klik <b>Export CSV</b> untuk mengunduh daftar pemenang.</li>
+          <li style="margin-bottom: 0.3rem;">Klik tombol <b>🏆 Podium</b> untuk melihat daftar pemenang. Klik <b>Export CSV</b> untuk mengunduh data.</li>
         </ul>
       </div>
     </div>

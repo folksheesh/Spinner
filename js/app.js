@@ -341,6 +341,11 @@ function dismissWinner() {
   setStatus('Ready', 'idle');
   AppState.phase = PHASE.IDLE;
   updateButton();
+
+  // Auto-show podium after 7th winner
+  if (DB.winners.length >= 7) {
+    setTimeout(() => openSummary(), 1000);
+  }
 }
 
 // ── Action dispatcher ──────────────────────────────────────
@@ -369,38 +374,63 @@ function closeGuide() {
 function openSummary() {
   const content = DOM.summaryContent;
   if (!content) return;
-  
+
   if (DB.winners.length === 0) {
-    content.innerHTML = '<div class="summary-empty">Belum ada pemenang yang diundi.</div>';
+    content.innerHTML = '<div class="podium-empty">Belum ada pemenang yang diundi.</div>';
   } else {
-    let html = '<div class="summary-list">';
-    [...DB.winners].reverse().forEach((w, i) => {
-      html += `
-        <div class="summary-card" style="animation-delay: ${i * 0.04}s">
-          <div class="sc-number">${String(i + 1).padStart(2, '0')}</div>
-          <div class="sc-details">
-            <div class="sc-id">${w.id}</div>
-            <div class="sc-info">
-              <span class="sc-name">${w.name}</span>
-              <span class="sc-dot">•</span>
-              <span class="sc-dept">${w.department}</span>
+    const avatarEmojis = ['🏆','🥈','🥉','⭐','🎯','🎪','🎲'];
+    const ordinal = (n) => {
+      const s = ['th','st','nd','rd'];
+      const v = n % 100;
+      return n + (s[(v - 20) % 10] || s[v] || s[0]);
+    };
+
+    // Show up to 7 winners (latest first = reverse order, then re-index)
+    const winners = [...DB.winners].slice(0, 7);
+    const top3 = winners.slice(0, 3);
+    const rest = winners.slice(3, 7);
+
+    let html = '';
+
+    // Top 3 in podium layout: 2nd, 1st, 3rd
+    if (top3.length > 0) {
+      html += '<div class="podium-top3">';
+      const order = top3.length >= 3 ? [1, 0, 2] : top3.length === 2 ? [1, 0] : [0];
+      order.forEach(idx => {
+        const w = top3[idx];
+        const place = idx + 1;
+        html += `
+          <div class="podium-card place-${place}" style="animation-delay: ${0.3 + idx * 0.2}s">
+            <div class="podium-rank">${place}<span class="podium-rank-suffix">${ordinal(place).replace(place,'')}</span></div>
+            <div class="podium-avatar">${avatarEmojis[idx]}</div>
+            <div class="podium-card-id">${w.id}</div>
+            <div class="podium-card-name">${w.name}</div>
+            <div class="podium-card-dept">${w.department}</div>
+          </div>`;
+      });
+      html += '</div>';
+    }
+
+    // 4th-7th
+    if (rest.length > 0) {
+      html += '<div class="podium-remaining">';
+      rest.forEach((w, i) => {
+        const rank = i + 4;
+        html += `
+          <div class="podium-remaining-card" style="animation-delay: ${0.8 + i * 0.1}s">
+            <div class="podium-remaining-rank">${rank}</div>
+            <div class="podium-remaining-info">
+              <div class="podium-remaining-id">${w.id}</div>
+              <div class="podium-remaining-name">${w.name}</div>
+              <div class="podium-remaining-dept">${w.department}</div>
             </div>
-          </div>
-        </div>
-      `;
-    });
-    html += '</div>';
+          </div>`;
+      });
+      html += '</div>';
+    }
+
     content.innerHTML = html;
   }
-  
-  const footer = DOM.summaryPanel.querySelector('.summary-footer');
-  let countEl = footer.querySelector('.summary-count');
-  if (!countEl) {
-    countEl = document.createElement('div');
-    countEl.className = 'summary-count';
-    footer.insertBefore(countEl, DOM.exportBtn);
-  }
-  countEl.innerHTML = `Total: <span>${DB.winners.length}</span> Winners`;
 
   DOM.summaryPanel.classList.add('visible');
 }
@@ -491,6 +521,7 @@ function bindEvents() {
         target.closest('#sound-btn') ||
         target.closest('#summary-btn') ||
         target.closest('#summary-panel') ||
+        target.closest('.podium-overlay') ||
         target.closest('#guide-btn') ||
         target.closest('#guide-panel') ||
         target.closest('.theme-dot') ||
