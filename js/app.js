@@ -126,7 +126,7 @@ function updateButton() {
 
   if (AppState.phase === PHASE.IDLE || AppState.phase === PHASE.DONE) {
     btn.className = 'action-btn btn-start';
-    text.textContent = AppState.phase === PHASE.DONE ? 'Next Draw' : 'Start Draw';
+    text.textContent = AppState.prizeRound > 1 ? 'Next Draw' : 'Start Draw';
     sub.textContent  = 'Spin all digits';
     btn.disabled = false;
   } else {
@@ -336,12 +336,16 @@ function showWinner(winner) {
 function dismissWinner() {
   DOM.winnerPanel.classList.remove('visible');
   setStatus('Ready', 'idle');
+  AppState.phase = PHASE.IDLE;
+  updateButton();
 }
 
 // ── Action dispatcher ──────────────────────────────────────
 function handleAction() {
-  if (AppState.phase === PHASE.IDLE || AppState.phase === PHASE.DONE) {
+  if (AppState.phase === PHASE.IDLE) {
     startAllSpinning();
+  } else if (AppState.phase === PHASE.DONE) {
+    dismissWinner();
   } else if (AppState.phase === PHASE.SPINNING) {
     stopNextSlot();
   }
@@ -446,7 +450,6 @@ function resetAll() {
 function bindEvents() {
   DOM.actionBtn?.addEventListener('click', () => { SoundEngine.unlock(); SyncEngine.emit('action'); });
   DOM.resetBtn?.addEventListener('click', resetAll);
-  DOM.winnerDismiss?.addEventListener('click', dismissWinner);
   
   DOM.summaryBtn?.addEventListener('click', openSummary);
   DOM.closeSummaryBtn?.addEventListener('click', closeSummary);
@@ -465,11 +468,12 @@ function bindEvents() {
     // Don't trigger action for UI buttons / summary panel / winner panel
     const target = e.target;
     if (target.closest('.action-btn') ||
+        target.closest('.top-bar') ||
+        target.closest('.bottom-tray') ||
         target.closest('#reset-btn') ||
         target.closest('#sound-btn') ||
         target.closest('#summary-btn') ||
         target.closest('#summary-panel') ||
-        target.closest('#winner-panel') ||
         target.closest('.theme-dot') ||
         target.closest('#remote-pill')) return;
 
@@ -488,6 +492,10 @@ function bindEvents() {
     if (e.code === 'KeyF') {
       cursorHidden = !cursorHidden;
       document.body.style.cursor = cursorHidden ? 'none' : '';
+      if (DOM.actionBtn) {
+        DOM.actionBtn.style.opacity = cursorHidden ? '0' : '1';
+        DOM.actionBtn.style.pointerEvents = cursorHidden ? 'none' : 'auto';
+      }
     }
   });
 
