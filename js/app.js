@@ -135,7 +135,7 @@ function updateButton() {
   } else {
     btn.className = 'action-btn btn-stop';
     text.textContent = 'Stop';
-    sub.textContent  = `Lock digit ${AppState.stoppedCount + 1} of 6`;
+    sub.textContent  = `Lock digit ${Math.min(AppState.stoppedCount + 1, 6)} of 6`;
     btn.disabled = false;
   }
 }
