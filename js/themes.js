@@ -1,6 +1,6 @@
 /**
  * THEME SWITCHER
- * 5 themes: elegant (default), arcade, cosmic, ember, glacier
+ * 10 themes: elegant, arcade, cosmic, ember, glacier, sakura, midnight, royale, crimson, aurora
  */
 
 const THEMES = [
@@ -9,6 +9,11 @@ const THEMES = [
   { id: 'cosmic',  name: 'Cosmic',   colors: ['#A78BFA', '#0a0620'] },
   { id: 'ember',   name: 'Ember',    colors: ['#FF6B00', '#0e0500'] },
   { id: 'glacier', name: 'Glacier',  colors: ['#60A5FA', '#060e1a'] },
+  { id: 'sakura',  name: 'Sakura',   colors: ['#F9A8D4', '#120510'] },
+  { id: 'midnight',name: 'Midnight', colors: ['#2DD4BF', '#020d0d'] },
+  { id: 'royale',  name: 'Royale',   colors: ['#FBBF24', '#0d0520'] },
+  { id: 'crimson', name: 'Crimson',  colors: ['#FB7185', '#100205'] },
+  { id: 'aurora',  name: 'Aurora',   colors: ['#34D399', '#0a0030'] },
 ];
 
 function setTheme(id) {

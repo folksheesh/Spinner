@@ -1,6 +1,8 @@
 /* ═══════════════════════════════════════════
    THEME SWITCHER UI (minimal circles in top bar)
+   Extra fonts for new themes
 ═══════════════════════════════════════════ */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800;900&family=Orbitron:wght@400;500;600;700;800;900&family=Cormorant+Garamond:wght@400;500;600;700&family=Bebas+Neue&family=Nunito:wght@400;600;700;800;900&display=swap');
 /* Handled in style.css for .theme-btn */
 
 
@@ -213,3 +215,518 @@ body.theme-glacier .hero-title {
 body.theme-glacier .hero-sub { color: #7DD3FC; }
 body.theme-glacier .btn-start { background: linear-gradient(135deg, #1D4ED8, #3B82F6); color: #fff; }
 body.theme-glacier .light-beam { background: linear-gradient(180deg, transparent, rgba(96,165,250,0.1), transparent); }
+
+
+/* ═══════════════════════════════════════════
+   THEME 6: SAKURA
+   Cherry blossom pink, Japanese elegance
+═══════════════════════════════════════════ */
+body.theme-sakura {
+  --bg:          #0a0208;
+  --bg-mid:      #120510;
+  --surface:     rgba(249,168,212,0.04);
+  --surface-2:   rgba(249,168,212,0.07);
+  --border:      rgba(249,168,212,0.1);
+  --accent:      #F9A8D4;
+  --accent-hot:  #FBCFE8;
+  --accent-dim:  rgba(249,168,212,0.12);
+  --accent-glow: rgba(249,168,212,0.35);
+  --green:       #F472B6;
+  --green-dim:   rgba(244,114,182,0.08);
+  --green-glow:  rgba(244,114,182,0.35);
+  --red:         #FB7185;
+  --text:        #FDF2F8;
+  --text-2:      rgba(253,242,248,0.55);
+  --text-3:      rgba(249,168,212,0.22);
+}
+
+body.theme-sakura .stage-bg::before {
+  background:
+    radial-gradient(ellipse 40% 30% at 30% 20%, rgba(244,114,182,0.1) 0%, transparent 70%),
+    radial-gradient(ellipse 35% 25% at 70% 80%, rgba(249,168,212,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 25% 20% at 50% 50%, rgba(236,72,153,0.04) 0%, transparent 55%);
+}
+
+/* Falling petals */
+body.theme-sakura::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(circle 3px at 10% 15%, rgba(249,168,212,0.5) 0%, transparent 100%),
+    radial-gradient(circle 2px at 30% 40%, rgba(251,207,232,0.4) 0%, transparent 100%),
+    radial-gradient(circle 3px at 55% 25%, rgba(244,114,182,0.4) 0%, transparent 100%),
+    radial-gradient(circle 2px at 70% 60%, rgba(249,168,212,0.3) 0%, transparent 100%),
+    radial-gradient(circle 3px at 85% 35%, rgba(251,207,232,0.5) 0%, transparent 100%),
+    radial-gradient(circle 2px at 45% 80%, rgba(244,114,182,0.3) 0%, transparent 100%),
+    radial-gradient(circle 2px at 20% 70%, rgba(249,168,212,0.35) 0%, transparent 100%);
+  pointer-events: none;
+  z-index: 1;
+  animation: petalDrift 8s ease-in-out infinite alternate;
+}
+@keyframes petalDrift { from { opacity: 0.4; transform: translateY(0); } to { opacity: 0.9; transform: translateY(5px); } }
+
+body.theme-sakura .hero-title {
+  font-family: 'Playfair Display', serif;
+  background: linear-gradient(135deg, #FBCFE8, #F9A8D4, #F472B6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 0.02em;
+  font-weight: 800;
+}
+body.theme-sakura .hero-sub {
+  color: #F472B6;
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  letter-spacing: 0.15em;
+}
+body.theme-sakura .event-badge {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+}
+body.theme-sakura .btn-start {
+  background: linear-gradient(135deg, #DB2777, #EC4899);
+  color: #fff;
+  border-radius: 50px;
+  font-family: 'Playfair Display', serif;
+}
+body.theme-sakura .btn-stop {
+  border-radius: 50px;
+}
+body.theme-sakura .light-beam { background: linear-gradient(180deg, transparent, rgba(244,114,182,0.1), transparent); }
+body.theme-sakura .digit-slot {
+  border-radius: 16px;
+  background: linear-gradient(180deg, #1a0810, #120508);
+  box-shadow: 0 0 20px rgba(249,168,212,0.08), inset 0 1px 0 rgba(249,168,212,0.1);
+}
+body.theme-sakura .digit-display {
+  font-family: 'Playfair Display', serif !important;
+}
+body.theme-sakura .stat-pill {
+  font-family: 'Playfair Display', serif;
+}
+body.theme-sakura .top-btn {
+  border-radius: 50px;
+}
+
+
+/* ═══════════════════════════════════════════
+   THEME 7: MIDNIGHT TEAL
+   Deep ocean teal, bioluminescence
+═══════════════════════════════════════════ */
+body.theme-midnight {
+  --bg:          #010a0a;
+  --bg-mid:      #020d0d;
+  --surface:     rgba(45,212,191,0.03);
+  --surface-2:   rgba(45,212,191,0.06);
+  --border:      rgba(45,212,191,0.08);
+  --accent:      #2DD4BF;
+  --accent-hot:  #5EEAD4;
+  --accent-dim:  rgba(45,212,191,0.12);
+  --accent-glow: rgba(45,212,191,0.35);
+  --green:       #2DD4BF;
+  --green-dim:   rgba(45,212,191,0.08);
+  --green-glow:  rgba(45,212,191,0.35);
+  --red:         #F87171;
+  --text:        #CCFBF1;
+  --text-2:      rgba(204,251,241,0.5);
+  --text-3:      rgba(45,212,191,0.2);
+}
+
+body.theme-midnight .stage-bg::before {
+  background:
+    radial-gradient(ellipse 45% 30% at 50% 100%, rgba(13,148,136,0.1) 0%, transparent 70%),
+    radial-gradient(ellipse 35% 25% at 20% 30%, rgba(20,184,166,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 25% 20% at 80% 50%, rgba(45,212,191,0.04) 0%, transparent 55%);
+}
+
+/* Bioluminescent glow */
+body.theme-midnight::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(circle 80px at 15% 80%, rgba(45,212,191,0.08) 0%, transparent 100%),
+    radial-gradient(circle 60px at 85% 20%, rgba(20,184,166,0.06) 0%, transparent 100%),
+    radial-gradient(circle 100px at 50% 60%, rgba(94,234,212,0.04) 0%, transparent 100%);
+  pointer-events: none;
+  z-index: 1;
+  animation: bioGlow 6s ease-in-out infinite alternate;
+}
+@keyframes bioGlow { from { opacity: 0.6; } to { opacity: 1; } }
+
+body.theme-midnight .hero-title {
+  font-family: 'Orbitron', sans-serif;
+  background: linear-gradient(135deg, #5EEAD4, #2DD4BF, #14B8A6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  font-size: clamp(2.2rem, 6vw, 5rem);
+}
+body.theme-midnight .hero-sub {
+  color: #5EEAD4;
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(0.55rem, 1vw, 0.7rem);
+  letter-spacing: 0.5em;
+}
+body.theme-midnight .event-badge {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.55rem;
+  letter-spacing: 0.3em;
+}
+body.theme-midnight .btn-start {
+  background: linear-gradient(135deg, #0D9488, #14B8A6);
+  color: #fff;
+  border-radius: 4px;
+  font-family: 'Orbitron', sans-serif;
+  letter-spacing: 0.1em;
+  border: 1px solid rgba(45,212,191,0.3);
+}
+body.theme-midnight .btn-stop {
+  border-radius: 4px;
+  border: 1px solid rgba(45,212,191,0.3);
+}
+body.theme-midnight .light-beam { background: linear-gradient(180deg, transparent, rgba(45,212,191,0.1), transparent); }
+body.theme-midnight .digit-slot {
+  border-radius: 6px;
+  background: linear-gradient(180deg, #041a1a, #020e0e);
+  box-shadow: 0 0 15px rgba(45,212,191,0.1), inset 0 0 30px rgba(45,212,191,0.03);
+  border: 1px solid rgba(45,212,191,0.15);
+}
+body.theme-midnight .digit-display {
+  font-family: 'Orbitron', sans-serif !important;
+}
+body.theme-midnight .stat-pill {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.6rem;
+  letter-spacing: 0.05em;
+}
+body.theme-midnight .top-btn {
+  border-radius: 4px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.05em;
+}
+
+
+/* ═══════════════════════════════════════════
+   THEME 8: ROYALE
+   Luxurious gold + deep purple, VIP energy
+═══════════════════════════════════════════ */
+body.theme-royale {
+  --bg:          #08030f;
+  --bg-mid:      #0d0520;
+  --surface:     rgba(251,191,36,0.04);
+  --surface-2:   rgba(251,191,36,0.07);
+  --border:      rgba(251,191,36,0.1);
+  --accent:      #FBBF24;
+  --accent-hot:  #FDE68A;
+  --accent-dim:  rgba(251,191,36,0.12);
+  --accent-glow: rgba(251,191,36,0.4);
+  --green:       #FBBF24;
+  --green-dim:   rgba(251,191,36,0.08);
+  --green-glow:  rgba(251,191,36,0.35);
+  --red:         #F87171;
+  --text:        #FFFBEB;
+  --text-2:      rgba(255,251,235,0.55);
+  --text-3:      rgba(251,191,36,0.22);
+}
+
+body.theme-royale .stage-bg::before {
+  background:
+    radial-gradient(ellipse 40% 30% at 50% 15%, rgba(251,191,36,0.1) 0%, transparent 70%),
+    radial-gradient(ellipse 30% 25% at 20% 80%, rgba(139,92,246,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 30% 20% at 80% 70%, rgba(168,85,247,0.06) 0%, transparent 55%);
+}
+
+/* Luxury shimmer */
+body.theme-royale::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(251,191,36,0.03) 0%, transparent 25%,
+    rgba(168,85,247,0.02) 40%, transparent 55%,
+    rgba(251,191,36,0.02) 70%, transparent 100%
+  );
+  pointer-events: none;
+  z-index: 1;
+  animation: royaleShimmer 8s ease-in-out infinite alternate;
+}
+@keyframes royaleShimmer { from { opacity: 0.5; } to { opacity: 1; } }
+
+body.theme-royale .hero-title {
+  font-family: 'Cormorant Garamond', serif;
+  background: linear-gradient(135deg, #FDE68A, #FBBF24, #F59E0B);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: none;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  font-size: clamp(3rem, 8vw, 7rem);
+}
+body.theme-royale .hero-sub {
+  color: #C084FC;
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  letter-spacing: 0.2em;
+  font-size: clamp(0.7rem, 1.3vw, 0.95rem);
+}
+body.theme-royale .event-badge {
+  color: #C084FC;
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+}
+body.theme-royale .btn-start {
+  background: linear-gradient(135deg, #B45309, #D97706);
+  color: #fff;
+  border-radius: 0;
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 700;
+  font-size: 1.1rem;
+  letter-spacing: 0.1em;
+  border: 2px solid rgba(251,191,36,0.3);
+}
+body.theme-royale .btn-stop {
+  border-radius: 0;
+  border: 2px solid rgba(251,191,36,0.3);
+}
+body.theme-royale .light-beam { background: linear-gradient(180deg, transparent, rgba(251,191,36,0.08), rgba(139,92,246,0.04), transparent); }
+body.theme-royale .digit-slot {
+  border-radius: 8px;
+  background: linear-gradient(180deg, #150a20, #0a0315);
+  box-shadow: 0 0 25px rgba(251,191,36,0.06), inset 0 1px 0 rgba(251,191,36,0.12);
+  border: 1px solid rgba(251,191,36,0.12);
+}
+body.theme-royale .digit-display {
+  font-family: 'Cormorant Garamond', serif !important;
+  font-weight: 700;
+}
+body.theme-royale .stat-pill {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.8rem;
+}
+body.theme-royale .top-btn {
+  border-radius: 0;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+}
+
+
+/* ═══════════════════════════════════════════
+   THEME 9: CRIMSON NIGHT
+   Dramatic red/rose, cinematic tension
+═══════════════════════════════════════════ */
+body.theme-crimson {
+  --bg:          #080102;
+  --bg-mid:      #100205;
+  --surface:     rgba(251,113,133,0.04);
+  --surface-2:   rgba(251,113,133,0.07);
+  --border:      rgba(251,113,133,0.1);
+  --accent:      #FB7185;
+  --accent-hot:  #FDA4AF;
+  --accent-dim:  rgba(251,113,133,0.12);
+  --accent-glow: rgba(251,113,133,0.35);
+  --green:       #FCA5A5;
+  --green-dim:   rgba(252,165,165,0.08);
+  --green-glow:  rgba(252,165,165,0.35);
+  --red:         #EF4444;
+  --text:        #FFF1F2;
+  --text-2:      rgba(255,241,242,0.55);
+  --text-3:      rgba(251,113,133,0.22);
+}
+
+body.theme-crimson .stage-bg::before {
+  background:
+    radial-gradient(ellipse 45% 35% at 50% 100%, rgba(220,38,38,0.1) 0%, transparent 70%),
+    radial-gradient(ellipse 35% 25% at 20% 20%, rgba(251,113,133,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 30% 20% at 80% 40%, rgba(190,18,60,0.05) 0%, transparent 55%);
+}
+
+/* Blood mist */
+body.theme-crimson::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 40% at 30% 90%, rgba(220,38,38,0.06) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 30% at 70% 10%, rgba(251,113,133,0.04) 0%, transparent 65%);
+  pointer-events: none;
+  z-index: 1;
+  animation: crimsonPulse 4s ease-in-out infinite alternate;
+}
+@keyframes crimsonPulse { from { opacity: 0.5; } to { opacity: 1; } }
+
+body.theme-crimson .hero-title {
+  font-family: 'Bebas Neue', sans-serif;
+  background: linear-gradient(135deg, #FDA4AF, #FB7185, #F43F5E);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  font-size: clamp(3.5rem, 9vw, 8rem);
+  line-height: 0.85;
+}
+body.theme-crimson .hero-sub {
+  color: #FDA4AF;
+  font-family: 'Bebas Neue', sans-serif;
+  letter-spacing: 0.6em;
+  font-size: clamp(0.7rem, 1.3vw, 0.95rem);
+}
+body.theme-crimson .event-badge {
+  font-family: 'Bebas Neue', sans-serif;
+  letter-spacing: 0.3em;
+  font-size: 0.75rem;
+}
+body.theme-crimson .btn-start {
+  background: linear-gradient(135deg, #BE123C, #E11D48);
+  color: #fff;
+  border-radius: 0;
+  font-family: 'Bebas Neue', sans-serif;
+  letter-spacing: 0.15em;
+  font-size: 1.1rem;
+}
+body.theme-crimson .btn-stop {
+  border-radius: 0;
+}
+body.theme-crimson .light-beam { background: linear-gradient(180deg, transparent, rgba(251,113,133,0.1), transparent); }
+body.theme-crimson .digit-slot {
+  border-radius: 4px;
+  background: linear-gradient(180deg, #1a0508, #100205);
+  box-shadow: 0 4px 20px rgba(251,113,133,0.08);
+}
+body.theme-crimson .digit-display {
+  font-family: 'Bebas Neue', sans-serif !important;
+  letter-spacing: 0.05em;
+}
+body.theme-crimson .stat-pill {
+  font-family: 'Bebas Neue', sans-serif;
+  letter-spacing: 0.1em;
+  font-size: 0.8rem;
+}
+body.theme-crimson .top-btn {
+  border-radius: 2px;
+  font-family: 'Bebas Neue', sans-serif;
+  letter-spacing: 0.1em;
+  font-size: 0.85rem;
+}
+
+
+/* ═══════════════════════════════════════════
+   THEME 10: AURORA BOREALIS
+   Northern lights — green + violet + cyan
+═══════════════════════════════════════════ */
+body.theme-aurora {
+  --bg:          #020010;
+  --bg-mid:      #0a0030;
+  --surface:     rgba(52,211,153,0.04);
+  --surface-2:   rgba(52,211,153,0.07);
+  --border:      rgba(52,211,153,0.1);
+  --accent:      #34D399;
+  --accent-hot:  #6EE7B7;
+  --accent-dim:  rgba(52,211,153,0.12);
+  --accent-glow: rgba(52,211,153,0.35);
+  --green:       #34D399;
+  --green-dim:   rgba(52,211,153,0.08);
+  --green-glow:  rgba(52,211,153,0.35);
+  --red:         #F472B6;
+  --text:        #D1FAE5;
+  --text-2:      rgba(209,250,229,0.55);
+  --text-3:      rgba(52,211,153,0.22);
+}
+
+body.theme-aurora .stage-bg::before {
+  background:
+    radial-gradient(ellipse 60% 30% at 30% 0%, rgba(52,211,153,0.12) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 25% at 60% 5%, rgba(139,92,246,0.1) 0%, transparent 65%),
+    radial-gradient(ellipse 40% 20% at 80% 10%, rgba(56,189,248,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 30% 20% at 50% 90%, rgba(52,211,153,0.04) 0%, transparent 55%);
+}
+
+/* Aurora waves */
+body.theme-aurora::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    linear-gradient(180deg,
+      rgba(52,211,153,0.06) 0%,
+      rgba(139,92,246,0.04) 20%,
+      transparent 40%,
+      transparent 60%,
+      rgba(56,189,248,0.03) 80%,
+      rgba(52,211,153,0.04) 100%
+    );
+  pointer-events: none;
+  z-index: 1;
+  animation: auroraWave 10s ease-in-out infinite alternate;
+}
+@keyframes auroraWave {
+  from { opacity: 0.4; transform: scaleY(1); }
+  to   { opacity: 1; transform: scaleY(1.1); }
+}
+
+body.theme-aurora .hero-title {
+  font-family: 'Nunito', sans-serif;
+  background: linear-gradient(135deg, #6EE7B7, #34D399, #A78BFA, #38BDF8);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: auroraText 6s ease-in-out infinite alternate;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+}
+@keyframes auroraText {
+  from { background-position: 0% 50%; }
+  to   { background-position: 100% 50%; }
+}
+body.theme-aurora .hero-sub {
+  color: #6EE7B7;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+}
+body.theme-aurora .event-badge {
+  color: #A78BFA;
+  font-family: 'Nunito', sans-serif;
+}
+body.theme-aurora .btn-start {
+  background: linear-gradient(135deg, #059669, #10B981, #7C3AED);
+  color: #fff;
+  border-radius: 20px;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+}
+body.theme-aurora .btn-stop {
+  border-radius: 20px;
+}
+body.theme-aurora .light-beam { background: linear-gradient(180deg, transparent, rgba(52,211,153,0.08), rgba(139,92,246,0.05), transparent); }
+body.theme-aurora .digit-slot {
+  border-radius: 20px;
+  background: linear-gradient(180deg, #0a0025, #050015);
+  box-shadow:
+    0 0 20px rgba(52,211,153,0.06),
+    0 0 40px rgba(139,92,246,0.04),
+    inset 0 1px 0 rgba(110,231,183,0.08);
+}
+body.theme-aurora .digit-display {
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 900;
+}
+body.theme-aurora .stat-pill {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+}
+body.theme-aurora .top-btn {
+  border-radius: 20px;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+}
