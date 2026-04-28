@@ -1,7 +1,7 @@
 /**
  * MAIN APP v3 — Cinematic Stage Build
  */
-const PHASE = { IDLE: 'idle', SPINNING: 'spinning', DONE: 'done' };
+const PHASE = { IDLE: 'idle', SPINNING: 'spinning', REVEALING: 'revealing', DONE: 'done', COOLDOWN: 'cooldown' };
 
 const AppState = {
   phase: PHASE.IDLE,
@@ -133,6 +133,11 @@ function updateButton() {
     text.textContent = AppState.prizeRound > 1 ? 'Next Draw' : 'Start Draw';
     sub.textContent  = 'Spin all digits';
     btn.disabled = false;
+  } else if (AppState.phase === PHASE.REVEALING || AppState.phase === PHASE.COOLDOWN) {
+    btn.className = 'action-btn btn-stop';
+    text.textContent = 'Wait';
+    sub.textContent  = AppState.phase === PHASE.REVEALING ? 'Revealing winner...' : 'Ready for next draw...';
+    btn.disabled = true;
   } else {
     btn.className = 'action-btn btn-stop';
     text.textContent = 'Stop';
@@ -343,7 +348,8 @@ function stopNextSlot() {
     if (isLastSlot) {
       clearInterval(AppState.tickInterval);
       AppState.tickInterval = null;
-      AppState.phase = PHASE.DONE;
+      AppState.phase = PHASE.REVEALING;
+      updateButton();
       DOM.digitsStage?.classList.remove('active');
       setTimeout(() => showWinner(AppState.currentWinner), 600);
     }
@@ -368,6 +374,17 @@ function showWinner(winner) {
   setTimeout(() => document.body.classList.remove('flash'), 500);
 
   AppState.prizeRound++;
+  
+  // Anti-spam: lock clicks for 1.5s after winner panel appears
+  const dismissBtn = document.getElementById('winner-dismiss');
+  if (dismissBtn) dismissBtn.disabled = true;
+  
+  setTimeout(() => {
+    AppState.phase = PHASE.DONE;
+    if (dismissBtn) dismissBtn.disabled = false;
+    updateButton();
+  }, 1500);
+  
   updateStats();
   updateWinnersList();
   updateButton();
@@ -378,8 +395,18 @@ function showWinner(winner) {
 function dismissWinner() {
   DOM.winnerPanel.classList.remove('visible');
   setStatus('Ready', 'idle');
-  AppState.phase = PHASE.IDLE;
+  
+  // Cooldown to prevent accidental double-click starting the next draw
+  AppState.phase = PHASE.COOLDOWN;
   updateButton();
+  
+  setTimeout(() => {
+    // Only transition back to IDLE if we're still in COOLDOWN
+    if (AppState.phase === PHASE.COOLDOWN) {
+      AppState.phase = PHASE.IDLE;
+      updateButton();
+    }
+  }, 600);
 
   // Auto-show podium after 7th winner
   if (DB.winners.length >= 7) {
