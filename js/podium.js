@@ -60,11 +60,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     content.innerHTML = html;
-
-    // Reset main data if 7 winners exist so next draw starts fresh
-    if (currentWinners.length >= 7) {
-      DB.resetWinners();
-    }
   }
 
   // Handle Export CSV

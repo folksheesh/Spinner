@@ -10,6 +10,7 @@ const AppState = {
   rollIntervals: [],
   tickInterval: null,
   prizeRound: 1,
+  cursorHidden: false
 };
 
 const DOM = {
@@ -140,8 +141,46 @@ function updateButton() {
   }
 }
 
+// ── Presentation Mode ──────────────────────────────────────
+function setPresentationMode(hidden) {
+  AppState.cursorHidden = hidden;
+  document.body.style.cursor = hidden ? 'none' : '';
+  
+  const uiState = hidden ? '0' : '1';
+  const pointerState = hidden ? 'none' : 'auto';
+  
+  if (DOM.actionBtn) {
+    DOM.actionBtn.style.opacity = uiState;
+    DOM.actionBtn.style.pointerEvents = pointerState;
+  }
+  
+  const topBar = document.querySelector('.top-bar');
+  if (topBar) {
+    topBar.style.transition = 'opacity 0.3s ease';
+    topBar.style.opacity = uiState;
+    topBar.style.pointerEvents = pointerState;
+  }
+  
+  const bottomTray = document.querySelector('.bottom-tray');
+  if (bottomTray) {
+    bottomTray.style.transition = 'opacity 0.3s ease';
+    bottomTray.style.opacity = uiState;
+    bottomTray.style.pointerEvents = pointerState;
+  }
+}
+
 // ── START ──────────────────────────────────────────────────
 function startAllSpinning() {
+  if (DB.winners.length >= 7) {
+    const txt = document.getElementById('reset-modal-text');
+    if (txt) txt.innerHTML = 'Sudah ada 7 pemenang terpilih.<br><br>Apakah Anda ingin mereset data dan memulai undian baru dari awal?';
+    document.getElementById('reset-modal')?.classList.add('visible');
+    if (AppState.cursorHidden) {
+      setPresentationMode(false);
+    }
+    return;
+  }
+
   const winner = DB.pickRandom();
   if (!winner) { setStatus('All participants have won!', 'warning'); return; }
 
@@ -379,7 +418,6 @@ function openSummary() {
 
 // ── Reset ──────────────────────────────────────────────────
 function resetAll() {
-  if (!confirm('Peringatan: Ini akan menghapus semua daftar pemenang. Lanjutkan?')) return;
 
   // Stop all active intervals and timeouts
   AppState.rollIntervals.forEach(id => {
@@ -410,7 +448,12 @@ function resetAll() {
 // ── Bindings ───────────────────────────────────────────────
 function bindEvents() {
   DOM.actionBtn?.addEventListener('click', () => { SoundEngine.unlock(); SyncEngine.emit('action'); });
-  DOM.resetBtn?.addEventListener('click', resetAll);
+  
+  DOM.resetBtn?.addEventListener('click', () => {
+    const txt = document.getElementById('reset-modal-text');
+    if (txt) txt.innerHTML = 'Apakah Anda yakin ingin mereset data dan memulai undian baru dari awal?<br><br><b>Semua data pemenang saat ini akan terhapus.</b>';
+    document.getElementById('reset-modal')?.classList.add('visible');
+  });
   
   DOM.summaryBtn?.addEventListener('click', openSummary);
 
@@ -422,10 +465,18 @@ function bindEvents() {
     DOM.soundBtn.textContent = on ? '🔊' : '🔇';
   });
 
+  document.getElementById('confirm-reset-btn')?.addEventListener('click', () => {
+    document.getElementById('reset-modal')?.classList.remove('visible');
+    resetAll();
+  });
+  
+  document.getElementById('cancel-reset-btn')?.addEventListener('click', () => {
+    document.getElementById('reset-modal')?.classList.remove('visible');
+  });
+
   window.addEventListener('doorprize:action', handleAction);
 
   // ── Click anywhere = Start/Stop (works with mouse, PPT remote, etc.) ──
-  let cursorHidden = false;
   document.addEventListener('click', (e) => {
     // Don't trigger action for UI buttons / summary panel / winner panel
     const target = e.target;
@@ -439,6 +490,7 @@ function bindEvents() {
         target.closest('.podium-overlay') ||
         target.closest('#guide-btn') ||
         target.closest('#guide-panel') ||
+        target.closest('#reset-modal') ||
         target.closest('.theme-dot') ||
         target.closest('#remote-pill')) return;
 
@@ -455,12 +507,7 @@ function bindEvents() {
     }
     // F key toggles cursor visibility (display only)
     if (e.code === 'KeyF') {
-      cursorHidden = !cursorHidden;
-      document.body.style.cursor = cursorHidden ? 'none' : '';
-      if (DOM.actionBtn) {
-        DOM.actionBtn.style.opacity = cursorHidden ? '0' : '1';
-        DOM.actionBtn.style.pointerEvents = cursorHidden ? 'none' : 'auto';
-      }
+      setPresentationMode(!AppState.cursorHidden);
     }
   });
 
