@@ -1122,6 +1122,55 @@ kbd {
   opacity: 1;
 }
 
+/* --- GRAND PRIZE WINNER ANIMATIONS --- */
+.winner-panel.grand-prize {
+  background: radial-gradient(circle at center, rgba(255, 215, 0, 0.15) 0%, rgba(4, 4, 10, 0.95) 80%);
+}
+
+.winner-panel.grand-prize .winner-inner {
+  animation: grandPrizePanelEnter 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.winner-panel.grand-prize .winner-eyebrow {
+  color: #FFD700;
+  text-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+  font-size: 0.9rem;
+  letter-spacing: 0.25em;
+}
+
+.winner-panel.grand-prize .winner-eyebrow::before,
+.winner-panel.grand-prize .winner-eyebrow::after {
+  background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.8));
+}
+
+.winner-panel.grand-prize .winner-id {
+  color: #FFD700;
+  animation: grandPrizeGlow 1.5s ease-in-out infinite alternate;
+  font-size: clamp(3.5rem, 9vw, 8rem);
+}
+
+.winner-panel.grand-prize .winner-name {
+  color: #FFF;
+  text-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+  font-size: clamp(2.2rem, 5vw, 4rem);
+}
+
+.winner-panel.grand-prize .winner-line {
+  background: #FFD700;
+  box-shadow: 0 0 15px #FFD700;
+}
+
+@keyframes grandPrizePanelEnter {
+  0% { transform: scale(0.5) translateY(50px); opacity: 0; filter: blur(10px); }
+  50% { transform: scale(1.1) translateY(-10px); opacity: 1; filter: blur(0); }
+  100% { transform: scale(1) translateY(0); opacity: 1; filter: blur(0); }
+}
+
+@keyframes grandPrizeGlow {
+  0% { text-shadow: 0 0 40px rgba(255, 215, 0, 0.6), 0 0 80px rgba(255, 215, 0, 0.3); transform: scale(1); }
+  100% { text-shadow: 0 0 60px rgba(255, 215, 0, 1), 0 0 120px rgba(255, 215, 0, 0.6); transform: scale(1.05); }
+}
+
 .winner-eyebrow {
   font-family: var(--font-mono);
   font-size: 0.65rem;

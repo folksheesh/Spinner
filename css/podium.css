@@ -260,15 +260,51 @@
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
+@keyframes grandPrizePulse {
+  0% { transform: translateY(0) scale(1); box-shadow: 0 0 40px rgba(255, 215, 0, 0.3), 0 20px 60px rgba(0, 0, 0, 0.5); }
+  50% { transform: translateY(-8px) scale(1.02); box-shadow: 0 0 60px rgba(255, 215, 0, 0.6), 0 20px 70px rgba(255, 215, 0, 0.2); }
+  100% { transform: translateY(0) scale(1); box-shadow: 0 0 40px rgba(255, 215, 0, 0.3), 0 20px 60px rgba(0, 0, 0, 0.5); }
+}
+
+@keyframes grandPrizeSparkle {
+  0% { filter: hue-rotate(0deg) brightness(1); }
+  50% { filter: hue-rotate(20deg) brightness(1.2); }
+  100% { filter: hue-rotate(0deg) brightness(1); }
+}
+
 /* ── 1st Place ── */
 .podium-card.place-1 {
-  --card-border-gradient: linear-gradient(135deg, #FFD700, #FFA500, #FFD700);
-  background: linear-gradient(180deg, rgba(255, 215, 0, 0.12) 0%, rgba(20, 15, 40, 0.95) 100%);
-  box-shadow: 0 0 40px rgba(255, 215, 0, 0.2), 0 20px 60px rgba(0, 0, 0, 0.5);
+  --card-border-gradient: linear-gradient(135deg, #FFD700, #FFA500, #FFD700, #FFF, #FFD700);
+  background: linear-gradient(180deg, rgba(255, 215, 0, 0.15) 0%, rgba(20, 15, 40, 0.95) 100%);
+  box-shadow: 0 0 40px rgba(255, 215, 0, 0.3), 0 20px 60px rgba(0, 0, 0, 0.5);
   width: clamp(180px, 22vw, 260px);
   min-height: 280px;
-  animation-delay: 0.3s;
+  padding-top: 2.5rem;
+  animation: podiumCardEnter 0.7s cubic-bezier(0.16, 1, 0.3, 1) backwards, grandPrizePulse 3s ease-in-out infinite, grandPrizeSparkle 4s linear infinite;
+  animation-delay: 0.3s, 1s, 1s;
   z-index: 3;
+}
+
+.grand-prize-label {
+  position: absolute;
+  top: 12px;
+  background: linear-gradient(90deg, #FFD700, #FFA500, #FFD700);
+  background-size: 200% auto;
+  color: #000;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  padding: 4px 15px;
+  border-radius: 20px;
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+  animation: textShine 3s linear infinite;
+  z-index: 10;
+  text-transform: uppercase;
+}
+
+@keyframes textShine {
+  to { background-position: 200% center; }
 }
 
 /* ── 2nd Place ── */

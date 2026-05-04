@@ -2,8 +2,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const content = document.getElementById('summary-content');
   if (!content) return;
   
-  // Clone current winners before potential reset
-  const currentWinners = [...DB.winners];
+  // Clone current winners before potential reset and reverse so the last drawn is 1st place
+  const currentWinners = [...DB.winners].reverse();
 
   if (currentWinners.length === 0) {
     content.innerHTML = '<div class="podium-empty">Belum ada pemenang yang diundi.</div>';
@@ -31,6 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const place = idx + 1;
         html += `
           <div class="podium-card place-${place}" style="animation-delay: ${0.3 + idx * 0.2}s">
+            ${place === 1 ? '<div class="grand-prize-label">GRAND PRIZE</div>' : ''}
             <div class="podium-rank">${place}<span class="podium-rank-suffix">${ordinal(place).replace(place,'')}</span></div>
             <div class="podium-avatar">${avatarEmojis[idx]}</div>
             <div class="podium-card-id">${w.id}</div>

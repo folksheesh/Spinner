@@ -362,6 +362,21 @@ function stopNextSlot() {
 // ── WINNER REVEAL ──────────────────────────────────────────
 function showWinner(winner) {
   DB.markWinner(winner);
+  
+  const totalDraws = DB.winners.length;
+  const rank = 8 - totalDraws;
+  
+  const eyebrow = document.querySelector('.winner-eyebrow');
+  if (eyebrow) {
+    if (rank === 1) {
+      eyebrow.textContent = '🏆 GRAND PRIZE - JUARA 1 🏆';
+      DOM.winnerPanel.classList.add('grand-prize');
+    } else {
+      eyebrow.textContent = `JUARA ${rank}`;
+      DOM.winnerPanel.classList.remove('grand-prize');
+    }
+  }
+
   DOM.winnerId.textContent   = winner.id;
   DOM.winnerName.textContent = winner.name;
   DOM.winnerDept.textContent = winner.department;
