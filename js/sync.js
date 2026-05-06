@@ -135,18 +135,9 @@ const SyncEngine = (() => {
         emit('ping');
       }
     }, 1000);
-
-    // Timeout after 12 seconds
-    clearTimeout(connectionTimeout);
-    connectionTimeout = setTimeout(() => {
-      if (!connected) {
-        clearInterval(pingInterval);
-        if (ws) ws.close();
-        pairingCode = null;
-        notifyStatus('error', 'Kode salah / Host tidak aktif');
-        window.dispatchEvent(new CustomEvent('doorprize:error'));
-      }
-    }, 12000);
+    
+    // Strict timeout removed to prevent annoying disconnection errors.
+    // The operator will silently stay active.
   }
 
   function init(role) {

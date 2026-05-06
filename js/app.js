@@ -294,8 +294,8 @@ function stopNextSlot() {
   clearInterval(capturedInterval);
   SoundEngine.playScreech(idx);
   
-  let slowDelay = 60;
-  let slowsLeft = 7; // Number of slowing ticks
+  let slowDelay = 40;
+  let slowsLeft = 4; // Number of slowing ticks
   
     const stage = DOM.digitsStage;
     if (!stage) return; // Guard: stage not in DOM
@@ -367,7 +367,7 @@ function stopNextSlot() {
   const tickSlow = () => {
     display.textContent = Math.floor(Math.random() * 10);
     slowsLeft--;
-    slowDelay += 35; 
+    slowDelay += 25; 
     
     if (slowsLeft % 2 === 0) {
       emitSmoke(8);

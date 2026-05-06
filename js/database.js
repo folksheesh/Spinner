@@ -4,32 +4,58 @@
  * ID harus 6 digit angka
  */
 
-// Generate 1200 dummy employees dynamically
-function generateEmployees(count) {
-  const depts = ['Engineering', 'Marketing', 'HR', 'Finance', 'Operations', 'Sales', 'IT', 'Legal', 'Product', 'Logistics'];
-  const firstNames = ['Ahmad', 'Budi', 'Citra', 'Dian', 'Eko', 'Fitria', 'Galih', 'Hana', 'Irwan', 'Joko', 'Kartika', 'Luthfi', 'Maya', 'Nanda', 'Oki', 'Putri', 'Qori', 'Rizky', 'Sari', 'Taufik', 'Umi', 'Vino', 'Wahyu', 'Xena', 'Yogi', 'Zahra', 'Aditya', 'Bella', 'Chandra', 'Desy', 'Reza', 'Kevin', 'Siska', 'Rini', 'Dodi', 'Tito', 'Andre'];
-  const lastNames = ['Fauzi', 'Santoso', 'Dewi', 'Pratiwi', 'Prasetyo', 'Sari', 'Wibowo', 'Kusuma', 'Hakim', 'Widodo', 'Anwar', 'Putri', 'Rizki', 'Setiawan', 'Rahayu', 'Amalia', 'Maulana', 'Indah', 'Hidayat', 'Kalsum', 'Bastian', 'Nugroho', 'Pradana', 'Nadia', 'Budiman', 'Safira', 'Kurniawan', 'Ramadhan', 'Wijaya', 'Siregar', 'Simanjuntak', 'Lestari', 'Saputra'];
-  
-  const data = [];
-  const usedIds = new Set();
-  
-  for (let i = 0; i < count; i++) {
-    let id;
-    do {
-      // Generate random 6-digit number (100000 to 999999)
-      id = String(Math.floor(100000 + Math.random() * 900000));
-    } while (usedIds.has(id));
-    usedIds.add(id);
-    
-    const fname = firstNames[Math.floor(Math.random() * firstNames.length)];
-    const lname = lastNames[Math.floor(Math.random() * lastNames.length)];
-    const dept = depts[Math.floor(Math.random() * depts.length)];
-    data.push({ id, name: `${fname} ${lname}`, department: dept });
-  }
-  return data;
-}
-
-const EMPLOYEE_DATABASE = generateEmployees(1200);
+const EMPLOYEE_DATABASE = [
+  { id: "100001", name: "Ahmad Fauzi", department: "Engineering" },
+  { id: "100002", name: "Budi Santoso", department: "Marketing" },
+  { id: "100003", name: "Citra Dewi", department: "HR" },
+  { id: "100004", name: "Dian Pratiwi", department: "Finance" },
+  { id: "100005", name: "Eko Prasetyo", department: "Operations" },
+  { id: "100006", name: "Fitria Sari", department: "Sales" },
+  { id: "100007", name: "Galih Wibowo", department: "IT" },
+  { id: "100008", name: "Hana Kusuma", department: "Legal" },
+  { id: "100009", name: "Irwan Hakim", department: "Product" },
+  { id: "100010", name: "Joko Widodo", department: "Logistics" },
+  { id: "100011", name: "Kartika Anwar", department: "Engineering" },
+  { id: "100012", name: "Luthfi Putri", department: "Marketing" },
+  { id: "100013", name: "Maya Rizki", department: "HR" },
+  { id: "100014", name: "Nanda Setiawan", department: "Finance" },
+  { id: "100015", name: "Oki Rahayu", department: "Operations" },
+  { id: "100016", name: "Putri Amalia", department: "Sales" },
+  { id: "100017", name: "Qori Maulana", department: "IT" },
+  { id: "100018", name: "Rizky Indah", department: "Legal" },
+  { id: "100019", name: "Sari Hidayat", department: "Product" },
+  { id: "100020", name: "Taufik Kalsum", department: "Logistics" },
+  { id: "100021", name: "Umi Bastian", department: "Engineering" },
+  { id: "100022", name: "Vino Nugroho", department: "Marketing" },
+  { id: "100023", name: "Wahyu Pradana", department: "HR" },
+  { id: "100024", name: "Xena Nadia", department: "Finance" },
+  { id: "100025", name: "Yogi Budiman", department: "Operations" },
+  { id: "100026", name: "Zahra Safira", department: "Sales" },
+  { id: "100027", name: "Aditya Kurniawan", department: "IT" },
+  { id: "100028", name: "Bella Ramadhan", department: "Legal" },
+  { id: "100029", name: "Chandra Wijaya", department: "Product" },
+  { id: "100030", name: "Desy Siregar", department: "Logistics" },
+  { id: "100031", name: "Reza Simanjuntak", department: "Engineering" },
+  { id: "100032", name: "Kevin Lestari", department: "Marketing" },
+  { id: "100033", name: "Siska Saputra", department: "HR" },
+  { id: "100034", name: "Rini Fauzi", department: "Finance" },
+  { id: "100035", name: "Dodi Santoso", department: "Operations" },
+  { id: "100036", name: "Tito Dewi", department: "Sales" },
+  { id: "100037", name: "Andre Pratiwi", department: "IT" },
+  { id: "100038", name: "Ahmad Prasetyo", department: "Legal" },
+  { id: "100039", name: "Budi Sari", department: "Product" },
+  { id: "100040", name: "Citra Wibowo", department: "Logistics" },
+  { id: "100041", name: "Dian Kusuma", department: "Engineering" },
+  { id: "100042", name: "Eko Hakim", department: "Marketing" },
+  { id: "100043", name: "Fitria Widodo", department: "HR" },
+  { id: "100044", name: "Galih Anwar", department: "Finance" },
+  { id: "100045", name: "Hana Putri", department: "Operations" },
+  { id: "100046", name: "Irwan Rizki", department: "Sales" },
+  { id: "100047", name: "Joko Setiawan", department: "IT" },
+  { id: "100048", name: "Kartika Rahayu", department: "Legal" },
+  { id: "100049", name: "Luthfi Amalia", department: "Product" },
+  { id: "100050", name: "Maya Maulana", department: "Logistics" }
+];
 
 // State management for winners
 const DB = {
