@@ -116,149 +116,133 @@ const SoundEngine = (() => {
     }
   }
 
-  // Audio object for the brake sound
-  const brakeAudio = new Audio('assets/SFX/Breaks.wav');
+  // ── Audio files (winner sounds only — no external brake file) ──
+  const winnerAudio      = new Audio('assets/SFX/Winner.mp3');
+  const grandPrizeAudio  = new Audio('assets/SFX/GrandPrizeWinner.mp3');
+  winnerAudio.preload     = 'auto';
+  grandPrizeAudio.preload = 'auto';
+  winnerAudio.volume      = 1.0;
+  grandPrizeAudio.volume  = 1.0;
 
-  // F1 High-Speed Braking (Using actual .wav file)
-  function playScreech() {
-    if (!enabled) return;
-    try {
-      brakeAudio.currentTime = 0;
-      brakeAudio.play().catch(e => console.warn('Could not play Breaks.wav:', e));
-    } catch (e) { }
-  }
-
-  // Mechanical Lock (Clunk when it fully stops)
-  function playLock() {
+  // ── F1 GEAR-SHIFT (procedural) ──────────────────────────────
+  // Two-hit mechanical "jeg-jeg" sound.
+  // slotIndex 0−6: each successive stop is faster, higher-pitched, more aggressive.
+  function playScreech(slotIndex = 0) {
     if (!enabled) return;
     try {
       const ac = getCtx();
-      const t = ac.currentTime;
+      const now = ac.currentTime;
 
-      // HEAVY CLUNK
-      const clunk = ac.createOscillator();
-      const clunkGain = ac.createGain();
-      
-      clunk.type = 'square';
-      clunk.frequency.setValueAtTime(120, t); 
-      clunk.frequency.exponentialRampToValueAtTime(20, t + 0.1); // Deep impact
-      
-      clunkGain.gain.setValueAtTime(2.0, t); // Loud hit
-      clunkGain.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
-      
-      clunk.connect(clunkGain);
-      clunkGain.connect(ac.destination);
-      clunk.start(t);
-      clunk.stop(t + 0.2);
+      // Scale factor: 0.0 (first stop) → 1.0 (sixth stop)
+      const g = Math.min(slotIndex, 5) / 5;
+
+      // Gap between two hits gets shorter as gear climbs (100ms → 55ms)
+      const gapSec    = (100 - g * 45) / 1000;
+      // Pitch multiplier climbs each gear (1.0x → 1.6x)
+      const basePitch = 1.0 + g * 0.6;
+      // Volume intensity climbs slightly
+      const intensity = 0.85 + g * 0.35;
+
+      function hit(startT, isSecond) {
+        const pitch = basePitch * (isSecond ? 1.28 : 1.0);
+        const vol   = intensity * (isSecond ? 1.2 : 1.0) * 1.5; // boosted volume
+
+        // 1. Sharp noise transient (the mechanical 'crack')
+        const noiseLen  = Math.round(ac.sampleRate * 0.08); // longer decay
+        const noiseBuf  = ac.createBuffer(1, noiseLen, ac.sampleRate);
+        const noiseData = noiseBuf.getChannelData(0);
+        for (let i = 0; i < noiseLen; i++) {
+          noiseData[i] = (Math.random() * 2 - 1) * Math.exp(-i / (noiseLen * 0.2));
+        }
+        const noiseSrc = ac.createBufferSource();
+        noiseSrc.buffer = noiseBuf;
+
+        const nbpf = ac.createBiquadFilter();
+        nbpf.type = 'bandpass';
+        nbpf.frequency.value = 1100 * pitch;
+        nbpf.Q.value = 1.2; // wider band
+
+        const nGain = ac.createGain();
+        nGain.gain.setValueAtTime(vol * 2.0, startT);
+        nGain.gain.exponentialRampToValueAtTime(0.001, startT + 0.07);
+
+        noiseSrc.connect(nbpf);
+        nbpf.connect(nGain);
+        nGain.connect(ac.destination);
+        noiseSrc.start(startT);
+
+        // 2. Engine blip — sawtooth sweep (the 'engine' voice)
+        const osc = ac.createOscillator();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(300 * pitch, startT);
+        osc.frequency.exponentialRampToValueAtTime(50 * pitch, startT + 0.08);
+
+        const lpf = ac.createBiquadFilter();
+        lpf.type = 'lowpass';
+        lpf.frequency.setValueAtTime(4000, startT);
+        lpf.frequency.exponentialRampToValueAtTime(200, startT + 0.08);
+
+        const oGain = ac.createGain();
+        oGain.gain.setValueAtTime(vol * 0.6, startT);
+        oGain.gain.exponentialRampToValueAtTime(0.001, startT + 0.09);
+
+        osc.connect(lpf);
+        lpf.connect(oGain);
+        oGain.connect(ac.destination);
+        osc.start(startT);
+        osc.stop(startT + 0.1);
+
+        // 3. Sub punch (body & weight)
+        const sub = ac.createOscillator();
+        sub.type = 'square';
+        sub.frequency.setValueAtTime(150 * pitch, startT);
+        sub.frequency.exponentialRampToValueAtTime(40, startT + 0.06);
+
+        const sGain = ac.createGain();
+        sGain.gain.setValueAtTime(vol * 0.8, startT);
+        sGain.gain.exponentialRampToValueAtTime(0.001, startT + 0.08);
+
+        sub.connect(sGain);
+        sGain.connect(ac.destination);
+        sub.start(startT);
+        sub.stop(startT + 0.09);
+      }
+
+      // Fire both hits
+      hit(now,           false); // "jeg"
+      hit(now + gapSec,  true);  // "jeg" (faster, higher)
 
     } catch (e) { }
   }
 
-  // WINNER JACKPOT - EXTREME THUNDEROUS EXPLOSION + Casino winning
-  function playWinner() {
+  // Silent stub — lock clunk removed to keep the gear-shift clean
+  function playLock() {}
+
+  // ── WINNER SOUND — uses real MP3 files ──
+  // isGrandPrize = true  → GrandPrizeWinner.mp3
+  // isGrandPrize = false → Winner.mp3
+  function playWinner(isGrandPrize = false) {
     if (!enabled) return;
     stopTension();
 
     try {
-      const ac = getCtx();
-      const t = ac.currentTime;
+      const audio = isGrandPrize ? grandPrizeAudio : winnerAudio;
+      // Stop any currently playing winner sound first (safety)
+      audio.pause();
+      audio.currentTime = 0;
+      audio.play().catch(e => console.warn('[Sound] Could not play winner audio:', e));
+    } catch (e) {
+      console.warn('[Sound] playWinner error:', e);
+    }
+  }
 
-      // 1. MASSIVE EXPLOSION NOISE
-      const bufferSize = ac.sampleRate * 4;
-      const buffer = ac.createBuffer(1, bufferSize, ac.sampleRate);
-      const data = buffer.getChannelData(0);
-      // Generate heavy clipped noise
-      for(let i=0; i<bufferSize; i++) {
-        let n = (Math.random() * 2 - 1) * 5; // overdrive raw noise
-        data[i] = Math.max(-1, Math.min(1, n)); // hard clip
-      }
-      
-      const noise = ac.createBufferSource();
-      noise.buffer = buffer;
-      
-      const noiseFilter = ac.createBiquadFilter();
-      noiseFilter.type = 'lowpass';
-      noiseFilter.frequency.setValueAtTime(6000, t); // Crackling bright start
-      noiseFilter.frequency.exponentialRampToValueAtTime(30, t + 2.5); // Sweeps down to an earthquake rumble
-      
-      const noiseGain = ac.createGain();
-      noiseGain.gain.setValueAtTime(2.0, t); // VERY LOUD
-      noiseGain.gain.linearRampToValueAtTime(0.8, t + 0.2); // Quick decay
-      noiseGain.gain.exponentialRampToValueAtTime(0.001, t + 3.5); // Long rumble tail
-      
-      noise.connect(noiseFilter);
-      noiseFilter.connect(noiseGain);
-      noiseGain.connect(ac.destination);
-      noise.start(t);
-
-      // 2. EARTHQUAKE SUB-BASS (Square wave sweep)
-      const boom = ac.createOscillator();
-      const boomFilter = ac.createBiquadFilter();
-      const boomGain = ac.createGain();
-      
-      boom.type = 'square'; // Gives it that tearing, explosive edge
-      boom.frequency.setValueAtTime(200, t); // High punch
-      boom.frequency.exponentialRampToValueAtTime(15, t + 1.0); // Dives into deep sub-bass
-      
-      boomFilter.type = 'lowpass';
-      boomFilter.frequency.setValueAtTime(1000, t);
-      boomFilter.frequency.exponentialRampToValueAtTime(30, t + 1.5);
-
-      boomGain.gain.setValueAtTime(1.5, t); // Overdrive
-      boomGain.gain.exponentialRampToValueAtTime(0.001, t + 2.0);
-      
-      boom.connect(boomFilter);
-      boomFilter.connect(boomGain);
-      boomGain.connect(ac.destination);
-      boom.start(t);
-      boom.stop(t + 2.1);
-
-      // 3. Fast Happy Arpeggio (Jackpot Coins over the explosion)
-      const arpeggio = [523, 659, 784, 1047, 1319, 1568]; // C Major
-      let noteTime = t + 0.25; // delay so the explosion hits first
-      
-      for (let i = 0; i < 28; i++) {
-        const freq = arpeggio[i % arpeggio.length];
-        const osc = ac.createOscillator();
-        const gain = ac.createGain();
-        osc.connect(gain);
-        gain.connect(ac.destination);
-        osc.frequency.value = freq;
-        osc.type = 'square';
-        gain.gain.setValueAtTime(0.15, noteTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, noteTime + 0.1);
-        osc.start(noteTime);
-        osc.stop(noteTime + 0.12);
-        noteTime += 0.07; // faster arpeggio
-      }
-
-      // 4. Grand Final Epic Chord
-      const finalChordT = noteTime + 0.1;
-      const chord = [261.63, 523, 659, 784, 1047]; // HUGE C major
-      chord.forEach(freq => {
-        const osc = ac.createOscillator();
-        const gain = ac.createGain();
-        osc.connect(gain);
-        gain.connect(ac.destination);
-        osc.frequency.value = freq;
-        osc.type = 'sawtooth';
-        
-        const filter = ac.createBiquadFilter();
-        filter.type = 'lowpass';
-        filter.frequency.setValueAtTime(600, finalChordT);
-        filter.frequency.linearRampToValueAtTime(4000, finalChordT + 0.8);
-        
-        osc.connect(filter);
-        filter.connect(gain);
-        
-        gain.gain.setValueAtTime(0, finalChordT);
-        gain.gain.linearRampToValueAtTime(0.2, finalChordT + 0.1);
-        gain.gain.exponentialRampToValueAtTime(0.001, finalChordT + 3.5);
-        osc.start(finalChordT);
-        osc.stop(finalChordT + 3.6);
-      });
-
-    } catch (e) { }
+  // Preload / warm up winner audio files after user interaction
+  function preloadAll() {
+    [winnerAudio, grandPrizeAudio].forEach(a => {
+      a.muted = true;
+      const p = a.play();
+      if (p) p.then(() => { a.pause(); a.currentTime = 0; a.muted = false; }).catch(() => { a.muted = false; });
+    });
   }
 
   // Misc unused endpoints included for compatibility
@@ -275,8 +259,9 @@ const SoundEngine = (() => {
     playDrumRoll,
     startTension,
     stopTension,
-    toggle() { enabled = !enabled; if (!enabled) stopTension(); return enabled; },
+    preloadAll,
+    toggle() { enabled = !enabled; if (!enabled) { stopTension(); winnerAudio.pause(); grandPrizeAudio.pause(); } return enabled; },
     isEnabled() { return enabled; },
-    unlock() { getCtx(); }
+    unlock() { getCtx(); preloadAll(); }
   };
 })();

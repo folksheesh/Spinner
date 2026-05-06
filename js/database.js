@@ -35,9 +35,13 @@ const EMPLOYEE_DATABASE = generateEmployees(1200);
 const DB = {
   employees: [...EMPLOYEE_DATABASE],
   winners: [],
+  absent: [],
   
   getAvailable() {
-    return this.employees.filter(e => !this.winners.find(w => w.id === e.id));
+    return this.employees.filter(e => 
+      !this.winners.find(w => w.id === e.id) && 
+      !this.absent.find(a => a.id === e.id)
+    );
   },
   
   pickRandom() {
@@ -53,23 +57,38 @@ const DB = {
       this.saveState();
     }
   },
+
+  markAbsent(employee) {
+    // Remove from winners if they are there
+    this.winners = this.winners.filter(w => w.id !== employee.id);
+    // Add to absent list so they aren't drawn again
+    if (!this.absent.find(a => a.id === employee.id)) {
+      this.absent.push({ ...employee, absentAt: new Date().toISOString() });
+    }
+    this.saveState();
+  },
   
   saveState() {
     try {
       localStorage.setItem('doorprize_winners', JSON.stringify(this.winners));
+      localStorage.setItem('doorprize_absent', JSON.stringify(this.absent));
     } catch(e) {}
   },
   
   loadState() {
     try {
-      const saved = localStorage.getItem('doorprize_winners');
-      if (saved) this.winners = JSON.parse(saved);
+      const savedWinners = localStorage.getItem('doorprize_winners');
+      if (savedWinners) this.winners = JSON.parse(savedWinners);
+      const savedAbsent = localStorage.getItem('doorprize_absent');
+      if (savedAbsent) this.absent = JSON.parse(savedAbsent);
     } catch(e) {}
   },
   
   resetWinners() {
     this.winners = [];
+    this.absent = [];
     localStorage.removeItem('doorprize_winners');
+    localStorage.removeItem('doorprize_absent');
   },
   
   getTotalParticipants() {

@@ -108,17 +108,17 @@ const SyncEngine = (() => {
 
   function initHost() {
     isHost = true;
-    pairingCode = Math.floor(1000 + Math.random() * 9000).toString();
-    notifyStatus('connecting', 'Generating pairing code...');
+    pairingCode = 'spin-event-2026'; // FIXED CHANNEL FOR PRODUCTION
+    notifyStatus('connecting', 'Connecting to server...');
     connectToRoom(pairingCode, true);
   }
 
-  function connectRemote(code) {
+  function connectRemote() {
     isHost = false;
-    pairingCode = code;
+    pairingCode = 'spin-event-2026'; // FIXED CHANNEL FOR PRODUCTION
     connected = false;
-    notifyStatus('connecting', 'Verifying code...');
-    connectToRoom(code, false);
+    notifyStatus('connecting', 'Connecting to host...');
+    connectToRoom(pairingCode, false);
 
     // Send ping after WebSocket is ready, then retry every 2s
     clearInterval(pingInterval);

@@ -1,87 +1,118 @@
+/**
+ * PODIUM PAGE — 3-Session System
+ * Session 1: Lucky Draw 1 (winners 1-3)
+ * Session 2: Lucky Draw 2 (winners 4-6)
+ * Session 3: Grand Prize  (winner 7)
+ */
 document.addEventListener('DOMContentLoaded', () => {
   const content = document.getElementById('summary-content');
   if (!content) return;
-  
-  // Clone current winners before potential reset and reverse so the last drawn is 1st place
-  const currentWinners = [...DB.winners].reverse();
 
-  if (currentWinners.length === 0) {
-    content.innerHTML = '<div class="podium-empty">Belum ada pemenang yang diundi.</div>';
+  // ── Determine which session to show ──
+  const urlParams   = new URLSearchParams(window.location.search);
+  const session     = parseInt(urlParams.get('session')) || 1;
+  const allWinners  = [...DB.winners]; // drawn in chronological order
+
+  let sessionWinners, sessionTitle, sessionSubtitle, nextLabel, nextSession;
+
+  if (session === 1) {
+    sessionWinners  = allWinners.slice(0, 3);
+    sessionTitle    = 'LUCKY DRAW 1';
+    sessionSubtitle = 'Session 1 Winners';
+    nextLabel       = 'Lanjut ke Lucky Draw 2 →';
+    nextSession     = null; // back to index.html to continue drawing
+  } else if (session === 2) {
+    sessionWinners  = allWinners.slice(3, 6);
+    sessionTitle    = 'LUCKY DRAW 2';
+    sessionSubtitle = 'Session 2 Winners';
+    nextLabel       = 'Lanjut ke Grand Prize →';
+    nextSession     = null;
   } else {
-    const avatarEmojis = ['🏆','🥈','🥉','⭐','🎯','🎪','🎲'];
-    const ordinal = (n) => {
-      const s = ['th','st','nd','rd'];
-      const v = n % 100;
-      return n + (s[(v - 20) % 10] || s[v] || s[0]);
-    };
-
-    // Show up to 7 winners
-    const winners = currentWinners.slice(0, 7);
-    const top3 = winners.slice(0, 3);
-    const rest = winners.slice(3, 7);
-
-    let html = '';
-
-    // Top 3 in podium layout: 2nd, 1st, 3rd
-    if (top3.length > 0) {
-      html += '<div class="podium-top3">';
-      const order = top3.length >= 3 ? [1, 0, 2] : top3.length === 2 ? [1, 0] : [0];
-      order.forEach(idx => {
-        const w = top3[idx];
-        const place = idx + 1;
-        html += `
-          <div class="podium-card place-${place}" style="animation-delay: ${0.3 + idx * 0.2}s">
-            ${place === 1 ? '<div class="grand-prize-label">GRAND PRIZE</div>' : ''}
-            <div class="podium-rank">${place}<span class="podium-rank-suffix">${ordinal(place).replace(place,'')}</span></div>
-            <div class="podium-avatar">${avatarEmojis[idx]}</div>
-            <div class="podium-card-id">${w.id}</div>
-            <div class="podium-card-name">${w.name}</div>
-            <div class="podium-card-dept">${w.department}</div>
-          </div>`;
-      });
-      html += '</div>';
-    }
-
-    // 4th-7th
-    if (rest.length > 0) {
-      html += '<div class="podium-remaining">';
-      rest.forEach((w, i) => {
-        const rank = i + 4;
-        html += `
-          <div class="podium-remaining-card" style="animation-delay: ${0.8 + i * 0.1}s">
-            <div class="podium-remaining-rank">${rank}</div>
-            <div class="podium-remaining-info">
-              <div class="podium-remaining-id">${w.id}</div>
-              <div class="podium-remaining-name">${w.name}</div>
-              <div class="podium-remaining-dept">${w.department}</div>
-            </div>
-          </div>`;
-      });
-      html += '</div>';
-    }
-
-    content.innerHTML = html;
+    sessionWinners  = allWinners.slice(6, 7);
+    sessionTitle    = 'GRAND PRIZE';
+    sessionSubtitle = '🏆 Pemenang Utama 🏆';
+    nextLabel       = '← Kembali';
+    nextSession     = null;
   }
 
-  // Handle Export CSV
+  // ── Update page header ──
+  const titleEl    = document.querySelector('.podium-title');
+  const subtitleEl = document.querySelector('.podium-subtitle');
+  const crownEl    = document.querySelector('.podium-crown');
+  if (titleEl)    titleEl.textContent    = sessionTitle;
+  if (subtitleEl) subtitleEl.textContent = sessionSubtitle;
+  if (crownEl)    crownEl.textContent    = session === 3 ? '🏆' : '🎉';
+
+  // ── Update close/back button ──
+  const closeBtn = document.getElementById('close-summary');
+  if (closeBtn) {
+    closeBtn.title = nextLabel;
+  }
+
+  // ── Empty state ──
+  if (sessionWinners.length === 0) {
+    content.innerHTML = '<div class="podium-empty">Belum ada pemenang untuk sesi ini.</div>';
+    return;
+  }
+
+  // ── GRAND PRIZE: special single-winner display ──
+  if (session === 3) {
+    const w = sessionWinners[0];
+    content.innerHTML = `
+      <div class="grand-prize-solo">
+        <div class="gps-badge">GRAND PRIZE WINNER</div>
+        <div class="gps-trophy">🏆</div>
+        <div class="gps-id">${w.id}</div>
+        <div class="gps-name">${w.name}</div>
+        <div class="gps-dept">${w.department}</div>
+      </div>
+    `;
+    return;
+  }
+
+  // ── LUCKY DRAW: 3-person podium (Equal Winners) ──
+  // Display drawn winners from left to right equally
+  const displayWinners = [...sessionWinners];
+  const top3 = displayWinners.slice(0, 3);
+
+  let html = '<div class="podium-top3">';
+  top3.forEach((w, idx) => {
+    if (!w) return;
+    html += `
+      <div class="podium-card place-equal" style="animation-delay: ${0.2 + idx * 0.15}s">
+        <div class="podium-rank">🎉<span class="podium-rank-suffix"></span></div>
+        <div class="podium-avatar">🏅</div>
+        <div class="podium-card-id">${w.id}</div>
+        <div class="podium-card-name">${w.name}</div>
+        <div class="podium-card-dept">${w.department}</div>
+      </div>`;
+  });
+  html += '</div>';
+  content.innerHTML = html;
+
+  // ── Export CSV ──
   document.getElementById('export-btn')?.addEventListener('click', () => {
-    if (currentWinners.length === 0) {
+    if (sessionWinners.length === 0) {
       alert('Belum ada data pemenang untuk diekspor.');
       return;
     }
-    let csv = 'No,ID,Nama,Departemen\n';
-    currentWinners.forEach((w, i) => {
-      csv += `${i + 1},${w.id},"${w.name}","${w.department}"\n`;
+    const label = session === 1 ? 'LuckyDraw1' : session === 2 ? 'LuckyDraw2' : 'GrandPrize';
+    // Export in display order
+    const exportList = [...sessionWinners];
+    let csv = 'Status,ID,Nama,Departemen\n';
+    exportList.forEach((w, i) => {
+      csv += `Winner,${w.id},"${w.name}","${w.department}"\n`;
     });
-    
+
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
+    const url  = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.setAttribute('href', url);
-    link.setAttribute('download', 'Daftar_Pemenang_DoorPrize.csv');
+    link.setAttribute('download', `Pemenang_${label}.csv`);
     link.style.visibility = 'hidden';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   });
 });

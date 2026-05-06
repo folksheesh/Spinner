@@ -91,11 +91,47 @@ function setStatus(text, type = 'idle') {
   el.className = 'status-line' + (type !== 'idle' ? ' status-' + type : '');
 }
 
+// ── Session info (3-session system) ───────────────────────
+// Session 1: Lucky Draw 1 (draws 1-3)
+// Session 2: Lucky Draw 2 (draws 4-6)
+// Session 3: Grand Prize  (draw 7)
+function getSessionInfo(prizeRound) {
+  if (prizeRound <= 3) {
+    return {
+      session: 1, name: 'Lucky Draw 1',
+      sessionRound: prizeRound,
+      isGrandPrize: false,
+      isLastInSession: prizeRound === 3
+    };
+  }
+  if (prizeRound <= 6) {
+    return {
+      session: 2, name: 'Lucky Draw 2',
+      sessionRound: prizeRound - 3,
+      isGrandPrize: false,
+      isLastInSession: prizeRound === 6
+    };
+  }
+  return {
+    session: 3, name: 'Grand Prize',
+    sessionRound: 1,
+    isGrandPrize: true,
+    isLastInSession: true
+  };
+}
+
 function updateStats() {
   if (DOM.statsTotal)     DOM.statsTotal.textContent     = DB.getTotalParticipants();
   if (DOM.statsRemaining) DOM.statsRemaining.textContent = DB.getRemainingCount();
   if (DOM.statsWinners)   DOM.statsWinners.textContent   = DB.getWinnersCount();
-  if (DOM.prizeRound)     DOM.prizeRound.textContent     = `Draw #${AppState.prizeRound}`;
+  if (DOM.prizeRound) {
+    const info = getSessionInfo(AppState.prizeRound);
+    if (info.isGrandPrize) {
+      DOM.prizeRound.textContent = '🏆 Grand Prize';
+    } else {
+      DOM.prizeRound.textContent = `${info.name}  •  ${info.sessionRound}/3`;
+    }
+  }
 }
 
 function updateWinnersList() {
@@ -174,8 +210,11 @@ function setPresentationMode(hidden) {
   }
 }
 
-// ── START ──────────────────────────────────────────────────
+// ── START ──────────────────────────────────────────────
 function startAllSpinning() {
+  // Guard: ignore if already spinning or in non-startable phase
+  if (AppState.phase !== PHASE.IDLE) return;
+
   if (DB.winners.length >= 7) {
     const txt = document.getElementById('reset-modal-text');
     if (txt) txt.innerHTML = 'Sudah ada 7 pemenang terpilih.<br><br>Apakah Anda ingin mereset data dan memulai undian baru dari awal?';
@@ -190,12 +229,19 @@ function startAllSpinning() {
   if (!winner) { setStatus('All participants have won!', 'warning'); return; }
 
   SoundEngine.unlock();
+  // Stop any lingering tension sound from previous round
+  SoundEngine.stopTension();
+
+  // Clear any lingering intervals from a previous aborted round
+  AppState.rollIntervals.forEach(id => { clearInterval(id); clearTimeout(id); });
+  AppState.rollIntervals = [];
+
   AppState.currentWinner = winner;
   AppState.stoppedCount  = 0;
   AppState.phase         = PHASE.SPINNING;
 
   // Dismiss winner panel if visible
-  DOM.winnerPanel.classList.remove('visible');
+  DOM.winnerPanel?.classList.remove('visible');
   resetDigitDisplay();
   DOM.digitsStage?.classList.add('active');
 
@@ -208,7 +254,7 @@ function startAllSpinning() {
     slot.classList.remove('revealed', 'locked');
     const speed = 50 + i * 8;
     AppState.rollIntervals[i] = setInterval(() => {
-      display.textContent = Math.floor(Math.random() * 10);
+      if (display) display.textContent = Math.floor(Math.random() * 10);
     }, speed);
   });
 
@@ -222,10 +268,18 @@ function startAllSpinning() {
 
 // ── STOP (one slot) ────────────────────────────────────────
 function stopNextSlot() {
-  const idx = AppState.stoppedCount;
-  if (idx >= 6 || AppState.phase !== PHASE.SPINNING) return;
+  if (AppState.phase !== PHASE.SPINNING) return;
+  if (!AppState.currentWinner) return;
 
-  // Increment immediately so fast clicks register the next slot correctly
+  const idx = AppState.stoppedCount;
+  if (idx >= 6) return;
+
+  // Guard: if this slot is already being processed (double-click), skip BEFORE incrementing
+  if (!AppState.rollIntervals[idx]) return;
+
+  // Mark this interval as taken immediately to prevent race conditions
+  const capturedInterval = AppState.rollIntervals[idx];
+  AppState.rollIntervals[idx] = null;
   AppState.stoppedCount++;
   const isLastSlot = AppState.stoppedCount === 6;
 
@@ -237,13 +291,14 @@ function stopNextSlot() {
   slot.classList.add('slowing');
 
   // Gradual slow down of the digit shuffling
-  clearInterval(AppState.rollIntervals[idx]);
-  SoundEngine.playScreech();
+  clearInterval(capturedInterval);
+  SoundEngine.playScreech(idx);
   
   let slowDelay = 60;
   let slowsLeft = 7; // Number of slowing ticks
   
     const stage = DOM.digitsStage;
+    if (!stage) return; // Guard: stage not in DOM
     const slotRect = slot.getBoundingClientRect();
     const stageRect = stage.getBoundingClientRect();
     const slotCenterX = slotRect.left - stageRect.left + slotRect.width / 2;
@@ -261,7 +316,6 @@ function stopNextSlot() {
         smoke.style.setProperty('--smoke-x', (Math.random() * 200 - 100) + 'px');
         smoke.style.setProperty('--smoke-y', (-15 - Math.random() * 90) + 'px');
         smoke.style.animationDelay = (Math.random() * 0.15) + 's';
-        // ~8% of smoke puffs appear IN FRONT of the tire for subtle depth
         if (Math.random() < 0.08) {
           smoke.style.zIndex = '3';
         }
@@ -313,9 +367,8 @@ function stopNextSlot() {
   const tickSlow = () => {
     display.textContent = Math.floor(Math.random() * 10);
     slowsLeft--;
-    slowDelay += 35; // 60, 95, 130, 165, 200, 235, 270...
+    slowDelay += 35; 
     
-    // Emit braking smoke gradually while slowing down
     if (slowsLeft % 2 === 0) {
       emitSmoke(8);
       emitDots(8);
@@ -325,7 +378,6 @@ function stopNextSlot() {
     if (slowsLeft > 0) {
       AppState.rollIntervals[idx] = setTimeout(tickSlow, slowDelay);
     } else {
-      // Final lock
       AppState.rollIntervals[idx] = null;
       const targetDigit = AppState.currentWinner.id[idx];
       display.textContent = targetDigit;
@@ -333,7 +385,6 @@ function stopNextSlot() {
       slot.classList.add('locked');
       SoundEngine.playLock();
       
-      // Emit the final big burst of smoke
       emitSmoke(25);
       emitSparks(20);
       emitDots(30);
@@ -345,45 +396,43 @@ function stopNextSlot() {
 
     SyncEngine.emit('phase_change', { phase: PHASE.SPINNING, stoppedCount: idx + 1 });
 
-    // All locked → winner
     if (isLastSlot) {
-      clearInterval(AppState.tickInterval);
-      AppState.tickInterval = null;
       AppState.phase = PHASE.REVEALING;
       updateButton();
       DOM.digitsStage?.classList.remove('active');
       setTimeout(() => showWinner(AppState.currentWinner), 600);
     }
-  } // end else
-  }; // end tickSlow
+  } 
+  }; 
 
   AppState.rollIntervals[idx] = setTimeout(tickSlow, slowDelay);
 }
 
 // ── WINNER REVEAL ──────────────────────────────────────────
 function showWinner(winner) {
+  if (!winner) return;
   DB.markWinner(winner);
   
-  const totalDraws = DB.winners.length;
-  const rank = 8 - totalDraws;
+  // Get session context BEFORE incrementing prizeRound
+  const info = getSessionInfo(AppState.prizeRound);
   
   const eyebrow = document.querySelector('.winner-eyebrow');
   if (eyebrow) {
-    if (rank === 1) {
-      eyebrow.textContent = '🏆 GRAND PRIZE - JUARA 1 🏆';
-      DOM.winnerPanel.classList.add('grand-prize');
+    if (info.isGrandPrize) {
+      eyebrow.textContent = '🏆 GRAND PRIZE 🏆';
+      DOM.winnerPanel?.classList.add('grand-prize');
     } else {
-      eyebrow.textContent = `JUARA ${rank}`;
-      DOM.winnerPanel.classList.remove('grand-prize');
+      eyebrow.textContent = `${info.name}  —  WINNER`;
+      DOM.winnerPanel?.classList.remove('grand-prize');
     }
   }
 
-  DOM.winnerId.textContent   = winner.id;
-  DOM.winnerName.textContent = winner.name;
-  DOM.winnerDept.textContent = winner.department;
-  DOM.winnerPanel.classList.add('visible');
+  if (DOM.winnerId)   DOM.winnerId.textContent   = winner.id;
+  if (DOM.winnerName) DOM.winnerName.textContent = winner.name;
+  if (DOM.winnerDept) DOM.winnerDept.textContent = winner.department;
+  DOM.winnerPanel?.classList.add('visible');
 
-  SoundEngine.playWinner();
+  SoundEngine.playWinner(info.isGrandPrize);
   launchConfetti();
 
   document.body.classList.add('flash');
@@ -391,7 +440,6 @@ function showWinner(winner) {
 
   AppState.prizeRound++;
   
-  // Anti-spam: lock clicks for 1.5s after winner panel appears
   const dismissBtn = document.getElementById('winner-dismiss');
   if (dismissBtn) dismissBtn.disabled = true;
   
@@ -409,35 +457,72 @@ function showWinner(winner) {
 
 // ── Dismiss winner panel ───────────────────────────────────
 function dismissWinner() {
-  DOM.winnerPanel.classList.remove('visible');
+  if (AppState.phase !== PHASE.DONE) return;
+
+  DOM.winnerPanel?.classList.remove('visible');
   setStatus('Ready', 'idle');
   
-  // Cooldown to prevent accidental double-click starting the next draw
   AppState.phase = PHASE.COOLDOWN;
   updateButton();
   
   setTimeout(() => {
-    // Only transition back to IDLE if we're still in COOLDOWN
     if (AppState.phase === PHASE.COOLDOWN) {
       AppState.phase = PHASE.IDLE;
       updateButton();
+      SyncEngine.emit('phase_change', { phase: 'idle' });
     }
   }, 600);
 
-  // Auto-show podium after 7th winner
-  if (DB.winners.length >= 7) {
-    setTimeout(() => openSummary(), 1000);
+  // Auto-show podium at the end of each session
+  const winnerCount = DB.winners.length;
+  if (winnerCount === 3) {
+    // End of Lucky Draw 1 → show LD1 podium
+    setTimeout(() => openSummary(1), 1200);
+  } else if (winnerCount === 6) {
+    // End of Lucky Draw 2 → show LD2 podium
+    setTimeout(() => openSummary(2), 1200);
+  } else if (winnerCount === 7) {
+    // Grand Prize done → show Grand Prize screen
+    setTimeout(() => openSummary(3), 1200);
   }
+}
+
+// ── Disqualify/Absent winner ───────────────────────────────
+function rejectWinner() {
+  if (AppState.phase !== PHASE.DONE) return;
+  if (!AppState.currentWinner) return;
+
+  // Mark in DB
+  DB.markAbsent(AppState.currentWinner);
+  AppState.currentWinner = null;
+
+  // Revert round counter so this slot can be drawn again
+  AppState.prizeRound--;
+
+  DOM.winnerPanel?.classList.remove('visible');
+  setStatus('Ready (Redraw)', 'idle');
+  
+  AppState.phase = PHASE.COOLDOWN;
+  updateButton();
+  updateStats();
+  updateWinnersList();
+  
+  setTimeout(() => {
+    if (AppState.phase === PHASE.COOLDOWN) {
+      AppState.phase = PHASE.IDLE;
+      updateButton();
+      SyncEngine.emit('phase_change', { phase: 'idle' });
+    }
+  }, 600);
 }
 
 // ── Action dispatcher ──────────────────────────────────────
 function handleAction() {
-  if (AppState.phase === PHASE.IDLE) {
-    startAllSpinning();
-  } else if (AppState.phase === PHASE.DONE) {
-    dismissWinner();
-  } else if (AppState.phase === PHASE.SPINNING) {
-    stopNextSlot();
+  switch (AppState.phase) {
+    case PHASE.IDLE:     startAllSpinning(); break;
+    case PHASE.DONE:     dismissWinner();    break;
+    case PHASE.SPINNING: stopNextSlot();     break;
+    default: break;
   }
 }
 
@@ -453,15 +538,20 @@ function closeGuide() {
 }
 
 // ── Summary Panel ──────────────────────────────────────────
-function openSummary() {
-  window.location.href = 'podium.html';
+// session: 1 = Lucky Draw 1, 2 = Lucky Draw 2, 3 = Grand Prize
+function openSummary(session) {
+  if (!session) {
+    // Determine from current winners count
+    const count = DB.winners.length;
+    if (count >= 7)      session = 3;
+    else if (count >= 4) session = 2;
+    else                 session = 1;
+  }
+  window.location.href = `podium.html?session=${session}`;
 }
 
-// Function exportCSV has been moved to podium.js
-
-// ── Reset ──────────────────────────────────────────────────
+// ── Reset ──────────────────────────────────────────────
 function resetAll() {
-
   // Stop all active intervals and timeouts
   AppState.rollIntervals.forEach(id => {
     clearInterval(id);
@@ -469,11 +559,20 @@ function resetAll() {
   });
   AppState.rollIntervals = [];
 
+  if (AppState.tickInterval) {
+    clearInterval(AppState.tickInterval);
+    AppState.tickInterval = null;
+  }
+
   // Stop any playing sounds
   SoundEngine.stopTension();
 
   // Remove any active smoke or particles from the stage
   document.querySelectorAll('.smoke-particle, .spark-pixel, .smoke-dot').forEach(el => el.remove());
+
+  // Remove any lingering confetti
+  const cc = DOM.confettiContainer;
+  if (cc) cc.innerHTML = '';
 
   AppState.phase = PHASE.IDLE;
   AppState.stoppedCount = 0;
@@ -481,7 +580,9 @@ function resetAll() {
   AppState.prizeRound = 1;
   DB.resetWinners();
   resetDigitDisplay();
-  DOM.winnerPanel.classList.remove('visible');
+  DOM.winnerPanel?.classList.remove('visible');
+  DOM.winnerPanel?.classList.remove('grand-prize');
+  document.getElementById('reset-modal')?.classList.remove('visible');
   setStatus('Ready', 'idle');
   updateButton();
   updateStats();
@@ -503,6 +604,19 @@ function bindEvents() {
   DOM.guideBtn?.addEventListener('click', openGuide);
   DOM.closeGuideBtn?.addEventListener('click', closeGuide);
 
+  document.getElementById('winner-absent')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (confirm('Yakin ingin membatalkan pemenang ini (TIDAK HADIR)?')) {
+      rejectWinner();
+    }
+  });
+
+  document.getElementById('winner-dismiss')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    SoundEngine.unlock();
+    SyncEngine.emit('action');
+  });
+
   DOM.soundBtn?.addEventListener('click', () => {
     const on = SoundEngine.toggle();
     DOM.soundBtn.textContent = on ? '🔊' : '🔇';
@@ -518,6 +632,7 @@ function bindEvents() {
   });
 
   window.addEventListener('doorprize:action', handleAction);
+  window.addEventListener('doorprize:reject', rejectWinner);
 
   // ── Click anywhere = Start/Stop (works with mouse, PPT remote, etc.) ──
   document.addEventListener('click', (e) => {
@@ -535,6 +650,8 @@ function bindEvents() {
         target.closest('#guide-panel') ||
         target.closest('#reset-modal') ||
         target.closest('.theme-dot') ||
+        target.closest('#winner-absent') ||
+        target.closest('#winner-dismiss') ||
         target.closest('#remote-pill')) return;
 
     e.preventDefault();
@@ -548,6 +665,13 @@ function bindEvents() {
       SoundEngine.unlock();
       SyncEngine.emit('action');
     }
+    // X key for Absent/Disqualify
+    if (e.code === 'KeyX' && AppState.phase === PHASE.DONE) {
+      e.preventDefault();
+      if (confirm('Yakin ingin membatalkan pemenang ini (TIDAK HADIR)?')) {
+        rejectWinner();
+      }
+    }
     // F key toggles cursor visibility (display only)
     if (e.code === 'KeyF') {
       setPresentationMode(!AppState.cursorHidden);
@@ -559,7 +683,7 @@ function bindEvents() {
     const codeEl = document.getElementById('remote-code');
     if (pill && codeEl) {
       pill.style.display = 'flex';
-      codeEl.textContent = e.detail;
+      codeEl.textContent = 'Operator Ready';
       codeEl.style.color = 'var(--accent)';
     }
   });
