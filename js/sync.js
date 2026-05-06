@@ -119,25 +119,14 @@ const SyncEngine = (() => {
     connected = false;
     notifyStatus('connecting', 'Connecting to host...');
     connectToRoom(pairingCode, false);
-
-    // Send ping after WebSocket is ready, then retry every 2s
-    clearInterval(pingInterval);
-    pingInterval = setInterval(() => {
-      if (!connected && ws && ws.readyState === WebSocket.OPEN) {
-        console.log('[Sync] Sending ping...');
-        emit('ping');
-      }
-    }, 2000);
-
-    // First ping after 1s
-    setTimeout(() => {
-      if (!connected && ws && ws.readyState === WebSocket.OPEN) {
-        emit('ping');
-      }
-    }, 1000);
     
-    // Strict timeout removed to prevent annoying disconnection errors.
-    // The operator will silently stay active.
+    // We don't need ping-pong for a fixed production channel
+    // and removing it prevents ntfy.sh 429 rate limits.
+    setTimeout(() => {
+      connected = true;
+      notifyStatus('connected', 'Connected to main display');
+      window.dispatchEvent(new CustomEvent('doorprize:connected'));
+    }, 1500);
   }
 
   function init(role) {
