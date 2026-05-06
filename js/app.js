@@ -238,6 +238,7 @@ function stopNextSlot() {
 
   // Gradual slow down of the digit shuffling
   clearInterval(AppState.rollIntervals[idx]);
+  SoundEngine.playScreech();
   
   let slowDelay = 60;
   let slowsLeft = 7; // Number of slowing ticks
