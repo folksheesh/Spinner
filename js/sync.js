@@ -12,6 +12,18 @@ const SyncEngine = (() => {
   let connected = false;
   let pingInterval = null;
   let connectionTimeout = null;
+  
+  // Local instant sync (works offline if on the same device)
+  const localChannel = new BroadcastChannel('doorprize_local_sync');
+  localChannel.onmessage = (e) => {
+    try {
+      const payload = e.data;
+      if (!payload || !payload.type) return;
+      if (isHost && payload.sender === 'host') return;
+      if (!isHost && payload.sender === 'remote') return;
+      handleIncoming(payload);
+    } catch (err) {}
+  };
 
   function handleIncoming(payload) {
     if (!payload || !payload.type) return;
@@ -28,11 +40,23 @@ const SyncEngine = (() => {
       handleIncoming(event);
     }
 
+    // 1. Send via local channel (instant, offline-capable for same device)
+    localChannel.postMessage(event);
+
+    // 2. Send via internet (ntfy.sh) for cross-device remote control
     if (pairingCode) {
-      fetch(`https://ntfy.sh/doorprize-v3-${pairingCode}`, {
+      const url = `https://ntfy.sh/doorprize-v3-${pairingCode}`;
+      fetch(url, {
         method: 'POST',
         body: JSON.stringify(event)
-      }).catch(err => console.warn('[Sync] POST error:', err));
+      }).catch(err => {
+        console.warn('[Sync] Primary POST failed, trying proxy...', err);
+        // Fallback to proxy if IP is temporarily banned by ntfy.sh firewall
+        fetch(`https://corsproxy.io/?${encodeURIComponent(url)}`, {
+          method: 'POST',
+          body: JSON.stringify(event)
+        }).catch(e => console.error('[Sync] Proxy also failed:', e));
+      });
     }
   }
 
@@ -108,14 +132,14 @@ const SyncEngine = (() => {
 
   function initHost() {
     isHost = true;
-    pairingCode = 'spin-event-2026'; // FIXED CHANNEL FOR PRODUCTION
+    pairingCode = 'prod-event-998877'; // NEW CHANNEL TO BYPASS RATE LIMIT
     notifyStatus('connecting', 'Connecting to server...');
     connectToRoom(pairingCode, true);
   }
 
   function connectRemote() {
     isHost = false;
-    pairingCode = 'spin-event-2026'; // FIXED CHANNEL FOR PRODUCTION
+    pairingCode = 'prod-event-998877'; // NEW CHANNEL TO BYPASS RATE LIMIT
     connected = false;
     notifyStatus('connecting', 'Connecting to host...');
     connectToRoom(pairingCode, false);

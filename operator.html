@@ -116,6 +116,32 @@
       animation: spin 1s linear infinite;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
+    
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.8);
+      display: none;
+      align-items: center; justify-content: center;
+      z-index: 100;
+      backdrop-filter: blur(4px);
+    }
+    .modal-overlay.visible {
+      display: flex;
+      animation: fadeIn 0.2s;
+    }
+    .modal {
+      background: #161b22;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 20px;
+      padding: 2rem;
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+    }
+    .modal h3 { margin: 0 0 1rem 0; color: #F44336; }
+    .modal p { color: var(--text-2); margin: 0; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
   </style>
 </head>
 <body>
@@ -142,7 +168,19 @@
     </div>
   </div>
 
-  <script src="js/sync.js?v=12"></script>
+  <!-- CONFIRM MODAL -->
+  <div class="modal-overlay" id="confirm-modal">
+    <div class="modal">
+      <h3>Yakin Gugurkan?</h3>
+      <p>Karyawan ini tidak akan bisa menang lagi di pengundian selanjutnya.</p>
+      <div class="action-row" style="margin-top: 1.5rem">
+        <button class="btn-action" style="background: #30363d; color: #fff" id="btn-cancel-reject">Batal</button>
+        <button class="btn-action btn-gugur" id="btn-confirm-reject">Ya, Gugurkan</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/sync.js?v=14"></script>
   <script>
     const panels = {
       waiting: document.getElementById('waiting-panel'),
@@ -186,16 +224,25 @@
     });
 
     // Actions
+    const confirmModal = document.getElementById('confirm-modal');
+
     document.getElementById('btn-continue').addEventListener('click', () => {
       SyncEngine.emit('action'); // Same as clicking continue
       showPanel('waiting');
     });
 
     document.getElementById('btn-reject').addEventListener('click', () => {
-      if (confirm('Yakin ingin menggugurkan pemenang ini?')) {
-        SyncEngine.emit('reject'); // New custom event for host
-        showPanel('waiting');
-      }
+      confirmModal.classList.add('visible');
+    });
+
+    document.getElementById('btn-cancel-reject').addEventListener('click', () => {
+      confirmModal.classList.remove('visible');
+    });
+
+    document.getElementById('btn-confirm-reject').addEventListener('click', () => {
+      confirmModal.classList.remove('visible');
+      SyncEngine.emit('reject'); // New custom event for host
+      showPanel('waiting');
     });
   </script>
 </body>
