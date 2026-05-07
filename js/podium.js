@@ -87,28 +87,27 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="gps-dept">${w.department}</div>
       </div>
     `;
-    return;
+  } else {
+    // ── LUCKY DRAW: 3-person podium (Equal Winners) ──
+    // Display drawn winners from left to right equally
+    const displayWinners = [...sessionWinners];
+    const top3 = displayWinners.slice(0, 3);
+  
+    let html = '<div class="podium-top3">';
+    top3.forEach((w, idx) => {
+      if (!w) return;
+      html += `
+        <div class="podium-card place-equal" style="animation-delay: ${0.2 + idx * 0.15}s">
+          <div class="podium-rank">🎉<span class="podium-rank-suffix"></span></div>
+          <div class="podium-avatar">🏅</div>
+          <div class="podium-card-id">${w.id}</div>
+          <div class="podium-card-name">${w.name}</div>
+          <div class="podium-card-dept">${w.department}</div>
+        </div>`;
+    });
+    html += '</div>';
+    content.innerHTML = html;
   }
-
-  // ── LUCKY DRAW: 3-person podium (Equal Winners) ──
-  // Display drawn winners from left to right equally
-  const displayWinners = [...sessionWinners];
-  const top3 = displayWinners.slice(0, 3);
-
-  let html = '<div class="podium-top3">';
-  top3.forEach((w, idx) => {
-    if (!w) return;
-    html += `
-      <div class="podium-card place-equal" style="animation-delay: ${0.2 + idx * 0.15}s">
-        <div class="podium-rank">🎉<span class="podium-rank-suffix"></span></div>
-        <div class="podium-avatar">🏅</div>
-        <div class="podium-card-id">${w.id}</div>
-        <div class="podium-card-name">${w.name}</div>
-        <div class="podium-card-dept">${w.department}</div>
-      </div>`;
-  });
-  html += '</div>';
-  content.innerHTML = html;
 
   // ── Export CSV ──
   document.getElementById('export-btn')?.addEventListener('click', () => {
