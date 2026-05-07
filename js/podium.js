@@ -17,14 +17,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (session === 1) {
     sessionWinners  = allWinners.slice(0, 3);
-    sessionTitle    = 'LUCKY DRAW 1';
-    sessionSubtitle = 'Session 1 Winners';
-    nextLabel       = 'Lanjut ke Lucky Draw 2 →';
+    sessionTitle    = 'LUCKY DRAW';
+    sessionSubtitle = 'Winners';
+    nextLabel       = 'Lanjut ke Lucky Draw →';
     nextSession     = null; // back to index.html to continue drawing
   } else if (session === 2) {
     sessionWinners  = allWinners.slice(3, 6);
-    sessionTitle    = 'LUCKY DRAW 2';
-    sessionSubtitle = 'Session 2 Winners';
+    sessionTitle    = 'LUCKY DRAW';
+    sessionSubtitle = 'Winners';
     nextLabel       = 'Lanjut ke Grand Prize →';
     nextSession     = null;
   } else {
@@ -100,9 +100,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // Export in display order
     const exportList = [...sessionWinners];
     let csv = 'Status,ID,Nama,Departemen\n';
-    exportList.forEach((w, i) => {
-      csv += `Winner,${w.id},"${w.name}","${w.department}"\n`;
+    
+    exportList.forEach((w) => {
+      csv += `Hadir (Winner),${w.id},"${w.name}","${w.department}"\n`;
     });
+
+    if (DB && DB.absent && DB.absent.length > 0) {
+      DB.absent.forEach((w) => {
+        csv += `Gugur (Tidak Hadir),${w.id},"${w.name}","${w.department}"\n`;
+      });
+    }
 
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url  = URL.createObjectURL(blob);
@@ -114,5 +121,19 @@ document.addEventListener('DOMContentLoaded', () => {
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
+  });
+  
+  // ── Play Podium Audio ──
+  const podiumAudio = new Audio('assets/SFX/Podium.mp3');
+  podiumAudio.loop = true;
+  podiumAudio.volume = 0.6; // Adjust volume as needed
+  
+  // Try to play immediately (might be blocked by browser policy)
+  podiumAudio.play().catch(e => {
+    console.warn("Autoplay prevented. Audio will start on first interaction.", e);
+    // If autoplay is prevented, play on first interaction
+    document.addEventListener('click', () => {
+      podiumAudio.play().catch(console.error);
+    }, { once: true });
   });
 });

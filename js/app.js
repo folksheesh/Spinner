@@ -92,13 +92,13 @@ function setStatus(text, type = 'idle') {
 }
 
 // ── Session info (3-session system) ───────────────────────
-// Session 1: Lucky Draw 1 (draws 1-3)
-// Session 2: Lucky Draw 2 (draws 4-6)
+// Session 1: Lucky Draw (draws 1-3)
+// Session 2: Lucky Draw (draws 4-6)
 // Session 3: Grand Prize  (draw 7)
 function getSessionInfo(prizeRound) {
   if (prizeRound <= 3) {
     return {
-      session: 1, name: 'Lucky Draw 1',
+      session: 1, name: 'Lucky Draw',
       sessionRound: prizeRound,
       isGrandPrize: false,
       isLastInSession: prizeRound === 3
@@ -106,7 +106,7 @@ function getSessionInfo(prizeRound) {
   }
   if (prizeRound <= 6) {
     return {
-      session: 2, name: 'Lucky Draw 2',
+      session: 2, name: 'Lucky Draw',
       sessionRound: prizeRound - 3,
       isGrandPrize: false,
       isLastInSession: prizeRound === 6
@@ -124,12 +124,23 @@ function updateStats() {
   if (DOM.statsTotal)     DOM.statsTotal.textContent     = DB.getTotalParticipants();
   if (DOM.statsRemaining) DOM.statsRemaining.textContent = DB.getRemainingCount();
   if (DOM.statsWinners)   DOM.statsWinners.textContent   = DB.getWinnersCount();
+  
+  const info = getSessionInfo(AppState.prizeRound);
+  
   if (DOM.prizeRound) {
-    const info = getSessionInfo(AppState.prizeRound);
     if (info.isGrandPrize) {
       DOM.prizeRound.textContent = '🏆 Grand Prize';
     } else {
-      DOM.prizeRound.textContent = `${info.name}  •  ${info.sessionRound}/3`;
+      DOM.prizeRound.textContent = info.name;
+    }
+  }
+  
+  const heroTitle = document.querySelector('.hero-title');
+  if (heroTitle) {
+    if (info.isGrandPrize) {
+      heroTitle.textContent = 'Grand Prize';
+    } else {
+      heroTitle.textContent = 'Lucky Draw';
     }
   }
 }
@@ -164,11 +175,16 @@ function updateButton() {
   const text = btn.querySelector('.btn-text');
   const sub  = btn.querySelector('.btn-sub');
 
-  if (AppState.phase === PHASE.IDLE || AppState.phase === PHASE.DONE) {
+  if (AppState.phase === PHASE.IDLE) {
     btn.className = 'action-btn btn-start';
     text.textContent = AppState.prizeRound > 1 ? 'Next Draw' : 'Start Draw';
     sub.textContent  = 'Spin all digits';
     btn.disabled = false;
+  } else if (AppState.phase === PHASE.DONE) {
+    btn.className = 'action-btn btn-stop';
+    text.textContent = 'Waiting...';
+    sub.textContent  = 'Menunggu Keputusan Operator';
+    btn.disabled = true;
   } else if (AppState.phase === PHASE.REVEALING || AppState.phase === PHASE.COOLDOWN) {
     btn.className = 'action-btn btn-stop';
     text.textContent = 'Wait';
@@ -419,10 +435,10 @@ function showWinner(winner) {
   const eyebrow = document.querySelector('.winner-eyebrow');
   if (eyebrow) {
     if (info.isGrandPrize) {
-      eyebrow.textContent = '🏆 GRAND PRIZE 🏆';
+      eyebrow.innerHTML = '<span>🏆 GRAND PRIZE 🏆</span>';
       DOM.winnerPanel?.classList.add('grand-prize');
     } else {
-      eyebrow.textContent = `${info.name}  —  WINNER`;
+      eyebrow.innerHTML = `<span>${info.name}<br>WINNER</span>`;
       DOM.winnerPanel?.classList.remove('grand-prize');
     }
   }
@@ -477,13 +493,13 @@ function dismissWinner() {
   const winnerCount = DB.winners.length;
   if (winnerCount === 3) {
     // End of Lucky Draw 1 → show LD1 podium
-    setTimeout(() => openSummary(1), 1200);
+    setTimeout(() => openSummary(1), 500);
   } else if (winnerCount === 6) {
     // End of Lucky Draw 2 → show LD2 podium
-    setTimeout(() => openSummary(2), 1200);
+    setTimeout(() => openSummary(2), 500);
   } else if (winnerCount === 7) {
     // Grand Prize done → show Grand Prize screen
-    setTimeout(() => openSummary(3), 1200);
+    setTimeout(() => openSummary(3), 500);
   }
 }
 
@@ -599,23 +615,18 @@ function bindEvents() {
     document.getElementById('reset-modal')?.classList.add('visible');
   });
   
-  DOM.summaryBtn?.addEventListener('click', openSummary);
+  DOM.summaryBtn?.addEventListener('click', () => {
+    document.getElementById('podium-modal')?.classList.add('visible');
+  });
+
+  document.getElementById('close-podium-modal')?.addEventListener('click', () => {
+    document.getElementById('podium-modal')?.classList.remove('visible');
+  });
 
   DOM.guideBtn?.addEventListener('click', openGuide);
   DOM.closeGuideBtn?.addEventListener('click', closeGuide);
 
-  document.getElementById('winner-absent')?.addEventListener('click', (e) => {
-    e.stopPropagation();
-    if (confirm('Yakin ingin membatalkan pemenang ini (TIDAK HADIR)?')) {
-      rejectWinner();
-    }
-  });
-
-  document.getElementById('winner-dismiss')?.addEventListener('click', (e) => {
-    e.stopPropagation();
-    SoundEngine.unlock();
-    SyncEngine.emit('action');
-  });
+  // Winner panel buttons have been moved to operator.html
 
   DOM.soundBtn?.addEventListener('click', () => {
     const on = SoundEngine.toggle();
@@ -649,10 +660,12 @@ function bindEvents() {
         target.closest('#guide-btn') ||
         target.closest('#guide-panel') ||
         target.closest('#reset-modal') ||
+        target.closest('#podium-modal') ||
         target.closest('.theme-dot') ||
-        target.closest('#winner-absent') ||
-        target.closest('#winner-dismiss') ||
+        target.closest('.winner-panel') ||
         target.closest('#remote-pill')) return;
+
+    if (AppState.phase === PHASE.DONE) return; // Block host from bypassing operator
 
     e.preventDefault();
     SoundEngine.unlock();
@@ -662,6 +675,7 @@ function bindEvents() {
   document.addEventListener('keydown', e => {
     if (e.code === 'Space') {
       e.preventDefault();
+      if (AppState.phase === PHASE.DONE) return; // Block host from bypassing operator
       SoundEngine.unlock();
       SyncEngine.emit('action');
     }
@@ -708,6 +722,10 @@ function bindEvents() {
 // ── Init ───────────────────────────────────────────────────
 function init() {
   SyncEngine.init('host');
+  
+  // Sync prizeRound with current winners so it doesn't reset to 1 on refresh
+  AppState.prizeRound = DB.winners.length + 1;
+  
   initParticles();
   updateStats();
   updateWinnersList();
