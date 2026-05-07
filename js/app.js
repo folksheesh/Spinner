@@ -673,7 +673,8 @@ function bindEvents() {
   });
 
   document.addEventListener('keydown', e => {
-    if (e.code === 'Space') {
+    const actionKeys = ['Space', 'PageDown', 'PageUp', 'ArrowRight', 'ArrowLeft', 'ArrowDown', 'ArrowUp', 'Enter'];
+    if (actionKeys.includes(e.code)) {
       e.preventDefault();
       if (AppState.phase === PHASE.DONE) return; // Block host from bypassing operator
       SoundEngine.unlock();
