@@ -153,6 +153,9 @@
       <h2>Menunggu Pemenang...</h2>
       <p>Silakan fokus ke layar utama.</p>
     </div>
+    <div style="margin-top: 1.5rem;">
+      <button class="btn-action" style="background: rgba(255,255,255,0.1); color: #fff; width: 100%; border: 1px solid rgba(255,255,255,0.2);" id="btn-close-podium">TUTUP PODIUM</button>
+    </div>
   </div>
 
   <!-- DECISION PANEL -->
@@ -243,6 +246,10 @@
       confirmModal.classList.remove('visible');
       SyncEngine.emit('reject'); // New custom event for host
       showPanel('waiting');
+    });
+
+    document.getElementById('btn-close-podium')?.addEventListener('click', () => {
+      SyncEngine.emit('close_podium');
     });
   </script>
 </body>

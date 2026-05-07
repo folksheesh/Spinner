@@ -8,6 +8,26 @@ document.addEventListener('DOMContentLoaded', () => {
   const content = document.getElementById('summary-content');
   if (!content) return;
 
+  // Initialize SyncEngine so operator can close podium remotely
+  if (typeof SyncEngine !== 'undefined') {
+    SyncEngine.init('host');
+    window.addEventListener('doorprize:close_podium', () => {
+      window.location.href = 'index.html';
+    });
+    window.addEventListener('doorprize:action', () => {
+      window.location.href = 'index.html';
+    });
+  }
+
+  // Allow closing podium with presenter remote keys (Next/Prev)
+  document.addEventListener('keydown', e => {
+    const actionKeys = ['Space', 'PageDown', 'PageUp', 'ArrowRight', 'ArrowLeft', 'ArrowDown', 'ArrowUp', 'Enter'];
+    if (actionKeys.includes(e.code)) {
+      e.preventDefault();
+      window.location.href = 'index.html';
+    }
+  });
+
   // ── Determine which session to show ──
   const urlParams   = new URLSearchParams(window.location.search);
   const session     = parseInt(urlParams.get('session')) || 1;
